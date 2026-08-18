@@ -1,0 +1,4840 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guardianes del Agua</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    overflow:hidden;
+    background:#06111c;
+    color:white;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+canvas{
+    display:block;
+}
+
+#gameCanvas{
+    position:fixed;
+    inset:0;
+}
+
+#hud{
+    position:fixed;
+    top:15px;
+    left:15px;
+    right:15px;
+    z-index:20;
+
+    display:flex;
+    justify-content:space-between;
+
+    pointer-events:none;
+}
+
+.panel{
+    background:rgba(5,15,27,.94);
+    border:1px solid rgba(70,210,255,.25);
+    border-radius:14px;
+    padding:12px 16px;
+
+    box-shadow:
+        0 10px 35px rgba(0,0,0,.4);
+}
+
+.waterBox{
+    min-width:260px;
+}
+
+.waterTop{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:7px;
+    font-weight:bold;
+}
+
+.waterBar{
+    width:230px;
+    height:16px;
+    background:#182938;
+    border-radius:20px;
+    overflow:hidden;
+}
+
+#waterFill{
+    width:100%;
+    height:100%;
+    background:linear-gradient(
+        90deg,
+        #008cff,
+        #28e6ff
+    );
+    transition:.35s;
+}
+
+#zoneInfo{
+    text-align:right;
+}
+
+#controls{
+    position:fixed;
+    left:15px;
+    bottom:15px;
+    z-index:20;
+    font-size:13px;
+}
+
+#message{
+    position:fixed;
+    left:50%;
+    bottom:30px;
+
+    transform:
+        translateX(-50%)
+        translateY(20px);
+
+    opacity:0;
+
+    z-index:100;
+
+    max-width:650px;
+
+    padding:15px 24px;
+
+    border-radius:14px;
+
+    background:rgba(5,15,27,.97);
+    border:1px solid #25d7ff;
+
+    box-shadow:
+        0 15px 50px rgba(0,0,0,.55);
+
+    transition:.3s;
+
+    text-align:center;
+
+    pointer-events:none;
+}
+
+/* ==============================
+   PANTALLA INICIAL
+============================== */
+
+#startScreen{
+    position:fixed;
+    inset:0;
+
+    z-index:500;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    background:
+        radial-gradient(
+            circle at 50% 30%,
+            #155273,
+            #07111c 65%
+        );
+}
+
+.startCard{
+    width:min(720px,92vw);
+
+    padding:45px;
+
+    border-radius:25px;
+
+    text-align:center;
+
+    background:rgba(4,14,26,.96);
+
+    border:1px solid #21cfff;
+
+    box-shadow:
+        0 30px 100px rgba(0,0,0,.7);
+}
+
+.startCard h1{
+    font-size:45px;
+    color:#5de7ff;
+    margin-bottom:18px;
+}
+
+.startCard p{
+    color:#bfd3df;
+    line-height:1.6;
+    margin:10px 0;
+}
+
+.mainButton{
+    margin-top:20px;
+
+    padding:15px 32px;
+
+    border:0;
+    border-radius:12px;
+
+    color:white;
+
+    font-size:17px;
+    font-weight:bold;
+
+    cursor:pointer;
+
+    background:
+        linear-gradient(
+            135deg,
+            #00bde9,
+            #126eff
+        );
+
+    transition:.2s;
+}
+
+.mainButton:hover{
+    transform:translateY(-2px);
+    filter:brightness(1.15);
+}
+
+/* ==============================
+   MODAL
+============================== */
+
+#modal{
+    position:fixed;
+    inset:0;
+
+    z-index:200;
+
+    display:none;
+
+    align-items:center;
+    justify-content:center;
+
+    background:rgba(0,0,0,.78);
+}
+
+#modalContent{
+    width:min(900px,95vw);
+    max-height:94vh;
+
+    background:
+        linear-gradient(
+            145deg,
+            #081827,
+            #0b2033
+        );
+
+    border:1px solid #24cfff;
+
+    border-radius:20px;
+
+    padding:20px;
+
+    box-shadow:
+        0 30px 100px rgba(0,0,0,.7);
+}
+
+.modalHeader{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    margin-bottom:12px;
+}
+
+.modalHeader h2{
+    color:#65e9ff;
+}
+
+.closeButton{
+    width:40px;
+    height:40px;
+
+    border:0;
+    border-radius:50%;
+
+    background:#d83d54;
+
+    color:white;
+
+    font-size:22px;
+
+    cursor:pointer;
+}
+
+.instructions{
+    padding:14px 17px;
+
+    background:#0d263b;
+
+    border-radius:12px;
+
+    margin-bottom:12px;
+
+    color:#d4efff;
+
+    line-height:1.55;
+}
+
+#miniCanvas{
+    width:100%;
+    height:auto;
+
+    display:block;
+
+    border-radius:14px;
+
+    background:#091622;
+
+    cursor:pointer;
+}
+
+/* ==============================
+   RESULTADO
+============================== */
+
+#resultOverlay{
+    position:fixed;
+    inset:0;
+
+    z-index:400;
+
+    display:none;
+
+    align-items:center;
+    justify-content:center;
+
+    background:rgba(0,0,0,.75);
+}
+
+.resultBox{
+    width:min(600px,90vw);
+
+    padding:35px;
+
+    text-align:center;
+
+    border-radius:22px;
+
+    background:#081827;
+
+    border:1px solid #2bdcff;
+
+    box-shadow:
+        0 30px 100px rgba(0,0,0,.7);
+}
+
+.resultIcon{
+    font-size:60px;
+    margin-bottom:10px;
+}
+
+.resultBox h2{
+    margin-bottom:15px;
+}
+
+.resultBox p{
+    color:#c7d9e5;
+    line-height:1.6;
+    margin-bottom:20px;
+}
+
+.resultButton{
+    padding:12px 25px;
+
+    border:0;
+    border-radius:10px;
+
+    color:white;
+
+    background:#087ddc;
+
+    cursor:pointer;
+
+    font-weight:bold;
+}
+
+@media(max-width:700px){
+
+    #hud{
+        flex-direction:column;
+        gap:8px;
+    }
+
+    #zoneInfo{
+        text-align:left;
+    }
+
+    .startCard h1{
+        font-size:34px;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<canvas id="gameCanvas"></canvas>
+
+<!-- ==============================
+     HUD
+============================== -->
+
+<div id="hud">
+
+    <div class="panel waterBox">
+
+        <div class="waterTop">
+
+            <span>💧 Reserva de agua</span>
+
+            <span id="waterText">
+                100%
+            </span>
+
+        </div>
+
+        <div class="waterBar">
+
+            <div id="waterFill"></div>
+
+        </div>
+
+        <small style="color:#8fa9b8">
+            Tus decisiones afectan la reserva.
+        </small>
+
+    </div>
+
+
+    <div class="panel" id="zoneInfo">
+
+        <b id="zoneName">
+            Zona 1: Barrio Alto
+        </b>
+
+        <br>
+
+        <span id="progress">
+            Desafíos: 0 / 4
+        </span>
+
+    </div>
+
+</div>
+
+
+<div id="controls" class="panel">
+
+    🎮 <b>WASD / Flechas</b> mover
+    · <b>E</b> interactuar
+
+</div>
+
+
+<div id="message"></div>
+
+
+<!-- ==============================
+     INICIO
+============================== -->
+
+<div id="startScreen">
+
+    <div class="startCard">
+
+        <h1>💧 Guardianes del Agua</h1>
+
+        <p>
+            Explora diferentes sectores de la ciudad,
+            encuentra problemas relacionados con el agua
+            y ayúdalos a solucionarse mediante diferentes
+            desafíos.
+        </p>
+
+        <p>
+            Cada zona presenta situaciones diferentes
+            y los desafíos se vuelven progresivamente
+            más complejos.
+        </p>
+
+        <p>
+            <b>
+                Tus errores tienen consecuencias:
+                la reserva de agua puede disminuir.
+            </b>
+        </p>
+
+        <button
+            class="mainButton"
+            onclick="startGame()">
+
+            COMENZAR AVENTURA
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- ==============================
+     MODAL
+============================== -->
+
+<div id="modal">
+
+    <div id="modalContent">
+
+        <div class="modalHeader">
+
+            <h2 id="miniTitle">
+                Desafío
+            </h2>
+
+            <button
+                class="closeButton"
+                onclick="closeMini()">
+
+                ×
+
+            </button>
+
+        </div>
+
+        <div
+            class="instructions"
+            id="miniInstructions">
+        </div>
+
+        <canvas
+            id="miniCanvas"
+            width="820"
+            height="500">
+        </canvas>
+
+    </div>
+
+</div>
+
+
+<!-- ==============================
+     RESULTADO
+============================== -->
+
+<div id="resultOverlay">
+
+    <div class="resultBox">
+
+        <div
+            class="resultIcon"
+            id="resultIcon">
+
+            💧
+
+        </div>
+
+        <h2 id="resultTitle">
+            Resultado
+        </h2>
+
+        <p id="resultText"></p>
+
+        <button
+            class="resultButton"
+            onclick="closeResult()">
+
+            CONTINUAR
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   CANVAS
+========================================================= */
+
+const canvas =
+    document.getElementById("gameCanvas");
+
+const ctx =
+    canvas.getContext("2d");
+
+const miniCanvas =
+    document.getElementById("miniCanvas");
+
+const mctx =
+    miniCanvas.getContext("2d");
+
+let W = 0;
+let H = 0;
+
+function resize(){
+
+    W =
+        canvas.width =
+        window.innerWidth;
+
+    H =
+        canvas.height =
+        window.innerHeight;
+}
+
+window.addEventListener(
+    "resize",
+    resize
+);
+
+resize();
+
+
+/* =========================================================
+   ESTADO
+========================================================= */
+
+let gameStarted = false;
+
+let miniActive = false;
+
+let currentMini = null;
+
+let water = 100;
+
+let currentZone = 0;
+
+let completed = [];
+
+let keys = {};
+
+let messageTimer = null;
+
+
+/* =========================================================
+   ZONAS
+========================================================= */
+
+const zones = [
+
+    {
+        name:"Barrio Alto",
+        x:100,
+        y:100,
+        w:1050,
+        h:700,
+        color:"#3e684a",
+
+        challenges:[
+            "drops",
+            "flappy",
+            "pipes",
+            "memory"
+        ]
+    },
+
+    {
+        name:"Valle Urbano",
+        x:1250,
+        y:100,
+        w:1100,
+        h:700,
+        color:"#416d8a",
+
+        challenges:[
+            "drops",
+            "pipes",
+            "flappy",
+            "memory",
+            "pipes"
+        ]
+    },
+
+    {
+        name:"Zona Industrial",
+        x:100,
+        y:1000,
+        w:1050,
+        h:750,
+        color:"#62596c",
+
+        challenges:[
+            "pipes",
+            "flappy",
+            "drops",
+            "memory",
+            "pipes",
+            "flappy"
+        ]
+    },
+
+    {
+        name:"Reserva Natural",
+        x:1250,
+        y:1000,
+        w:1100,
+        h:750,
+        color:"#286851",
+
+        challenges:[
+            "memory",
+            "pipes",
+            "drops",
+            "flappy",
+            "pipes",
+            "memory",
+            "drops"
+        ]
+    }
+
+];
+
+
+const world = {
+    width:2450,
+    height:1800
+};
+
+
+/* =========================================================
+   JUGADOR
+========================================================= */
+
+const player = {
+
+    x:300,
+    y:300,
+
+    speed:4,
+
+    dir:"down"
+
+};
+
+
+let camera = {
+    x:0,
+    y:0
+};
+
+
+let objects = [];
+
+
+/* =========================================================
+   CREAR MAPA
+========================================================= */
+
+function generateWorld(){
+
+    objects = [];
+
+    zones.forEach(
+        (z,zoneIndex)=>{
+
+            /* ÁRBOLES */
+
+            for(
+                let i=0;
+                i<20+zoneIndex*6;
+                i++
+            ){
+
+                objects.push({
+
+                    type:"tree",
+
+                    x:
+                        z.x+
+                        50+
+                        Math.random()*
+                        (z.w-100),
+
+                    y:
+                        z.y+
+                        60+
+                        Math.random()*
+                        (z.h-120),
+
+                    zone:zoneIndex
+
+                });
+
+            }
+
+
+            /* EDIFICIOS */
+
+            for(
+                let i=0;
+                i<5+zoneIndex*2;
+                i++
+            ){
+
+                objects.push({
+
+                    type:"building",
+
+                    x:
+                        z.x+
+                        70+
+                        Math.random()*
+                        (z.w-220),
+
+                    y:
+                        z.y+
+                        80+
+                        Math.random()*
+                        (z.h-180),
+
+                    w:
+                        110+
+                        Math.random()*60,
+
+                    h:
+                        80+
+                        Math.random()*60,
+
+                    zone:zoneIndex
+
+                });
+
+            }
+
+
+            /* ESTACIONES */
+
+            const total =
+                z.challenges.length;
+
+            for(
+                let i=0;
+                i<total;
+                i++
+            ){
+
+                const angle =
+                    i/total*
+                    Math.PI*2;
+
+                const cx =
+                    z.x+
+                    z.w/2;
+
+                const cy =
+                    z.y+
+                    z.h/2;
+
+                objects.push({
+
+                    type:"challenge",
+
+                    x:
+                        cx+
+                        Math.cos(angle)*260,
+
+                    y:
+                        cy+
+                        Math.sin(angle)*240,
+
+                    zone:zoneIndex,
+
+                    challengeIndex:i
+
+                });
+
+            }
+
+        }
+    );
+}
+
+generateWorld();
+
+
+/* =========================================================
+   MENSAJES
+========================================================= */
+
+const successMessages = [
+
+"💧 ¡Excelente trabajo! Una reparación bien hecha significa que menos agua termina desperdiciándose.",
+
+"🌱 ¡Lo lograste! Una pequeña acción puede convertirse en un gran beneficio para toda la ciudad.",
+
+"👏 ¡Reparación completada! El agua vuelve a circular donde realmente hace falta.",
+
+"💦 ¡Muy bien! Has recuperado parte de la reserva y ayudado a mantener funcionando la zona.",
+
+"🌎 ¡La ciudad te lo agradece! Resolver estos problemas evita pérdidas innecesarias.",
+
+"✨ ¡Gran decisión! Cuidar el agua también consiste en saber actuar cuando aparece un problema.",
+
+"🔧 ¡Problema solucionado! Una tubería menos con fugas significa más agua disponible.",
+
+"💙 ¡Excelente! Tu habilidad permitió aprovechar mejor un recurso que todos necesitamos.",
+
+"🌊 ¡Lo conseguiste! El sistema vuelve a funcionar y la reserva de agua aumenta.",
+
+"🏙️ ¡Buen trabajo! Has demostrado que cuidar la ciudad también puede ser un desafío divertido.",
+
+"💚 ¡Reparación exitosa! Tus acciones están ayudando a conservar el agua de la comunidad.",
+
+"🎯 ¡Perfecto! Has resuelto el problema sin desperdiciar más recursos.",
+
+"💧 ¡Muy bien hecho! El agua que recuperaste podrá utilizarse en otro lugar de la ciudad.",
+
+"⭐ ¡Gran trabajo! Cada desafío superado representa una oportunidad menos de desperdiciar agua.",
+
+"🌱 ¡Objetivo cumplido! La zona está un poco más preparada gracias a tu intervención."
+
+];
+
+
+const failMessages = [
+
+"⚠️ La reparación salió mal. Parte del agua se desperdició antes de poder solucionar el problema.",
+
+"💧 La reserva ha disminuido. Un pequeño error puede provocar una pérdida importante de agua.",
+
+"😟 Algo salió mal. El sistema perdió agua mientras intentabas repararlo.",
+
+"🚰 ¡Cuidado! La fuga continúa y la reserva de agua se está reduciendo.",
+
+"⚠️ No pudiste completar la reparación. La ciudad necesitará que tengas más cuidado la próxima vez.",
+
+"💦 Se desperdició agua durante el intento. Todavía puedes recuperarte si resuelves los siguientes desafíos.",
+
+"😰 La situación empeoró un poco. El agua perdida podría haber sido utilizada por otras personas.",
+
+"🔧 La reparación falló. Antes de volver a intentarlo, observa con atención el problema.",
+
+"🌊 Parte de la reserva se perdió. Recuerda: solucionar rápido no siempre significa solucionar bien.",
+
+"⚠️ La infraestructura sigue dañada y el agua continúa perdiéndose.",
+
+"💧 ¡Cuidado con la reserva! Los errores comienzan a tener consecuencias para toda la zona.",
+
+"😕 Esta vez no funcionó. La ciudad necesita que encuentres una solución más precisa.",
+
+"🚨 Se detectó una pérdida adicional de agua. Todavía estás a tiempo de recuperar la situación.",
+
+"💦 El intento consumió parte de la reserva. Cada decisión cuenta cuando el recurso es limitado.",
+
+"⚠️ La reparación no fue suficiente. El sistema necesita una solución más cuidadosa."
+
+];
+
+
+function randomMessage(array){
+
+    return array[
+        Math.floor(
+            Math.random()*array.length
+        )
+    ];
+}
+
+
+/* =========================================================
+   MENSAJES TEMPORALES
+========================================================= */
+
+function showMessage(text){
+
+    const el =
+        document.getElementById("message");
+
+    el.textContent = text;
+
+    el.style.opacity = "1";
+
+    el.style.transform =
+        "translateX(-50%) translateY(0)";
+
+    clearTimeout(messageTimer);
+
+    messageTimer =
+        setTimeout(
+            ()=>{
+                el.style.opacity = "0";
+
+                el.style.transform =
+                    "translateX(-50%) translateY(20px)";
+            },
+            2800
+        );
+}
+
+
+/* =========================================================
+   HUD
+========================================================= */
+
+function updateHUD(){
+
+    const fill =
+        document.getElementById("waterFill");
+
+    const text =
+        document.getElementById("waterText");
+
+
+    fill.style.width =
+        water+"%";
+
+    text.textContent =
+        Math.round(water)+"%";
+
+
+    if(water<=25){
+
+        fill.style.background =
+            "linear-gradient(90deg,#ff304d,#ff713d)";
+
+    }else{
+
+        fill.style.background =
+            "linear-gradient(90deg,#008cff,#26e5ff)";
+    }
+
+
+    const zone =
+        zones[currentZone];
+
+
+    const done =
+        completed.filter(
+            id =>
+                id.startsWith(
+                    currentZone+"-"
+                )
+        ).length;
+
+
+    document.getElementById(
+        "zoneName"
+    ).textContent =
+        `Zona ${currentZone+1}: ${zone.name}`;
+
+
+    document.getElementById(
+        "progress"
+    ).textContent =
+        `Desafíos: ${done} / ${zone.challenges.length}`;
+}
+
+
+/* =========================================================
+   TECLADO
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    e => {
+
+        const key =
+            e.key.toLowerCase();
+
+        keys[key] = true;
+
+
+        if(
+            [
+                "arrowup",
+                "arrowdown",
+                "arrowleft",
+                "arrowright",
+                " "
+            ].includes(key)
+        ){
+
+            e.preventDefault();
+        }
+
+
+        /*
+        IMPORTANTE:
+
+        E solamente funciona en el mapa.
+        No se intenta interactuar mientras
+        un minijuego está abierto.
+        */
+
+        if(
+            key === "e" &&
+            gameStarted &&
+            !miniActive
+        ){
+
+            interact();
+        }
+
+    }
+);
+
+
+document.addEventListener(
+    "keyup",
+    e => {
+
+        keys[
+            e.key.toLowerCase()
+        ] = false;
+
+    }
+);
+
+
+/* =========================================================
+   MOVIMIENTO
+========================================================= */
+
+function updatePlayer(){
+
+    if(
+        miniActive ||
+        !gameStarted
+    ){
+
+        return;
+    }
+
+
+    let dx = 0;
+    let dy = 0;
+
+
+    if(
+        keys["w"] ||
+        keys["arrowup"]
+    ){
+
+        dy = -1;
+
+        player.dir = "up";
+    }
+
+
+    if(
+        keys["s"] ||
+        keys["arrowdown"]
+    ){
+
+        dy = 1;
+
+        player.dir = "down";
+    }
+
+
+    if(
+        keys["a"] ||
+        keys["arrowleft"]
+    ){
+
+        dx = -1;
+
+        player.dir = "left";
+    }
+
+
+    if(
+        keys["d"] ||
+        keys["arrowright"]
+    ){
+
+        dx = 1;
+
+        player.dir = "right";
+    }
+
+
+    if(dx || dy){
+
+        const length =
+            Math.hypot(dx,dy);
+
+        dx /= length;
+        dy /= length;
+
+
+        player.x +=
+            dx*player.speed;
+
+        player.y +=
+            dy*player.speed;
+    }
+
+
+    player.x =
+        Math.max(
+            25,
+            Math.min(
+                world.width-25,
+                player.x
+            )
+        );
+
+
+    player.y =
+        Math.max(
+            25,
+            Math.min(
+                world.height-25,
+                player.y
+            )
+        );
+
+
+    camera.x =
+        Math.max(
+            0,
+            Math.min(
+                world.width-W,
+                player.x-W/2
+            )
+        );
+
+
+    camera.y =
+        Math.max(
+            0,
+            Math.min(
+                world.height-H,
+                player.y-H/2
+            )
+        );
+}
+
+
+/* =========================================================
+   DISTANCIA
+========================================================= */
+
+function distance(a,b){
+
+    return Math.hypot(
+        a.x-b.x,
+        a.y-b.y
+    );
+}
+
+
+/* =========================================================
+   INTERACTUAR
+========================================================= */
+
+function interact(){
+
+    let closest = null;
+
+    let best = 75;
+
+
+    objects.forEach(
+        o => {
+
+            if(
+                o.type !== "challenge" ||
+                o.zone !== currentZone
+            ){
+
+                return;
+            }
+
+
+            const id =
+                `${o.zone}-${o.challengeIndex}`;
+
+
+            if(
+                completed.includes(id)
+            ){
+
+                return;
+            }
+
+
+            const d =
+                distance(player,o);
+
+
+            if(d < best){
+
+                best = d;
+
+                closest = o;
+            }
+
+        }
+    );
+
+
+    if(!closest){
+
+        showMessage(
+            "🔧 Acércate a una estación de reparación y presiona E."
+        );
+
+        return;
+    }
+
+
+    const type =
+        zones[currentZone]
+        .challenges[
+            closest.challengeIndex
+        ];
+
+
+    startMini(
+        type,
+        closest
+    );
+}
+
+
+/* =========================================================
+   DIBUJAR MAPA
+========================================================= */
+
+function drawWorld(){
+
+    ctx.clearRect(
+        0,
+        0,
+        W,
+        H
+    );
+
+
+    ctx.save();
+
+    ctx.translate(
+        -camera.x,
+        -camera.y
+    );
+
+
+    ctx.fillStyle =
+        "#152330";
+
+    ctx.fillRect(
+        0,
+        0,
+        world.width,
+        world.height
+    );
+
+
+    /* ZONAS */
+
+    zones.forEach(
+        z => {
+
+            ctx.fillStyle =
+                z.color;
+
+            ctx.fillRect(
+                z.x,
+                z.y,
+                z.w,
+                z.h
+            );
+
+
+            ctx.globalAlpha = .08;
+
+            ctx.fillStyle = "#fff";
+
+
+            for(
+                let x=z.x;
+                x<z.x+z.w;
+                x+=50
+            ){
+
+                for(
+                    let y=z.y;
+                    y<z.y+z.h;
+                    y+=50
+                ){
+
+                    ctx.fillRect(
+                        x,
+                        y,
+                        2,
+                        2
+                    );
+                }
+            }
+
+
+            ctx.globalAlpha = 1;
+
+
+            ctx.fillStyle =
+                "rgba(0,0,0,.28)";
+
+            ctx.fillRect(
+                z.x+20,
+                z.y+20,
+                250,
+                50
+            );
+
+
+            ctx.fillStyle = "#fff";
+
+            ctx.font =
+                "bold 21px Arial";
+
+            ctx.fillText(
+                z.name,
+                z.x+35,
+                z.y+52
+            );
+
+        }
+    );
+
+
+    /* CAMINOS */
+
+    ctx.lineCap = "round";
+
+    ctx.strokeStyle = "#bea977";
+
+    ctx.lineWidth = 85;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        0,
+        450
+    );
+
+    ctx.lineTo(
+        world.width,
+        450
+    );
+
+    ctx.moveTo(
+        600,
+        0
+    );
+
+    ctx.lineTo(
+        600,
+        world.height
+    );
+
+    ctx.stroke();
+
+
+    ctx.strokeStyle =
+        "#ead9a8";
+
+    ctx.lineWidth = 52;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        0,
+        450
+    );
+
+    ctx.lineTo(
+        world.width,
+        450
+    );
+
+    ctx.moveTo(
+        600,
+        0
+    );
+
+    ctx.lineTo(
+        600,
+        world.height
+    );
+
+    ctx.stroke();
+
+
+    drawZoneConnections();
+
+
+    objects.forEach(
+        o => {
+
+            if(o.type==="tree")
+                drawTree(o);
+
+            if(o.type==="building")
+                drawBuilding(o);
+
+            if(o.type==="challenge")
+                drawChallenge(o);
+
+        }
+    );
+
+
+    drawPlayer();
+
+
+    ctx.restore();
+}
+
+
+/* =========================================================
+   CONEXIONES
+========================================================= */
+
+function drawZoneConnections(){
+
+    ctx.lineWidth = 10;
+
+    ctx.strokeStyle = "#fff";
+
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        1150,
+        450
+    );
+
+    ctx.lineTo(
+        1250,
+        450
+    );
+
+    ctx.stroke();
+
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        1150,
+        1370
+    );
+
+    ctx.lineTo(
+        1250,
+        1370
+    );
+
+    ctx.stroke();
+
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        600,
+        800
+    );
+
+    ctx.lineTo(
+        600,
+        1000
+    );
+
+    ctx.stroke();
+
+
+    ctx.fillStyle="#fff";
+
+    ctx.font =
+        "bold 13px Arial";
+
+
+    ctx.fillText(
+        "↗ SIGUIENTE ZONA",
+        1160,
+        430
+    );
+
+
+    ctx.fillText(
+        "↓ SIGUIENTE ZONA",
+        615,
+        900
+    );
+}
+
+
+/* =========================================================
+   ÁRBOL
+========================================================= */
+
+function drawTree(o){
+
+    ctx.fillStyle =
+        "#563722";
+
+    ctx.fillRect(
+        o.x-7,
+        o.y+8,
+        14,
+        36
+    );
+
+
+    ctx.fillStyle =
+        "#143c28";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        o.x,
+        o.y,
+        28,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    ctx.fillStyle =
+        "#246843";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        o.x-15,
+        o.y+5,
+        18,
+        0,
+        Math.PI*2
+    );
+
+    ctx.arc(
+        o.x+15,
+        o.y+5,
+        18,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+}
+
+
+/* =========================================================
+   EDIFICIO
+========================================================= */
+
+function drawBuilding(o){
+
+    ctx.fillStyle =
+        "#68747f";
+
+    ctx.fillRect(
+        o.x,
+        o.y,
+        o.w,
+        o.h
+    );
+
+
+    ctx.fillStyle =
+        "#37424d";
+
+
+    for(
+        let x=o.x+15;
+        x<o.x+o.w-10;
+        x+=30
+    ){
+
+        for(
+            let y=o.y+15;
+            y<o.y+o.h-10;
+            y+=30
+        ){
+
+            ctx.fillRect(
+                x,
+                y,
+                15,
+                18
+            );
+        }
+    }
+
+
+    ctx.fillStyle =
+        "#414c57";
+
+    ctx.fillRect(
+        o.x-5,
+        o.y-10,
+        o.w+10,
+        10
+    );
+}
+
+
+/* =========================================================
+   ESTACIÓN
+========================================================= */
+
+function drawChallenge(o){
+
+    const id =
+        `${o.zone}-${o.challengeIndex}`;
+
+
+    const done =
+        completed.includes(id);
+
+
+    ctx.fillStyle =
+        done
+        ? "rgba(40,220,120,.15)"
+        : "rgba(30,215,255,.15)";
+
+
+    ctx.beginPath();
+
+    ctx.arc(
+        o.x,
+        o.y,
+        50,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    ctx.fillStyle =
+        done
+        ? "#25d979"
+        : "#14bde8";
+
+
+    ctx.beginPath();
+
+    ctx.arc(
+        o.x,
+        o.y,
+        25,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    ctx.fillStyle =
+        "#07111c";
+
+    ctx.font =
+        "bold 19px Arial";
+
+    ctx.textAlign =
+        "center";
+
+    ctx.textBaseline =
+        "middle";
+
+
+    ctx.fillText(
+        done ? "✓" : "🔧",
+        o.x,
+        o.y
+    );
+
+
+    ctx.textAlign =
+        "left";
+
+    ctx.textBaseline =
+        "alphabetic";
+
+
+    if(!done){
+
+        ctx.fillStyle =
+            "#fff";
+
+        ctx.font =
+            "bold 12px Arial";
+
+        ctx.fillText(
+            "E · REPARAR",
+            o.x-40,
+            o.y+45
+        );
+    }
+}
+
+
+/* =========================================================
+   PERSONAJE
+========================================================= */
+
+function drawPlayer(){
+
+    const x =
+        player.x;
+
+    const y =
+        player.y;
+
+
+    ctx.fillStyle =
+        "rgba(0,0,0,.3)";
+
+    ctx.beginPath();
+
+    ctx.ellipse(
+        x,
+        y+25,
+        20,
+        8,
+        0,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    /* piernas */
+
+    ctx.fillStyle =
+        "#172236";
+
+    ctx.fillRect(
+        x-12,
+        y+8,
+        9,
+        22
+    );
+
+    ctx.fillRect(
+        x+3,
+        y+8,
+        9,
+        22
+    );
+
+
+    /* zapatos */
+
+    ctx.fillStyle =
+        "#111";
+
+    ctx.fillRect(
+        x-15,
+        y+27,
+        12,
+        6
+    );
+
+    ctx.fillRect(
+        x+3,
+        y+27,
+        12,
+        6
+    );
+
+
+    /* cuerpo */
+
+    ctx.fillStyle =
+        "#08a9d7";
+
+    ctx.fillRect(
+        x-15,
+        y-15,
+        30,
+        28
+    );
+
+
+    /* mochila */
+
+    ctx.fillStyle =
+        "#f5a20a";
+
+    ctx.fillRect(
+        x+11,
+        y-10,
+        7,
+        23
+    );
+
+
+    /* cuello */
+
+    ctx.fillStyle =
+        "#d99775";
+
+    ctx.fillRect(
+        x-6,
+        y-21,
+        12,
+        10
+    );
+
+
+    /* cabeza */
+
+    ctx.fillStyle =
+        "#dca17e";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        x,
+        y-29,
+        14,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    /* cabello */
+
+    ctx.fillStyle =
+        "#20242b";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        x,
+        y-35,
+        14,
+        Math.PI,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    /* ojos */
+
+    ctx.fillStyle =
+        "#07111c";
+
+    ctx.fillRect(
+        x-7,
+        y-31,
+        3,
+        3
+    );
+
+    ctx.fillRect(
+        x+4,
+        y-31,
+        3,
+        3
+    );
+
+
+    /* gorra */
+
+    ctx.fillStyle =
+        "#f1c40f";
+
+    ctx.fillRect(
+        x-14,
+        y-43,
+        28,
+        6
+    );
+}
+
+
+/* =========================================================
+   INICIAR
+========================================================= */
+
+function startGame(){
+
+    document.getElementById(
+        "startScreen"
+    ).style.display = "none";
+
+
+    gameStarted = true;
+
+    miniActive = false;
+
+    currentMini = null;
+
+    water = 100;
+
+    currentZone = 0;
+
+    completed = [];
+
+
+    player.x = 300;
+    player.y = 300;
+
+
+    updateHUD();
+
+
+    showMessage(
+        "🗺️ Explora la zona y encuentra las estaciones de reparación."
+    );
+}
+
+
+/* =========================================================
+   ABRIR MINIJUEGO
+========================================================= */
+
+function startMini(type,obj){
+
+    /*
+    Limpieza importante:
+
+    Al abrir un minijuego eliminamos las teclas
+    que estaban presionadas en el mapa.
+    */
+
+    keys = {};
+
+
+    miniActive = true;
+
+
+    currentMini = {
+
+        type:type,
+
+        obj:obj,
+
+        lives:3,
+
+        state:{}
+
+    };
+
+
+    document.getElementById(
+        "modal"
+    ).style.display = "flex";
+
+
+    if(type==="drops")
+        initDrops();
+
+
+    if(type==="flappy")
+        initFlappy();
+
+
+    if(type==="pipes")
+        initPipes();
+
+
+    if(type==="memory")
+        initMemory();
+}
+
+
+/* =========================================================
+   CERRAR MINIJUEGO
+========================================================= */
+
+function closeMini(){
+
+    /*
+    MUY IMPORTANTE:
+
+    Limpiamos completamente las teclas.
+    Esto evita que WASD quede "pegado".
+    */
+
+    keys = {};
+
+
+    miniActive = false;
+
+    currentMini = null;
+
+
+    document.getElementById(
+        "modal"
+    ).style.display = "none";
+
+
+    /*
+    Devolvemos el foco lógico al mapa.
+    */
+
+    gameStarted = true;
+}
+
+
+/* =========================================================
+   RESULTADO
+========================================================= */
+
+function showResult(
+    success,
+    message
+){
+
+    const overlay =
+        document.getElementById(
+            "resultOverlay"
+        );
+
+
+    const icon =
+        document.getElementById(
+            "resultIcon"
+        );
+
+
+    const title =
+        document.getElementById(
+            "resultTitle"
+        );
+
+
+    const text =
+        document.getElementById(
+            "resultText"
+        );
+
+
+    overlay.style.display =
+        "flex";
+
+
+    if(success){
+
+        icon.textContent =
+            "💧";
+
+        title.textContent =
+            "¡Reparación completada!";
+
+        title.style.color =
+            "#50e6a3";
+
+    }else{
+
+        icon.textContent =
+            "⚠️";
+
+        title.textContent =
+            "Algo salió mal";
+
+        title.style.color =
+            "#ff6576";
+    }
+
+
+    text.textContent =
+        message;
+}
+
+
+/* =========================================================
+   CERRAR RESULTADO
+========================================================= */
+
+function closeResult(){
+
+    document.getElementById(
+        "resultOverlay"
+    ).style.display = "none";
+
+
+    /*
+    IMPORTANTE:
+
+    Nos aseguramos de que el juego quede
+    completamente desbloqueado.
+    */
+
+    miniActive = false;
+
+    currentMini = null;
+
+    keys = {};
+
+    gameStarted = true;
+
+
+    checkZoneCompletion();
+
+    updateHUD();
+}
+
+
+/* =========================================================
+   GANAR
+========================================================= */
+
+function winMini(){
+
+    if(!miniActive)
+        return;
+
+
+    const id =
+        `${currentMini.obj.zone}-${currentMini.obj.challengeIndex}`;
+
+
+    if(
+        !completed.includes(id)
+    ){
+
+        completed.push(id);
+    }
+
+
+    water =
+        Math.min(
+            100,
+            water+12
+        );
+
+
+    const message =
+        randomMessage(
+            successMessages
+        );
+
+
+    closeMini();
+
+
+    showResult(
+        true,
+        message+
+        " Has recuperado 12% de la reserva."
+    );
+
+
+    updateHUD();
+}
+
+
+/* =========================================================
+   PERDER VIDA
+========================================================= */
+
+function loseMiniLife(){
+
+    if(!miniActive)
+        return;
+
+
+    currentMini.lives--;
+
+
+    if(
+        currentMini.lives > 0
+    ){
+
+        showMessage(
+            "❤️ Fallaste. Vidas restantes: "+
+            currentMini.lives
+        );
+
+        return;
+    }
+
+
+    water =
+        Math.max(
+            0,
+            water-15
+        );
+
+
+    const message =
+        randomMessage(
+            failMessages
+        );
+
+
+    closeMini();
+
+
+    showResult(
+        false,
+        message+
+        " Se perdió 15% de la reserva."
+    );
+
+
+    updateHUD();
+
+
+    if(water<=0){
+
+        setTimeout(
+            gameOver,
+            300
+        );
+    }
+}
+
+
+/* =========================================================
+   COMPLETAR ZONA
+========================================================= */
+
+function checkZoneCompletion(){
+
+    const done =
+        completed.filter(
+            id =>
+                id.startsWith(
+                    currentZone+"-"
+                )
+        ).length;
+
+
+    if(
+        done >=
+        zones[currentZone].challenges.length
+    ){
+
+        if(
+            currentZone <
+            zones.length-1
+        ){
+
+            currentZone++;
+
+
+            showMessage(
+                "🎉 ¡Zona completada! Ahora puedes explorar: "+
+                zones[currentZone].name
+            );
+
+
+            /*
+            IMPORTANTE:
+            No movemos automáticamente al jugador.
+
+            El jugador debe caminar por el mapa
+            hasta la siguiente zona.
+            */
+
+        }else{
+
+            victoryGame();
+        }
+    }
+}
+
+
+/* =========================================================
+   GAME OVER
+========================================================= */
+
+function gameOver(){
+
+    gameStarted = false;
+
+    miniActive = false;
+
+    currentMini = null;
+
+    keys = {};
+
+
+    document.getElementById(
+        "startScreen"
+    ).style.display =
+        "flex";
+
+
+    document.querySelector(
+        ".startCard"
+    ).innerHTML = `
+
+        <h1 style="color:#ff5366">
+            💧 La reserva llegó a 0%
+        </h1>
+
+        <p>
+            La ciudad se quedó sin la reserva
+            necesaria para continuar.
+        </p>
+
+        <p>
+            Los errores durante las reparaciones
+            fueron acumulando pérdidas.
+        </p>
+
+        <p>
+            Ahora conoces mejor los problemas
+            y puedes intentarlo nuevamente.
+        </p>
+
+        <button
+            class="mainButton"
+            onclick="location.reload()">
+
+            INTENTAR DE NUEVO
+
+        </button>
+    `;
+}
+
+
+/* =========================================================
+   VICTORIA
+========================================================= */
+
+function victoryGame(){
+
+    gameStarted = false;
+
+    miniActive = false;
+
+    currentMini = null;
+
+    keys = {};
+
+
+    document.getElementById(
+        "startScreen"
+    ).style.display =
+        "flex";
+
+
+    document.querySelector(
+        ".startCard"
+    ).innerHTML = `
+
+        <h1 style="color:#4ee6a0">
+            🌎 ¡Ciudad restaurada!
+        </h1>
+
+        <p>
+            Completaste todos los desafíos
+            de las cuatro zonas.
+        </p>
+
+        <p>
+            Reparaste los problemas,
+            conservaste el agua y ayudaste
+            a que la ciudad siguiera funcionando.
+        </p>
+
+        <p>
+            <b>
+                Reserva final:
+                ${Math.round(water)}%
+            </b>
+        </p>
+
+        <button
+            class="mainButton"
+            onclick="location.reload()">
+
+            JUGAR DE NUEVO
+
+        </button>
+    `;
+}
+
+
+/* =========================================================
+   GOTAS
+========================================================= */
+
+function initDrops(){
+
+    document.getElementById(
+        "miniTitle"
+    ).textContent =
+        "💧 Atrapa las gotas";
+
+
+    document.getElementById(
+        "miniInstructions"
+    ).innerHTML = `
+
+        <b>Objetivo:</b>
+        mueve el balde con
+        <b>← →</b> o <b>A/D</b>.
+        <br>
+
+        Atrapa <b>12 gotas</b>.
+        <br>
+
+        Si una gota cae al suelo,
+        pierdes una vida.
+
+        <br><br>
+
+        <span style="color:#ffbd4a">
+        ❤️ Vidas: 3
+        </span>
+    `;
+
+
+    currentMini.state = {
+
+        bucket:{
+            x:360,
+            y:430,
+            w:100,
+            h:25
+        },
+
+        drops:[],
+
+        score:0,
+
+        spawn:0
+
+    };
+}
+
+
+function updateDrops(){
+
+    const s =
+        currentMini.state;
+
+
+    if(
+        keys["arrowleft"] ||
+        keys["a"]
+    ){
+
+        s.bucket.x -= 8;
+    }
+
+
+    if(
+        keys["arrowright"] ||
+        keys["d"]
+    ){
+
+        s.bucket.x += 8;
+    }
+
+
+    s.bucket.x =
+        Math.max(
+            0,
+            Math.min(
+                720,
+                s.bucket.x
+            )
+        );
+
+
+    s.spawn--;
+
+
+    if(s.spawn<=0){
+
+        s.drops.push({
+
+            x:
+                20+
+                Math.random()*780,
+
+            y:-20,
+
+            speed:
+                3+
+                currentZone*.8
+
+        });
+
+
+        s.spawn =
+            25-
+            Math.min(
+                10,
+                currentZone*2
+            );
+    }
+
+
+    s.drops.forEach(
+        d=>{
+            d.y += d.speed;
+        }
+    );
+
+
+    for(
+        let i=s.drops.length-1;
+        i>=0;
+        i--
+    ){
+
+        const d =
+            s.drops[i];
+
+
+        if(
+
+            d.y+10 >
+            s.bucket.y &&
+
+            d.x >
+            s.bucket.x &&
+
+            d.x <
+            s.bucket.x+
+            s.bucket.w
+
+        ){
+
+            s.score++;
+
+            s.drops.splice(
+                i,
+                1
+            );
+
+
+            if(
+                s.score >= 12
+            ){
+
+                winMini();
+
+                return;
+            }
+
+
+        }else if(
+            d.y > 500
+        ){
+
+            s.drops.splice(
+                i,
+                1
+            );
+
+
+            loseMiniLife();
+
+
+            if(!miniActive)
+                return;
+        }
+    }
+}
+
+
+function drawDrops(){
+
+    const s =
+        currentMini.state;
+
+
+    mctx.fillStyle =
+        "#0b3347";
+
+    mctx.fillRect(
+        0,
+        0,
+        820,
+        500
+    );
+
+
+    mctx.strokeStyle =
+        "rgba(100,220,255,.16)";
+
+
+    for(
+        let i=0;
+        i<30;
+        i++
+    ){
+
+        const x =
+            (i*73)%820;
+
+
+        mctx.beginPath();
+
+        mctx.moveTo(
+            x,
+            0
+        );
+
+        mctx.lineTo(
+            x-20,
+            500
+        );
+
+        mctx.stroke();
+    }
+
+
+    s.drops.forEach(
+        d=>{
+
+            mctx.fillStyle =
+                "#48dcff";
+
+            mctx.beginPath();
+
+            mctx.arc(
+                d.x,
+                d.y,
+                9,
+                0,
+                Math.PI*2
+            );
+
+            mctx.fill();
+        }
+    );
+
+
+    /* BALDE */
+
+    mctx.fillStyle =
+        "#e8edf0";
+
+    mctx.fillRect(
+        s.bucket.x,
+        s.bucket.y,
+        s.bucket.w,
+        s.bucket.h
+    );
+
+
+    mctx.fillStyle =
+        "#4bd8ff";
+
+    mctx.fillRect(
+        s.bucket.x+5,
+        s.bucket.y+5,
+        s.bucket.w-10,
+        8
+    );
+
+
+    mctx.fillStyle =
+        "#fff";
+
+    mctx.font =
+        "bold 20px Arial";
+
+
+    mctx.fillText(
+        `Gotas: ${s.score}/12`,
+        20,
+        35
+    );
+
+
+    mctx.fillText(
+        `❤️ ${currentMini.lives}`,
+        700,
+        35
+    );
+}
+
+
+/* =========================================================
+   FLAPPY
+========================================================= */
+
+function initFlappy(){
+
+    document.getElementById(
+        "miniTitle"
+    ).textContent =
+        "🐦 Control del flujo";
+
+
+    document.getElementById(
+        "miniInstructions"
+    ).innerHTML = `
+
+        <b>Objetivo:</b>
+        mantén el personaje en el aire.
+
+        <br>
+
+        Pulsa
+        <b>ESPACIO</b>
+        o
+        <b>↑</b>
+        para subir.
+
+        <br>
+
+        Atraviesa los espacios
+        sin chocar.
+
+        <br><br>
+
+        <span style="color:#ffbd4a">
+        ❤️ Vidas: 3
+        </span>
+    `;
+
+
+    currentMini.state = {
+
+        bird:{
+            x:150,
+            y:250,
+            vy:0
+        },
+
+        pipes:[],
+
+        timer:0,
+
+        score:0
+
+    };
+}
+
+
+function updateFlappy(){
+
+    const s =
+        currentMini.state;
+
+
+    if(
+        keys[" "] ||
+        keys["arrowup"]
+    ){
+
+        s.bird.vy = -7;
+
+        keys[" "] = false;
+
+        keys["arrowup"] = false;
+    }
+
+
+    s.bird.vy += .35;
+
+    s.bird.y +=
+        s.bird.vy;
+
+
+    s.timer--;
+
+
+    if(s.timer<=0){
+
+        const gap =
+            155-
+            currentZone*10;
+
+
+        const top =
+            60+
+            Math.random()*210;
+
+
+        s.pipes.push({
+
+            x:820,
+
+            top,
+
+            bottom:
+                top+gap,
+
+            passed:false
+
+        });
+
+
+        s.timer =
+            95-
+            currentZone*7;
+    }
+
+
+    s.pipes.forEach(
+        p=>{
+            p.x -=
+                4+
+                currentZone*.5;
+        }
+    );
+
+
+    for(
+        const p of s.pipes
+    ){
+
+        if(
+            !p.passed &&
+            p.x < s.bird.x
+        ){
+
+            p.passed = true;
+
+            s.score++;
+
+
+            if(
+                s.score >=
+                6+currentZone
+            ){
+
+                winMini();
+
+                return;
+            }
+        }
+    }
+
+
+    for(
+        const p of s.pipes
+    ){
+
+        if(
+
+            s.bird.x+12 > p.x &&
+
+            s.bird.x-12 <
+            p.x+55 &&
+
+            (
+                s.bird.y-12 < p.top ||
+                s.bird.y+12 > p.bottom
+            )
+
+        ){
+
+            loseMiniLife();
+
+            if(!miniActive)
+                return;
+
+
+            s.bird.x=150;
+            s.bird.y=250;
+            s.bird.vy=0;
+
+            return;
+        }
+    }
+
+
+    if(
+        s.bird.y<0 ||
+        s.bird.y>500
+    ){
+
+        loseMiniLife();
+
+        if(!miniActive)
+            return;
+
+
+        s.bird.y=250;
+        s.bird.vy=0;
+    }
+}
+
+
+function drawFlappy(){
+
+    const s =
+        currentMini.state;
+
+
+    mctx.fillStyle =
+        "#69cbe8";
+
+    mctx.fillRect(
+        0,
+        0,
+        820,
+        500
+    );
+
+
+    /* tuberías */
+
+    s.pipes.forEach(
+        p=>{
+
+            mctx.fillStyle =
+                "#35ad55";
+
+            mctx.fillRect(
+                p.x,
+                0,
+                55,
+                p.top
+            );
+
+            mctx.fillRect(
+                p.x,
+                p.bottom,
+                55,
+                500-p.bottom
+            );
+
+
+            mctx.fillStyle =
+                "#4bca68";
+
+            mctx.fillRect(
+                p.x-6,
+                p.top-20,
+                67,
+                20
+            );
+
+            mctx.fillRect(
+                p.x-6,
+                p.bottom,
+                67,
+                20
+            );
+        }
+    );
+
+
+    /* personaje */
+
+    mctx.fillStyle =
+        "#ffdf45";
+
+    mctx.beginPath();
+
+    mctx.arc(
+        s.bird.x,
+        s.bird.y,
+        14,
+        0,
+        Math.PI*2
+    );
+
+    mctx.fill();
+
+
+    mctx.fillStyle =
+        "#222";
+
+    mctx.fillRect(
+        s.bird.x+5,
+        s.bird.y-4,
+        4,
+        4
+    );
+
+
+    mctx.fillStyle =
+        "#fff";
+
+    mctx.font =
+        "bold 20px Arial";
+
+
+    mctx.fillText(
+        `Puntos: ${s.score}/${6+currentZone}`,
+        20,
+        35
+    );
+
+
+    mctx.fillText(
+        `❤️ ${currentMini.lives}`,
+        700,
+        35
+    );
+}
+
+
+/* =========================================================
+   TUBERÍAS
+========================================================= */
+
+function initPipes(){
+
+    document.getElementById(
+        "miniTitle"
+    ).textContent =
+        "🔧 Reconstrucción de tuberías";
+
+
+    document.getElementById(
+        "miniInstructions"
+    ).innerHTML = `
+
+        <b>¿QUÉ DEBES HACER?</b>
+
+        <br><br>
+
+        <span style="
+            display:inline-block;
+            background:#22e678;
+            color:#042514;
+            padding:6px 10px;
+            border-radius:5px;
+            font-weight:bold;
+        ">
+            🟩 ENTRADA
+        </span>
+
+        <b>→</b>
+
+        conecta todas las tuberías
+
+        <b>→</b>
+
+        <span style="
+            display:inline-block;
+            background:#ff4058;
+            color:white;
+            padding:6px 10px;
+            border-radius:5px;
+            font-weight:bold;
+        ">
+            🟥 SALIDA
+        </span>
+
+        <br><br>
+
+        Haz <b>clic</b> en cada pieza para
+        girarla.
+
+        <br>
+
+        Las tuberías conectadas a la entrada
+        se iluminarán de <b>azul</b>.
+
+        <br>
+
+        <b>
+        Solo ganas cuando el agua puede viajar
+        desde la ENTRADA VERDE hasta la SALIDA ROJA.
+        </b>
+
+        <br><br>
+
+        <span style="color:#ffbd4a">
+        ❤️ Vidas: 3
+        </span>
+    `;
+
+
+    const size =
+        Math.min(
+            7,
+            4+currentZone
+        );
+
+
+    currentMini.state = {
+
+        size,
+
+        cell:70,
+
+        offsetX:
+            (820-size*70)/2,
+
+        offsetY:70,
+
+        grid:[]
+
+    };
+
+
+    createPipePuzzle();
+}
+
+
+function createPipePuzzle(){
+
+    const s =
+        currentMini.state;
+
+    const N =
+        s.size;
+
+
+    s.grid=[];
+
+
+    for(
+        let y=0;
+        y<N;
+        y++
+    ){
+
+        let row=[];
+
+
+        for(
+            let x=0;
+            x<N;
+            x++
+        ){
+
+            const types=[
+                "straight",
+                "corner",
+                "end"
+            ];
+
+
+            row.push({
+
+                type:
+                    types[
+                        Math.floor(
+                            Math.random()*3
+                        )
+                    ],
+
+                rot:
+                    Math.floor(
+                        Math.random()*4
+                    )
+
+            });
+        }
+
+
+        s.grid.push(row);
+    }
+
+
+    /*
+    Creamos una ruta válida.
+    */
+
+    let path=[];
+
+    let x=0;
+    let y=0;
+
+
+    path.push({
+        x,
+        y
+    });
+
+
+    while(
+        x<N-1 ||
+        y<N-1
+    ){
+
+        if(
+            x<N-1 &&
+            y<N-1
+        ){
+
+            if(
+                Math.random()<.5
+            ){
+
+                x++;
+
+            }else{
+
+                y++;
+            }
+
+        }else if(
+            x<N-1
+        ){
+
+            x++;
+
+        }else{
+
+            y++;
+        }
+
+
+        path.push({
+            x,
+            y
+        });
+    }
+
+
+    /*
+    Convertimos la ruta en piezas.
+    */
+
+    for(
+        let i=0;
+        i<path.length;
+        i++
+    ){
+
+        const p =
+            path[i];
+
+        const prev =
+            path[i-1];
+
+        const next =
+            path[i+1];
+
+
+        let dirs=[];
+
+
+        function addDirection(a,b){
+
+            if(!a)
+                return;
+
+
+            if(a.x<b.x)
+                dirs.push("L");
+
+            if(a.x>b.x)
+                dirs.push("R");
+
+            if(a.y<b.y)
+                dirs.push("U");
+
+            if(a.y>b.y)
+                dirs.push("D");
+        }
+
+
+        if(prev)
+            addDirection(
+                prev,
+                p
+            );
+
+
+        if(next)
+            addDirection(
+                next,
+                p
+            );
+
+
+        let type;
+
+
+        if(dirs.length===1){
+
+            type="end";
+
+        }else if(
+
+            (
+                dirs.includes("L") &&
+                dirs.includes("R")
+            )
+
+            ||
+
+            (
+                dirs.includes("U") &&
+                dirs.includes("D")
+            )
+
+        ){
+
+            type="straight";
+
+        }else{
+
+            type="corner";
+        }
+
+
+        s.grid[p.y][p.x] = {
+
+            type,
+
+            rot:
+                Math.floor(
+                    Math.random()*4
+                )
+
+        };
+    }
+}
+
+
+/* =========================================================
+   CONEXIONES
+========================================================= */
+
+function pipeConnections(cell){
+
+    let dirs=[];
+
+
+    if(
+        cell.type==="straight"
+    ){
+
+        dirs=[
+            "L",
+            "R"
+        ];
+
+    }else if(
+        cell.type==="corner"
+    ){
+
+        dirs=[
+            "U",
+            "R"
+        ];
+
+    }else{
+
+        dirs=[
+            "R"
+        ];
+    }
+
+
+    for(
+        let i=0;
+        i<cell.rot%4;
+        i++
+    ){
+
+        dirs =
+            dirs.map(
+                d => {
+
+                    if(d==="U")
+                        return "R";
+
+                    if(d==="R")
+                        return "D";
+
+                    if(d==="D")
+                        return "L";
+
+                    return "U";
+                }
+            );
+    }
+
+
+    return dirs;
+}
+
+
+/* =========================================================
+   PIPES CONECTADAS
+========================================================= */
+
+function getConnectedPipeCells(){
+
+    const s =
+        currentMini.state;
+
+    const N =
+        s.size;
+
+
+    const visited =
+        Array.from(
+            {length:N},
+            () =>
+                new Array(N).fill(false)
+        );
+
+
+    const queue=[
+        {
+            x:0,
+            y:0
+        }
+    ];
+
+
+    visited[0][0] = true;
+
+
+    const result=[];
+
+
+    while(queue.length){
+
+        const p =
+            queue.shift();
+
+
+        result.push(p);
+
+
+        const dirs =
+            pipeConnections(
+                s.grid[p.y][p.x]
+            );
+
+
+        dirs.forEach(
+            dir => {
+
+                let nx =
+                    p.x;
+
+                let ny =
+                    p.y;
+
+                let opposite;
+
+
+                if(dir==="L"){
+
+                    nx--;
+
+                    opposite="R";
+
+                }
+
+
+                if(dir==="R"){
+
+                    nx++;
+
+                    opposite="L";
+
+                }
+
+
+                if(dir==="U"){
+
+                    ny--;
+
+                    opposite="D";
+
+                }
+
+
+                if(dir==="D"){
+
+                    ny++;
+
+                    opposite="U";
+
+                }
+
+
+                if(
+                    nx<0 ||
+                    ny<0 ||
+                    nx>=N ||
+                    ny>=N
+                ){
+
+                    return;
+                }
+
+
+                if(
+                    !pipeConnections(
+                        s.grid[ny][nx]
+                    ).includes(
+                        opposite
+                    )
+                ){
+
+                    return;
+                }
+
+
+                if(
+                    !visited[ny][nx]
+                ){
+
+                    visited[ny][nx]=true;
+
+                    queue.push({
+                        x:nx,
+                        y:ny
+                    });
+                }
+
+            }
+        );
+    }
+
+
+    return result;
+}
+
+
+function checkPipeSolved(){
+
+    const connected =
+        getConnectedPipeCells();
+
+
+    const N =
+        currentMini.state.size;
+
+
+    return connected.some(
+        p =>
+            p.x===N-1 &&
+            p.y===N-1
+    );
+}
+
+
+/* =========================================================
+   DIBUJAR TUBERÍAS
+========================================================= */
+
+function drawPipes(){
+
+    const s =
+        currentMini.state;
+
+    const N =
+        s.size;
+
+
+    mctx.fillStyle =
+        "#081521";
+
+    mctx.fillRect(
+        0,
+        0,
+        820,
+        500
+    );
+
+
+    const connected =
+        getConnectedPipeCells();
+
+
+    for(
+        let y=0;
+        y<N;
+        y++
+    ){
+
+        for(
+            let x=0;
+            x<N;
+            x++
+        ){
+
+            const px =
+                s.offsetX+
+                x*s.cell;
+
+            const py =
+                s.offsetY+
+                y*s.cell;
+
+
+            mctx.fillStyle =
+                "#102b3d";
+
+            mctx.fillRect(
+                px+3,
+                py+3,
+                s.cell-6,
+                s.cell-6
+            );
+
+
+            const active =
+                connected.some(
+                    p =>
+                        p.x===x &&
+                        p.y===y
+                );
+
+
+            drawPipeCell(
+                px,
+                py,
+                s.grid[y][x],
+                active
+            );
+        }
+    }
+
+
+    /* ENTRADA VERDE */
+
+    mctx.fillStyle =
+        "#22e678";
+
+    mctx.fillRect(
+        s.offsetX-110,
+        s.offsetY+15,
+        100,
+        45
+    );
+
+
+    mctx.fillStyle =
+        "#042514";
+
+    mctx.font =
+        "bold 16px Arial";
+
+    mctx.fillText(
+        "ENTRADA",
+        s.offsetX-96,
+        s.offsetY+44
+    );
+
+
+    /* SALIDA ROJA */
+
+    const exitX =
+        s.offsetX+
+        N*s.cell+
+        10;
+
+    const exitY =
+        s.offsetY+
+        (N-1)*s.cell+
+        15;
+
+
+    mctx.fillStyle =
+        "#ff4058";
+
+    mctx.fillRect(
+        exitX,
+        exitY,
+        90,
+        45
+    );
+
+
+    mctx.fillStyle =
+        "#fff";
+
+    mctx.fillText(
+        "SALIDA",
+        exitX+15,
+        exitY+29
+    );
+
+
+    mctx.fillStyle =
+        "#bcd1df";
+
+    mctx.font =
+        "14px Arial";
+
+    mctx.fillText(
+        "🟩 ENTRADA → 🔵 RED DE AGUA → 🟥 SALIDA",
+        20,
+        470
+    );
+}
+
+
+function drawPipeCell(
+    px,
+    py,
+    cell,
+    connected
+){
+
+    const cx =
+        px+35;
+
+    const cy =
+        py+35;
+
+
+    const dirs =
+        pipeConnections(cell);
+
+
+    mctx.strokeStyle =
+        connected
+        ? "#35ddff"
+        : "#667582";
+
+
+    mctx.lineWidth = 20;
+
+    mctx.lineCap = "square";
+
+
+    dirs.forEach(
+        dir => {
+
+            mctx.beginPath();
+
+            mctx.moveTo(
+                cx,
+                cy
+            );
+
+
+            if(dir==="L")
+                mctx.lineTo(
+                    px,
+                    cy
+                );
+
+            if(dir==="R")
+                mctx.lineTo(
+                    px+70,
+                    cy
+                );
+
+            if(dir==="U")
+                mctx.lineTo(
+                    cx,
+                    py
+                );
+
+            if(dir==="D")
+                mctx.lineTo(
+                    cx,
+                    py+70
+                );
+
+
+            mctx.stroke();
+        }
+    );
+
+
+    mctx.fillStyle =
+        connected
+        ? "#7beaff"
+        : "#8997a0";
+
+
+    mctx.beginPath();
+
+    mctx.arc(
+        cx,
+        cy,
+        10,
+        0,
+        Math.PI*2
+    );
+
+    mctx.fill();
+}
+
+
+/* =========================================================
+   CLICK DE TUBERÍAS
+========================================================= */
+
+function handlePipeClick(mx,my){
+
+    if(
+        !miniActive ||
+        !currentMini ||
+        currentMini.type!=="pipes"
+    ){
+
+        return;
+    }
+
+
+    const s =
+        currentMini.state;
+
+
+    const gx =
+        Math.floor(
+            (mx-s.offsetX)/
+            s.cell
+        );
+
+
+    const gy =
+        Math.floor(
+            (my-s.offsetY)/
+            s.cell
+        );
+
+
+    if(
+        gx<0 ||
+        gy<0 ||
+        gx>=s.size ||
+        gy>=s.size
+    ){
+
+        return;
+    }
+
+
+    s.grid[gy][gx].rot++;
+
+
+    if(
+        checkPipeSolved()
+    ){
+
+        winMini();
+    }
+}
+
+
+/* =========================================================
+   GOTAS / FLAPPY / MEMORIA
+   CLICK GENERAL DEL MINICANVAS
+========================================================= */
+
+miniCanvas.addEventListener(
+    "click",
+    e => {
+
+        if(
+            !miniActive ||
+            !currentMini
+        ){
+
+            return;
+        }
+
+
+        const rect =
+            miniCanvas.getBoundingClientRect();
+
+
+        const mx =
+            (e.clientX-rect.left) *
+            miniCanvas.width /
+            rect.width;
+
+
+        const my =
+            (e.clientY-rect.top) *
+            miniCanvas.height /
+            rect.height;
+
+
+        if(
+            currentMini.type==="pipes"
+        ){
+
+            handlePipeClick(
+                mx,
+                my
+            );
+
+            return;
+        }
+
+
+        if(
+            currentMini.type==="memory"
+        ){
+
+            handleMemoryClick(
+                mx,
+                my
+            );
+
+            return;
+        }
+
+    }
+);
+
+
+/* =========================================================
+   SIMÓN / MEMORIA
+========================================================= */
+
+function initMemory(){
+
+    document.getElementById(
+        "miniTitle"
+    ).textContent =
+        "🧠 Simón — Secuencia de válvulas";
+
+
+    document.getElementById(
+        "miniInstructions"
+    ).innerHTML = `
+
+        <b>Objetivo:</b>
+        observa cuidadosamente la secuencia
+        de válvulas iluminadas.
+
+        <br><br>
+
+        Después de que termine,
+        haz clic en los botones
+        <b>en el mismo orden</b>.
+
+        <br><br>
+
+        Cada botón que pulses brillará
+        para que puedas saber cuál seleccionaste.
+
+        <br>
+
+        La secuencia se vuelve más larga
+        en cada zona.
+
+        <br><br>
+
+        <span style="color:#ffbd4a">
+        ❤️ Vidas: 3
+        </span>
+    `;
+
+
+    currentMini.state = {
+
+        count:
+            Math.min(
+                8,
+                4+currentZone
+            ),
+
+        sequence:[],
+
+        input:[],
+
+        showing:true,
+
+        showIndex:0,
+
+        showTimer:0,
+
+        nextTimer:0,
+
+        round:0,
+
+        buttons:[],
+
+        clickedIndex:-1,
+
+        clickedTimer:0,
+
+        errorIndex:-1,
+
+        errorTimer:0
+
+    };
+
+
+    createMemoryRound();
+}
+
+
+/* =========================================================
+   CREAR RONDA DE SIMÓN
+========================================================= */
+
+function createMemoryRound(){
+
+    const s =
+        currentMini.state;
+
+
+    /*
+    Generamos una secuencia.
+    */
+
+    s.sequence = [];
+
+
+    const sequenceLength =
+        3+currentZone;
+
+
+    for(
+        let i=0;
+        i<sequenceLength;
+        i++
+    ){
+
+        s.sequence.push(
+            Math.floor(
+                Math.random()*s.count
+            )
+        );
+    }
+
+
+    s.input = [];
+
+    s.showing = true;
+
+    s.showIndex = 0;
+
+    /*
+    45 frames = 750ms aproximadamente
+    */
+
+    s.showTimer = 45;
+
+    s.nextTimer = 0;
+
+    s.clickedIndex = -1;
+
+    s.clickedTimer = 0;
+
+    s.errorIndex = -1;
+
+    s.errorTimer = 0;
+
+
+    s.buttons = [];
+
+
+    for(
+        let i=0;
+        i<s.count;
+        i++
+    ){
+
+        const col =
+            i%4;
+
+        const row =
+            Math.floor(i/4);
+
+
+        s.buttons.push({
+
+            x:
+                120+
+                col*150,
+
+            y:
+                140+
+                row*110,
+
+            w:100,
+
+            h:70
+
+        });
+    }
+}
+
+
+/* =========================================================
+   UPDATE SIMÓN
+========================================================= */
+
+function updateMemory(){
+
+    const s =
+        currentMini.state;
+
+
+    /*
+    ANIMACIÓN DEL BOTÓN PULSADO
+    */
+
+    if(
+        s.clickedTimer > 0
+    ){
+
+        s.clickedTimer--;
+
+        if(
+            s.clickedTimer<=0
+        ){
+
+            s.clickedIndex=-1;
+        }
+    }
+
+
+    /*
+    ANIMACIÓN DEL ERROR
+    */
+
+    if(
+        s.errorTimer > 0
+    ){
+
+        s.errorTimer--;
+
+        if(
+            s.errorTimer<=0
+        ){
+
+            s.errorIndex=-1;
+        }
+    }
+
+
+    /*
+    ==========================================
+    MOSTRAR SECUENCIA
+    ==========================================
+    */
+
+    if(s.showing){
+
+        s.showTimer--;
+
+
+        /*
+        Cada botón dura 45 frames.
+        */
+
+        if(
+            s.showTimer<=0
+        ){
+
+            s.showIndex++;
+
+
+            /*
+            PAUSA de 15 frames
+            entre botones.
+            */
+
+            s.showTimer = 15;
+
+
+            if(
+                s.showIndex >=
+                s.sequence.length
+            ){
+
+                /*
+                Dejamos una pausa antes
+                de permitir al jugador responder.
+                */
+
+                s.showing=false;
+
+                s.showIndex=-1;
+
+                s.nextTimer=25;
+            }
+        }
+
+
+        return;
+    }
+
+
+    /*
+    ==========================================
+    PAUSA ANTES DE RESPONDER
+    ==========================================
+    */
+
+    if(
+        s.nextTimer>0
+    ){
+
+        s.nextTimer--;
+
+        return;
+    }
+}
+
+
+/* =========================================================
+   CLICK SIMÓN
+========================================================= */
+
+function handleMemoryClick(mx,my){
+
+    const s =
+        currentMini.state;
+
+
+    /*
+    Durante la demostración
+    no se puede pulsar.
+    */
+
+    if(
+        s.showing ||
+        s.nextTimer>0
+    ){
+
+        return;
+    }
+
+
+    /*
+    Revisamos qué botón se pulsó.
+    */
+
+    let selected = -1;
+
+
+    for(
+        let i=0;
+        i<s.buttons.length;
+        i++
+    ){
+
+        const b =
+            s.buttons[i];
+
+
+        if(
+
+            mx>=b.x &&
+            mx<=b.x+b.w &&
+            my>=b.y &&
+            my<=b.y+b.h
+
+        ){
+
+            selected=i;
+
+            break;
+        }
+    }
+
+
+    if(selected===-1)
+        return;
+
+
+    /*
+    ==========================================
+    EFECTO DE BRILLO
+    ==========================================
+    */
+
+    s.clickedIndex =
+        selected;
+
+    /*
+    18 frames ≈ 300ms
+    */
+
+    s.clickedTimer = 18;
+
+
+    const position =
+        s.input.length;
+
+
+    /*
+    ==========================================
+    COMPROBAR
+    ==========================================
+    */
+
+    if(
+        selected !==
+        s.sequence[position]
+    ){
+
+        /*
+        Mostrar el botón que provocó
+        el error en rojo.
+        */
+
+        s.errorIndex =
+            selected;
+
+        s.errorTimer =
+            30;
+
+
+        loseMiniLife();
+
+
+        if(!miniActive)
+            return;
+
+
+        /*
+        Si todavía tiene vidas,
+        dejamos un pequeño descanso
+        antes de una nueva secuencia.
+        */
+
+        s.nextTimer=25;
+
+        createMemoryRound();
+
+        return;
+    }
+
+
+    /*
+    RESPUESTA CORRECTA
+    */
+
+    s.input.push(
+        selected
+    );
+
+
+    /*
+    ¿Terminó toda la secuencia?
+    */
+
+    if(
+        s.input.length ===
+        s.sequence.length
+    ){
+
+        s.round++;
+
+
+        /*
+        Más rondas según la zona.
+        */
+
+        if(
+            s.round >=
+            2+currentZone
+        ){
+
+            winMini();
+
+            return;
+        }
+
+
+        /*
+        Nueva ronda,
+        pero con una pequeña pausa.
+        */
+
+        s.nextTimer=30;
+
+
+        setTimeout(
+            ()=>{
+
+                if(
+                    miniActive &&
+                    currentMini &&
+                    currentMini.type==="memory"
+                ){
+
+                    createMemoryRound();
+                }
+
+            },
+            500
+        );
+    }
+}
+
+
+/* =========================================================
+   DIBUJAR SIMÓN
+========================================================= */
+
+function drawMemory(){
+
+    const s =
+        currentMini.state;
+
+
+    mctx.fillStyle =
+        "#101d2d";
+
+    mctx.fillRect(
+        0,
+        0,
+        820,
+        500
+    );
+
+
+    /*
+    TÍTULO
+    */
+
+    mctx.fillStyle =
+        "#fff";
+
+    mctx.font =
+        "bold 22px Arial";
+
+
+    mctx.textAlign =
+        "center";
+
+
+    mctx.fillText(
+
+        s.showing
+        ? "👀 OBSERVA LA SECUENCIA"
+        : "🖱️ REPITE LA SECUENCIA",
+
+        410,
+        55
+
+    );
+
+
+    mctx.textAlign =
+        "left";
+
+
+    /*
+    BOTONES
+    */
+
+    s.buttons.forEach(
+        (b,i)=>{
+
+            let color =
+                "#1a3850";
+
+
+            /*
+            BOTÓN QUE SE MUESTRA
+            EN LA SECUENCIA
+            */
+
+            if(
+                s.showing &&
+                s.showIndex>=0 &&
+                s.sequence[
+                    s.showIndex
+                ]===i
+            ){
+
+                color =
+                    "#38dcff";
+            }
+
+
+            /*
+            BOTÓN PULSADO
+            */
+
+            if(
+                !s.showing &&
+                s.clickedIndex===i &&
+                s.clickedTimer>0
+            ){
+
+                color =
+                    "#ffe45c";
+            }
+
+
+            /*
+            BOTÓN DEL ERROR
+            */
+
+            if(
+                s.errorIndex===i &&
+                s.errorTimer>0
+            ){
+
+                color =
+                    "#ff4058";
+            }
+
+
+            /*
+            BRILLO
+            */
+
+            if(
+                (
+                    s.showing &&
+                    s.showIndex>=0 &&
+                    s.sequence[
+                        s.showIndex
+                    ]===i
+                )
+                ||
+                (
+                    !s.showing &&
+                    s.clickedIndex===i &&
+                    s.clickedTimer>0
+                )
+            ){
+
+                mctx.shadowColor =
+                    color;
+
+                mctx.shadowBlur =
+                    28;
+
+            }else{
+
+                mctx.shadowBlur=0;
+            }
+
+
+            mctx.fillStyle =
+                color;
+
+
+            mctx.fillRect(
+                b.x,
+                b.y,
+                b.w,
+                b.h
+            );
+
+
+            mctx.shadowBlur=0;
+
+
+            /*
+            BORDE
+            */
+
+            mctx.strokeStyle =
+                "#5c849c";
+
+            mctx.lineWidth=2;
+
+            mctx.strokeRect(
+                b.x,
+                b.y,
+                b.w,
+                b.h
+            );
+
+
+            /*
+            NÚMERO
+            */
+
+            mctx.fillStyle =
+                "#fff";
+
+            mctx.font =
+                "bold 18px Arial";
+
+
+            mctx.textAlign =
+                "center";
+
+            mctx.textBaseline =
+                "middle";
+
+
+            mctx.fillText(
+                i+1,
+                b.x+b.w/2,
+                b.y+b.h/2
+            );
+
+
+            mctx.textAlign =
+                "left";
+
+            mctx.textBaseline =
+                "alphabetic";
+        }
+    );
+
+
+    /*
+    INFORMACIÓN
+    */
+
+    mctx.fillStyle =
+        "#b7ccd9";
+
+    mctx.font =
+        "15px Arial";
+
+
+    mctx.fillText(
+        `Ronda ${s.round+1}/${2+currentZone}`,
+        20,
+        35
+    );
+
+
+    mctx.fillText(
+        `❤️ ${currentMini.lives}`,
+        720,
+        35
+    );
+
+
+    if(
+        !s.showing &&
+        s.nextTimer<=0
+    ){
+
+        mctx.fillStyle =
+            "#69e8ff";
+
+        mctx.font =
+            "bold 14px Arial";
+
+        mctx.textAlign =
+            "center";
+
+        mctx.fillText(
+            `Progreso: ${s.input.length}/${s.sequence.length}`,
+            410,
+            475
+        );
+
+        mctx.textAlign =
+            "left";
+    }
+}
+
+
+/* =========================================================
+   UPDATE MINIJUEGO
+========================================================= */
+
+function updateMini(){
+
+    if(
+        !miniActive ||
+        !currentMini
+    ){
+
+        return;
+    }
+
+
+    switch(
+        currentMini.type
+    ){
+
+        case "drops":
+            updateDrops();
+            break;
+
+        case "flappy":
+            updateFlappy();
+            break;
+
+        case "memory":
+            updateMemory();
+            break;
+
+    }
+}
+
+
+/* =========================================================
+   DIBUJAR MINIJUEGO
+========================================================= */
+
+function drawMini(){
+
+    if(
+        !miniActive ||
+        !currentMini
+    ){
+
+        return;
+    }
+
+
+    switch(
+        currentMini.type
+    ){
+
+        case "drops":
+            drawDrops();
+            break;
+
+        case "flappy":
+            drawFlappy();
+            break;
+
+        case "pipes":
+            drawPipes();
+            break;
+
+        case "memory":
+            drawMemory();
+            break;
+
+    }
+}
+
+
+/* =========================================================
+   LOOP
+========================================================= */
+
+function gameLoop(){
+
+    /*
+    El mapa SIEMPRE se dibuja cuando
+    el juego está activo.
+
+    Esto evita que quede congelado
+    después de cerrar un minijuego.
+    */
+
+    if(gameStarted){
+
+        updatePlayer();
+
+        updateMini();
+
+        updateHUD();
+
+        drawWorld();
+
+        drawMini();
+    }
+
+
+    requestAnimationFrame(
+        gameLoop
+    );
+}
+
+
+gameLoop();
+
+</script>
+
+</body>
+</html>

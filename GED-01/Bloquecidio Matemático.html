@@ -1,0 +1,2267 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Bloquecidio Matemático</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background: #222;
+        }
+
+        /* =====================================
+           ESCENARIOS
+        ===================================== */
+
+        #juego {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nivel1 {
+            background: linear-gradient(
+                #59c8f2 0%,
+                #b8edff 68%,
+                #68b94c 68%,
+                #68b94c 100%
+            );
+        }
+
+        .nivel2 {
+            background: linear-gradient(
+                #f5c866 0%,
+                #ffe8ad 68%,
+                #d28a35 68%,
+                #d28a35 100%
+            );
+        }
+
+        .nivel3 {
+            background: linear-gradient(
+                #75bde8 0%,
+                #e5f7ff 68%,
+                #d9e6ea 68%,
+                #d9e6ea 100%
+            );
+        }
+
+        .nivel4 {
+            background: linear-gradient(
+                #d64b32 0%,
+                #ff9d52 68%,
+                #56332b 68%,
+                #56332b 100%
+            );
+        }
+
+        .nivel5 {
+            background: linear-gradient(
+                #474b86 0%,
+                #8e91ce 68%,
+                #68442f 68%,
+                #68442f 100%
+            );
+        }
+
+        .nivel6 {
+            background: linear-gradient(
+                #2c9fd0 0%,
+                #9eeaff 68%,
+                #287c9d 68%,
+                #287c9d 100%
+            );
+        }
+
+        .nivel7 {
+            background: linear-gradient(
+                #080a2c 0%,
+                #252d68 68%,
+                #252637 68%,
+                #252637 100%
+            );
+        }
+
+        .nivel8 {
+            background: linear-gradient(
+                #142719 0%,
+                #47794a 68%,
+                #263927 68%,
+                #263927 100%
+            );
+        }
+
+        .nivel9 {
+            background: linear-gradient(
+                #8ed8ff 0%,
+                #f1fbff 68%,
+                #ffffff 68%,
+                #ffffff 100%
+            );
+        }
+
+        .nivel10 {
+            background: linear-gradient(
+                #322052 0%,
+                #9b5eb8 68%,
+                #70412d 68%,
+                #70412d 100%
+            );
+        }
+
+        /* =====================================
+           CIELO Y DECORACION
+        ===================================== */
+
+        .nube {
+            position: absolute;
+            width: 110px;
+            height: 38px;
+            background: white;
+            border-radius: 50px;
+            opacity: 0.85;
+            z-index: 1;
+        }
+
+        .nube:before {
+            content: "";
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 50%;
+            left: 15px;
+            top: -23px;
+        }
+
+        .nube:after {
+            content: "";
+            position: absolute;
+            width: 55px;
+            height: 55px;
+            background: white;
+            border-radius: 50%;
+            right: 10px;
+            top: -27px;
+        }
+
+        .nube1 {
+            top: 100px;
+            left: 8%;
+        }
+
+        .nube2 {
+            top: 170px;
+            left: 55%;
+            transform: scale(0.8);
+        }
+
+        .nube3 {
+            top: 70px;
+            left: 78%;
+            transform: scale(0.6);
+        }
+
+        /* =====================================
+           INFORMACION
+        ===================================== */
+
+        #informacion {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: white;
+            border: 4px solid #333;
+            border-radius: 12px;
+            padding: 10px 15px;
+            font-size: 16px;
+            font-weight: bold;
+            z-index: 50;
+            box-shadow: 4px 4px rgba(0,0,0,0.25);
+        }
+
+        #controles {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: white;
+            border: 4px solid #333;
+            border-radius: 12px;
+            padding: 10px 15px;
+            font-size: 14px;
+            font-weight: bold;
+            text-align: center;
+            z-index: 50;
+        }
+
+        #titulo {
+            position: absolute;
+            top: 20px;
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            text-shadow: 4px 4px #333;
+            z-index: 40;
+        }
+
+        #nombreNivel {
+            position: absolute;
+            top: 75px;
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            text-shadow: 3px 3px #333;
+            z-index: 40;
+        }
+
+        /* =====================================
+           MUNDO
+        ===================================== */
+
+        #mundo {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 1900px;
+            height: 68%;
+        }
+
+        #suelo {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 1900px;
+            height: 90px;
+            background-color: #a85b38;
+            background-image:
+                linear-gradient(
+                    90deg,
+                    #69351f 3px,
+                    transparent 3px
+                ),
+                linear-gradient(
+                    #69351f 3px,
+                    transparent 3px
+                );
+            background-size: 70px 45px;
+            border-top: 8px solid #57301f;
+        }
+
+        /* =====================================
+           PERSONAJE
+        ===================================== */
+
+        #personaje {
+            position: absolute;
+            width: 48px;
+            height: 68px;
+            left: 100px;
+            bottom: 90px;
+            z-index: 30;
+        }
+
+        #cabeza {
+            width: 40px;
+            height: 38px;
+            background: #f1bd91;
+            border: 4px solid #222;
+            border-radius: 8px;
+        }
+
+        #cuerpo {
+            width: 45px;
+            height: 35px;
+            background: #e53935;
+            border: 4px solid #222;
+            border-radius: 8px;
+        }
+
+        .pie {
+            position: absolute;
+            width: 20px;
+            height: 10px;
+            background: #222;
+            bottom: -7px;
+            border-radius: 10px;
+        }
+
+        .pie1 {
+            left: 0;
+        }
+
+        .pie2 {
+            right: 0;
+        }
+
+        /* =====================================
+           PLATAFORMAS
+        ===================================== */
+
+        .plataforma {
+            position: absolute;
+            height: 30px;
+            background: #8b572a;
+            border: 4px solid #533216;
+            border-radius: 5px;
+            z-index: 10;
+        }
+
+        .plataforma.verde {
+            background: #42a845;
+            border-color: #246124;
+        }
+
+        .plataforma.hielo {
+            background: #b8efff;
+            border-color: #398ba5;
+        }
+
+        .plataforma.lava {
+            background: #ff761c;
+            border-color: #9e2600;
+        }
+
+        .plataforma.nube {
+            background: white;
+            border-color: #b9c9d1;
+            opacity: 1;
+        }
+
+        .plataforma.morada {
+            background: #9b59b6;
+            border-color: #5b2c6f;
+        }
+
+        /* =====================================
+           OBSTACULOS
+        ===================================== */
+
+        .obstaculo {
+            position: absolute;
+            z-index: 20;
+        }
+
+        .cactus {
+            width: 36px;
+            height: 70px;
+            background: #319b49;
+            border: 4px solid #1d632f;
+            border-radius: 15px;
+        }
+
+        .roca {
+            width: 65px;
+            height: 48px;
+            background: #666;
+            border: 5px solid #333;
+            border-radius: 45% 50% 25% 25%;
+        }
+
+        .espina {
+            width: 70px;
+            height: 30px;
+            background: #e53636;
+            border: 4px solid #741b1b;
+            clip-path: polygon(
+                0% 100%,
+                15% 20%,
+                30% 100%,
+                50% 10%,
+                70% 100%,
+                85% 20%,
+                100% 100%
+            );
+        }
+
+        .caja {
+            width: 55px;
+            height: 55px;
+            background: #c27b30;
+            border: 5px solid #704317;
+        }
+
+        .arbusto {
+            width: 70px;
+            height: 45px;
+            background: #287a39;
+            border: 5px solid #174b25;
+            border-radius: 50%;
+        }
+
+        .cristal {
+            width: 45px;
+            height: 65px;
+            background: #8ce8ff;
+            border: 5px solid #2980a0;
+            transform: rotate(20deg);
+        }
+
+        /* =====================================
+           BLOQUE
+        ===================================== */
+
+        #bloquePregunta {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            left: 1650px;
+            bottom: 90px;
+            background: #f5a623;
+            border: 5px solid #985d09;
+            color: white;
+            font-size: 48px;
+            font-weight: bold;
+            text-align: center;
+            line-height: 60px;
+            border-radius: 8px;
+            z-index: 25;
+            box-shadow:
+                inset -5px -5px rgba(0,0,0,0.2),
+                inset 5px 5px rgba(255,255,255,0.25);
+        }
+
+        #textoBloque {
+            position: absolute;
+            left: 1580px;
+            bottom: 165px;
+            width: 210px;
+            text-align: center;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            text-shadow: 2px 2px #333;
+            z-index: 25;
+        }
+
+        /* =====================================
+           PANEL PREGUNTA
+        ===================================== */
+
+        #panelPregunta {
+            display: none;
+            position: fixed;
+            width: 90%;
+            max-width: 600px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 5px solid #333;
+            border-radius: 18px;
+            padding: 25px;
+            text-align: center;
+            z-index: 100;
+            box-shadow: 8px 8px rgba(0,0,0,0.4);
+        }
+
+        #numeroPregunta {
+            color: #555;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        #operacion {
+            font-size: 40px;
+            font-weight: bold;
+            margin: 20px;
+            color: #333;
+        }
+
+        #alternativas {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .respuesta {
+            padding: 14px;
+            font-size: 22px;
+            font-weight: bold;
+            color: white;
+            background: #3498db;
+            border: 4px solid #21618c;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px #174a6e;
+        }
+
+        .respuesta:hover {
+            background: #5dade2;
+        }
+
+        .respuesta:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
+        #feedback {
+            min-height: 45px;
+            margin-top: 15px;
+            font-size: 21px;
+            font-weight: bold;
+            line-height: 1.3;
+        }
+
+        .correcto {
+            color: #159447;
+        }
+
+        .incorrecto {
+            color: #d63031;
+        }
+
+        /* =====================================
+           PANTALLA FINAL
+        ===================================== */
+
+        #pantallaFinal {
+            display: none;
+            position: fixed;
+            width: 90%;
+            max-width: 570px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 6px solid #333;
+            border-radius: 20px;
+            padding: 35px;
+            text-align: center;
+            z-index: 200;
+            box-shadow: 10px 10px rgba(0,0,0,0.4);
+        }
+
+        #pantallaFinal h2 {
+            color: #f5a623;
+            font-size: 38px;
+            margin-top: 0;
+        }
+
+        #resultado {
+            font-size: 60px;
+            color: #3498db;
+            font-weight: bold;
+            margin: 20px;
+        }
+
+        #mensajeFinal {
+            font-size: 20px;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        #botonReiniciar {
+            background: #27ae60;
+            color: white;
+            border: 4px solid #1e8449;
+            border-radius: 10px;
+            padding: 14px 28px;
+            font-size: 21px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #botonReiniciar:hover {
+            background: #2ecc71;
+        }
+
+        /* =====================================
+           PANTALLA INICIAL
+        ===================================== */
+
+        #pantallaInicio {
+            position: fixed;
+            width: 100%;
+            height: 100vh;
+            top: 0;
+            left: 0;
+            background: linear-gradient(#59c8f2, #a9eaff);
+            z-index: 300;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #cajaInicio {
+            width: 90%;
+            max-width: 620px;
+            background: white;
+            border: 6px solid #333;
+            border-radius: 20px;
+            padding: 35px;
+            text-align: center;
+            box-shadow: 10px 10px rgba(0,0,0,0.3);
+        }
+
+        #cajaInicio h1 {
+            color: #f5a623;
+            font-size: 42px;
+            text-shadow: 3px 3px #333;
+        }
+
+        #cajaInicio p {
+            font-size: 18px;
+            line-height: 1.5;
+        }
+
+        #botonInicio {
+            background: #3498db;
+            color: white;
+            border: 4px solid #21618c;
+            border-radius: 10px;
+            padding: 15px 35px;
+            font-size: 23px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #botonInicio:hover {
+            background: #5dade2;
+        }
+
+        /* =====================================
+           RESPONSIVE
+        ===================================== */
+
+        @media (max-width: 700px) {
+
+            #titulo {
+                font-size: 23px;
+                top: 65px;
+            }
+
+            #nombreNivel {
+                top: 95px;
+                font-size: 17px;
+            }
+
+            #controles {
+                display: none;
+            }
+
+            #informacion {
+                font-size: 13px;
+                padding: 7px 10px;
+            }
+
+            #panelPregunta {
+                padding: 15px;
+            }
+
+            #operacion {
+                font-size: 32px;
+            }
+
+            .respuesta {
+                font-size: 18px;
+                padding: 11px;
+            }
+
+            #cajaInicio h1 {
+                font-size: 30px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div id="juego" class="nivel1">
+
+
+    <div class="nube nube1"></div>
+    <div class="nube nube2"></div>
+    <div class="nube nube3"></div>
+
+
+    <div id="informacion">
+
+        ⭐ Puntaje:
+        <span id="puntaje">0</span>/10
+
+        <br>
+
+        🗺️ Nivel:
+        <span id="nivel">1</span>/10
+
+    </div>
+
+
+    <div id="controles">
+
+        ← → / A D = Moverse
+
+        <br>
+
+        ESPACIO / W / ↑ = Saltar
+
+    </div>
+
+
+    <div id="titulo">
+
+        BLOQUECIDIO MATEMÁTICO
+
+    </div>
+
+
+    <div id="nombreNivel">
+
+        Pradera Matemática
+
+    </div>
+
+
+    <div id="mundo">
+
+
+        <div id="suelo"></div>
+
+
+        <div id="personaje">
+
+            <div id="cabeza"></div>
+
+            <div id="cuerpo"></div>
+
+            <div class="pie pie1"></div>
+
+            <div class="pie pie2"></div>
+
+        </div>
+
+
+        <div id="objetosNivel"></div>
+
+
+        <div id="textoBloque">
+
+            ¡Llega hasta aquí
+            para resolver el desafío!
+
+        </div>
+
+
+        <div id="bloquePregunta">
+
+            ?
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+<!-- =====================================
+     PANEL DE PREGUNTA
+===================================== -->
+
+<div id="panelPregunta">
+
+
+    <div id="numeroPregunta">
+
+        Desafío matemático
+
+    </div>
+
+
+    <div id="operacion">
+
+        5 + 5 = ?
+
+    </div>
+
+
+    <div id="alternativas"></div>
+
+
+    <div id="feedback"></div>
+
+
+</div>
+
+
+<!-- =====================================
+     PANTALLA FINAL
+===================================== -->
+
+<div id="pantallaFinal">
+
+
+    <h2>
+
+        🏆 ¡Aventura Completada!
+
+    </h2>
+
+
+    <div id="resultado">
+
+        0/10
+
+    </div>
+
+
+    <div id="mensajeFinal">
+
+        ¡Buen trabajo!
+
+    </div>
+
+
+    <button id="botonReiniciar"
+            onclick="reiniciarJuego()">
+
+        🔄 Jugar de nuevo
+
+    </button>
+
+
+</div>
+
+
+<!-- =====================================
+     PANTALLA DE INICIO
+===================================== -->
+
+<div id="pantallaInicio">
+
+
+    <div id="cajaInicio">
+
+
+        <h1>
+
+            🧱 Bloquecidio Matemático
+
+        </h1>
+
+
+        <p>
+
+            ¡Bienvenido a la aventura matemática!
+
+        </p>
+
+
+        <p>
+
+            Supera obstáculos, salta plataformas
+            y llega al bloque de interrogación.
+
+        </p>
+
+
+        <p>
+
+            🎮 <b>A / D</b> o <b>← / →</b>:
+            mover al personaje.
+
+            <br>
+
+            🦘 <b>ESPACIO</b>, <b>W</b> o <b>↑</b>:
+            saltar.
+
+        </p>
+
+
+        <p>
+
+            Al llegar al bloque <b>?</b>,
+            tendrás que resolver un desafío matemático.
+
+        </p>
+
+
+        <button id="botonInicio"
+                onclick="iniciarJuego()">
+
+            ▶ COMENZAR AVENTURA
+
+        </button>
+
+
+    </div>
+
+
+</div>
+
+
+<script>
+
+
+/* =====================================
+   VARIABLES
+===================================== */
+
+var puntaje = 0;
+
+var nivelActual = 1;
+
+var respuestaCorrecta = 0;
+
+var posicionJugador = 100;
+
+var posicionVertical = 90;
+
+var velocidadJugador = 0;
+
+var velocidadVertical = 0;
+
+var gravedad = 0.7;
+
+var fuerzaSalto = 14;
+
+var puedeSaltar = false;
+
+var teclas = {};
+
+var juegoIniciado = false;
+
+var preguntaAbierta = false;
+
+var objetos = [];
+
+
+/* =====================================
+   NOMBRES DE LOS NIVELES
+===================================== */
+
+var nombresNiveles = [
+
+    "Pradera Matemática",
+
+    "Desierto de los Números",
+
+    "Montañas de las Fracciones",
+
+    "Volcán de las Operaciones",
+
+    "Castillo de la Multiplicación",
+
+    "Cavernas de la División",
+
+    "Galaxia Matemática",
+
+    "Bosque de los Acertijos",
+
+    "Ciudad de las Nubes",
+
+    "Castillo del Desafío Final"
+
+];
+
+
+/* =====================================
+   MENSAJES CORRECTOS
+===================================== */
+
+var mensajesCorrectos = [
+
+    "¡Excelente! ¡Tu respuesta fue correcta!",
+
+    "¡Muy bien! ¡Los números no pudieron detenerte!",
+
+    "¡Correcto! ¡Puedes continuar la aventura!",
+
+    "¡Fantástico! ¡Has demostrado tus habilidades!",
+
+    "¡Genial! ¡El camino está despejado!",
+
+    "¡Respuesta correcta! ¡Sigue avanzando!",
+
+    "¡Muy bien hecho! ¡Eres un gran aventurero matemático!",
+
+    "¡Perfecto! ¡Ese ejercicio no fue rival para ti!"
+
+];
+
+
+/* =====================================
+   MENSAJES INCORRECTOS
+===================================== */
+
+var mensajesIncorrectos = [
+
+    "¡Incorrecto! No te preocupes, ¡sigue intentando!",
+
+    "¡Ups! Esa no era la respuesta. ¡La próxima puede ser!",
+
+    "¡Casi! Revisa tus cálculos y continúa.",
+
+    "¡Incorrecto! ¡Los obstáculos matemáticos son difíciles!",
+
+    "¡No fue esa! Pero todavía tienes muchos desafíos.",
+
+    "¡Fallaste este desafío! ¡No te rindas!",
+
+    "¡Esa respuesta no era correcta! ¡Continúa la aventura!",
+
+    "¡Cuidado! Los números te sorprendieron esta vez."
+
+];
+
+
+/* =====================================
+   CONTROLES
+===================================== */
+
+document.addEventListener("keydown", function(evento) {
+
+    teclas[evento.key.toLowerCase()] = true;
+
+    if (
+        evento.key == "ArrowUp" ||
+        evento.key == "ArrowDown" ||
+        evento.key == "ArrowLeft" ||
+        evento.key == "ArrowRight" ||
+        evento.key == " "
+    ) {
+
+        evento.preventDefault();
+
+    }
+
+});
+
+
+document.addEventListener("keyup", function(evento) {
+
+    teclas[evento.key.toLowerCase()] = false;
+
+});
+
+
+/* =====================================
+   INICIAR JUEGO
+===================================== */
+
+function iniciarJuego() {
+
+    document.getElementById("pantallaInicio").style.display =
+        "none";
+
+    juegoIniciado = true;
+
+    crearNivel();
+
+    actualizarJuego();
+
+}
+
+
+/* =====================================
+   CREAR NIVEL
+===================================== */
+
+function crearNivel() {
+
+    var objetosNivel =
+        document.getElementById("objetosNivel");
+
+    objetosNivel.innerHTML = "";
+
+    objetos = [];
+
+    posicionJugador = 100;
+
+    posicionVertical = 90;
+
+    velocidadJugador = 0;
+
+    velocidadVertical = 0;
+
+    puedeSaltar = true;
+
+    document.getElementById("nivel").innerHTML =
+        nivelActual;
+
+    document.getElementById("nombreNivel").innerHTML =
+        nombresNiveles[nivelActual - 1];
+
+    cambiarFondo();
+
+    crearObstaculos();
+
+    crearBloque();
+
+}
+
+
+/* =====================================
+   CAMBIAR FONDO
+===================================== */
+
+function cambiarFondo() {
+
+    document.getElementById("juego").className =
+        "nivel" + nivelActual;
+
+}
+
+
+/* =====================================
+   CREAR OBSTACULOS
+===================================== */
+
+function crearObstaculos() {
+
+    var posiciones = [];
+
+    var tipos = [];
+
+    if (nivelActual == 1) {
+
+        posiciones = [430, 750, 1050];
+
+        tipos = ["arbusto", "caja", "roca"];
+
+    } else if (nivelActual == 2) {
+
+        posiciones = [400, 680, 930, 1250];
+
+        tipos = ["cactus", "cactus", "roca", "cactus"];
+
+    } else if (nivelActual == 3) {
+
+        posiciones = [380, 650, 900, 1200];
+
+        tipos = ["roca", "espina", "roca", "espina"];
+
+        crearPlataforma(570, 230, "hielo");
+
+        crearPlataforma(1080, 260, "hielo");
+
+    } else if (nivelActual == 4) {
+
+        posiciones = [370, 600, 850, 1100, 1350];
+
+        tipos = [
+            "espina",
+            "roca",
+            "espina",
+            "roca",
+            "espina"
+        ];
+
+        crearPlataforma(700, 220, "lava");
+
+        crearPlataforma(1150, 250, "lava");
+
+    } else if (nivelActual == 5) {
+
+        posiciones = [350, 590, 850, 1100, 1320];
+
+        tipos = [
+            "caja",
+            "caja",
+            "roca",
+            "caja",
+            "espina"
+        ];
+
+        crearPlataforma(470, 220, "morada");
+
+        crearPlataforma(1000, 240, "morada");
+
+    } else if (nivelActual == 6) {
+
+        posiciones = [350, 580, 810, 1050, 1300];
+
+        tipos = [
+            "cristal",
+            "cristal",
+            "roca",
+            "cristal",
+            "espina"
+        ];
+
+        crearPlataforma(450, 230, "hielo");
+
+        crearPlataforma(800, 270, "hielo");
+
+        crearPlataforma(1180, 220, "hielo");
+
+    } else if (nivelActual == 7) {
+
+        posiciones = [400, 700, 1000, 1300];
+
+        tipos = [
+            "roca",
+            "espina",
+            "roca",
+            "espina"
+        ];
+
+        crearPlataforma(500, 250, "morada");
+
+        crearPlataforma(900, 300, "morada");
+
+        crearPlataforma(1250, 240, "morada");
+
+    } else if (nivelActual == 8) {
+
+        posiciones = [350, 550, 780, 1000, 1250, 1400];
+
+        tipos = [
+            "arbusto",
+            "espina",
+            "arbusto",
+            "roca",
+            "espina",
+            "arbusto"
+        ];
+
+        crearPlataforma(680, 220, "verde");
+
+        crearPlataforma(1120, 250, "verde");
+
+    } else if (nivelActual == 9) {
+
+        posiciones = [350, 600, 850, 1080, 1320];
+
+        tipos = [
+            "nube",
+            "espina",
+            "nube",
+            "roca",
+            "espina"
+        ];
+
+        crearPlataforma(450, 230, "nube");
+
+        crearPlataforma(750, 280, "nube");
+
+        crearPlataforma(1050, 220, "nube");
+
+        crearPlataforma(1300, 300, "nube");
+
+    } else {
+
+        posiciones = [
+            330,
+            530,
+            730,
+            930,
+            1130,
+            1330,
+            1480
+        ];
+
+        tipos = [
+            "caja",
+            "espina",
+            "roca",
+            "caja",
+            "espina",
+            "roca",
+            "espina"
+        ];
+
+        crearPlataforma(450, 220, "morada");
+
+        crearPlataforma(850, 260, "morada");
+
+        crearPlataforma(1200, 230, "morada");
+
+    }
+
+
+    var contador = 0;
+
+    while (contador < posiciones.length) {
+
+        crearObstaculo(
+            posiciones[contador],
+            tipos[contador]
+        );
+
+        contador++;
+
+    }
+
+}
+
+
+/* =====================================
+   CREAR OBSTACULO
+===================================== */
+
+function crearObstaculo(posicion, tipo) {
+
+    var objeto =
+        document.createElement("div");
+
+    objeto.className =
+        "obstaculo " + tipo;
+
+    objeto.style.left =
+        posicion + "px";
+
+    objeto.style.bottom =
+        "90px";
+
+    document
+        .getElementById("objetosNivel")
+        .appendChild(objeto);
+
+    objetos.push(objeto);
+
+}
+
+
+/* =====================================
+   CREAR PLATAFORMA
+===================================== */
+
+function crearPlataforma(
+    posicion,
+    altura,
+    tipo
+) {
+
+    var plataforma =
+        document.createElement("div");
+
+    plataforma.className =
+        "plataforma " + tipo;
+
+    plataforma.style.left =
+        posicion + "px";
+
+    plataforma.style.bottom =
+        altura + "px";
+
+    plataforma.style.width =
+        "150px";
+
+    document
+        .getElementById("objetosNivel")
+        .appendChild(plataforma);
+
+    objetos.push(plataforma);
+
+}
+
+
+/* =====================================
+   CREAR BLOQUE
+===================================== */
+
+function crearBloque() {
+
+    var bloque =
+        document.getElementById("bloquePregunta");
+
+    bloque.style.left =
+        "1650px";
+
+    bloque.style.bottom =
+        "90px";
+
+}
+
+
+/* =====================================
+   ACTUALIZAR JUEGO
+===================================== */
+
+function actualizarJuego() {
+
+    if (juegoIniciado == false) {
+
+        return;
+
+    }
+
+    moverJugador();
+
+    aplicarGravedad();
+
+    comprobarColisiones();
+
+    comprobarBloque();
+
+    moverCamara();
+
+    dibujarJugador();
+
+    requestAnimationFrame(
+        actualizarJuego
+    );
+
+}
+
+
+/* =====================================
+   MOVER JUGADOR
+===================================== */
+
+function moverJugador() {
+
+    velocidadJugador = 0;
+
+    if (
+        teclas["arrowright"] == true ||
+        teclas["d"] == true
+    ) {
+
+        velocidadJugador = 5;
+
+    }
+
+    if (
+        teclas["arrowleft"] == true ||
+        teclas["a"] == true
+    ) {
+
+        velocidadJugador = -5;
+
+    }
+
+    posicionJugador =
+        posicionJugador + velocidadJugador;
+
+    if (posicionJugador < 20) {
+
+        posicionJugador = 20;
+
+    }
+
+    if (posicionJugador > 1750) {
+
+        posicionJugador = 1750;
+
+    }
+
+    if (
+        teclas[" "] == true ||
+        teclas["w"] == true ||
+        teclas["arrowup"] == true
+    ) {
+
+        saltar();
+
+    }
+
+}
+
+
+/* =====================================
+   SALTAR
+===================================== */
+
+function saltar() {
+
+    if (puedeSaltar == true) {
+
+        velocidadVertical =
+            fuerzaSalto;
+
+        puedeSaltar = false;
+
+    }
+
+}
+
+
+/* =====================================
+   GRAVEDAD
+===================================== */
+
+function aplicarGravedad() {
+
+    velocidadVertical =
+        velocidadVertical - gravedad;
+
+    posicionVertical =
+        posicionVertical + velocidadVertical;
+
+    if (posicionVertical <= 90) {
+
+        posicionVertical = 90;
+
+        velocidadVertical = 0;
+
+        puedeSaltar = true;
+
+    }
+
+}
+
+
+/* =====================================
+   COLISIONES
+===================================== */
+
+function comprobarColisiones() {
+
+    var jugadorIzquierda =
+        posicionJugador;
+
+    var jugadorDerecha =
+        posicionJugador + 45;
+
+    var jugadorAbajo =
+        posicionVertical;
+
+    var jugadorArriba =
+        posicionVertical + 65;
+
+    var contador = 0;
+
+    while (contador < objetos.length) {
+
+        var objeto =
+            objetos[contador];
+
+        var izquierda =
+            parseInt(objeto.style.left);
+
+        var abajo =
+            parseInt(objeto.style.bottom);
+
+        var ancho =
+            objeto.offsetWidth;
+
+        var alto =
+            objeto.offsetHeight;
+
+        var derecha =
+            izquierda + ancho;
+
+        var arriba =
+            abajo + alto;
+
+        var tocaHorizontal =
+            jugadorDerecha > izquierda &&
+            jugadorIzquierda < derecha;
+
+        var tocaVertical =
+            jugadorArriba > abajo &&
+            jugadorAbajo < arriba;
+
+        if (
+            tocaHorizontal &&
+            tocaVertical
+        ) {
+
+            if (
+                objeto.className.indexOf(
+                    "espina"
+                ) != -1
+            ) {
+
+                reiniciarPosicion();
+
+            } else if (
+                objeto.className.indexOf(
+                    "cactus"
+                ) != -1
+            ) {
+
+                reiniciarPosicion();
+
+            } else if (
+                objeto.className.indexOf(
+                    "roca"
+                ) != -1
+            ) {
+
+                if (
+                    velocidadVertical <= 0 &&
+                    jugadorAbajo >= arriba - 25
+                ) {
+
+                    posicionVertical =
+                        arriba;
+
+                    velocidadVertical = 0;
+
+                    puedeSaltar = true;
+
+                } else {
+
+                    reiniciarPosicion();
+
+                }
+
+            } else if (
+                objeto.className.indexOf(
+                    "caja"
+                ) != -1
+            ) {
+
+                if (
+                    velocidadVertical <= 0 &&
+                    jugadorAbajo >= arriba - 25
+                ) {
+
+                    posicionVertical =
+                        arriba;
+
+                    velocidadVertical = 0;
+
+                    puedeSaltar = true;
+
+                } else {
+
+                    reiniciarPosicion();
+
+                }
+
+            } else {
+
+                if (
+                    velocidadVertical <= 0 &&
+                    jugadorAbajo >= arriba - 25
+                ) {
+
+                    posicionVertical =
+                        arriba;
+
+                    velocidadVertical = 0;
+
+                    puedeSaltar = true;
+
+                }
+
+            }
+
+        }
+
+        contador++;
+
+    }
+
+}
+
+
+/* =====================================
+   REINICIAR POSICION
+===================================== */
+
+function reiniciarPosicion() {
+
+    posicionJugador = 100;
+
+    posicionVertical = 90;
+
+    velocidadVertical = 0;
+
+}
+
+
+/* =====================================
+   COMPROBAR BLOQUE
+===================================== */
+
+function comprobarBloque() {
+
+    if (preguntaAbierta == true) {
+
+        return;
+
+    }
+
+    var bloque =
+        document.getElementById(
+            "bloquePregunta"
+        );
+
+    var posicionBloque =
+        parseInt(bloque.style.left);
+
+    var distancia =
+        Math.abs(
+            posicionJugador -
+            posicionBloque
+        );
+
+    if (
+        distancia < 65 &&
+        posicionVertical < 180
+    ) {
+
+        mostrarPregunta();
+
+    }
+
+}
+
+
+/* =====================================
+   DIBUJAR PERSONAJE
+===================================== */
+
+function dibujarJugador() {
+
+    var personaje =
+        document.getElementById(
+            "personaje"
+        );
+
+    personaje.style.left =
+        posicionJugador + "px";
+
+    personaje.style.bottom =
+        posicionVertical + "px";
+
+}
+
+
+/* =====================================
+   CAMARA
+===================================== */
+
+function moverCamara() {
+
+    var anchoPantalla =
+        window.innerWidth;
+
+    var posicionCamara =
+        posicionJugador -
+        anchoPantalla / 2;
+
+    if (posicionCamara < 0) {
+
+        posicionCamara = 0;
+
+    }
+
+    if (posicionCamara > 1200) {
+
+        posicionCamara = 1200;
+
+    }
+
+    document.getElementById(
+        "mundo"
+    ).style.transform =
+        "translateX(-" +
+        posicionCamara +
+        "px)";
+
+}
+
+
+/* =====================================
+   MOSTRAR PREGUNTA
+===================================== */
+
+function mostrarPregunta() {
+
+    if (preguntaAbierta == true) {
+
+        return;
+
+    }
+
+    preguntaAbierta = true;
+
+    document.getElementById(
+        "panelPregunta"
+    ).style.display = "block";
+
+    generarPregunta();
+
+}
+
+
+/* =====================================
+   NUMERO ALEATORIO
+===================================== */
+
+function numeroAleatorio(
+    minimo,
+    maximo
+) {
+
+    return Math.floor(
+        Math.random() *
+        (maximo - minimo + 1)
+    ) + minimo;
+
+}
+
+
+/* =====================================
+   GENERAR PREGUNTA
+===================================== */
+
+function generarPregunta() {
+
+    var tipoOperacion =
+        numeroAleatorio(1, 4);
+
+    var numero1;
+
+    var numero2;
+
+    if (tipoOperacion == 1) {
+
+        numero1 =
+            numeroAleatorio(
+                10,
+                50 + nivelActual * 5
+            );
+
+        numero2 =
+            numeroAleatorio(
+                5,
+                40 + nivelActual * 5
+            );
+
+        respuestaCorrecta =
+            numero1 + numero2;
+
+        document.getElementById(
+            "operacion"
+        ).innerHTML =
+            numero1 +
+            " + " +
+            numero2 +
+            " = ?";
+
+    } else if (tipoOperacion == 2) {
+
+        numero1 =
+            numeroAleatorio(
+                30,
+                100 + nivelActual * 5
+            );
+
+        numero2 =
+            numeroAleatorio(
+                5,
+                numero1
+            );
+
+        respuestaCorrecta =
+            numero1 - numero2;
+
+        document.getElementById(
+            "operacion"
+        ).innerHTML =
+            numero1 +
+            " - " +
+            numero2 +
+            " = ?";
+
+    } else if (tipoOperacion == 3) {
+
+        numero1 =
+            numeroAleatorio(
+                2,
+                8 + Math.floor(
+                    nivelActual / 2
+                )
+            );
+
+        numero2 =
+            numeroAleatorio(
+                2,
+                10
+            );
+
+        respuestaCorrecta =
+            numero1 * numero2;
+
+        document.getElementById(
+            "operacion"
+        ).innerHTML =
+            numero1 +
+            " × " +
+            numero2 +
+            " = ?";
+
+    } else {
+
+        numero2 =
+            numeroAleatorio(
+                2,
+                10
+            );
+
+        var resultadoDivision =
+            numeroAleatorio(
+                2,
+                10 +
+                Math.floor(
+                    nivelActual / 2
+                )
+            );
+
+        numero1 =
+            numero2 *
+            resultadoDivision;
+
+        respuestaCorrecta =
+            resultadoDivision;
+
+        document.getElementById(
+            "operacion"
+        ).innerHTML =
+            numero1 +
+            " ÷ " +
+            numero2 +
+            " = ?";
+
+    }
+
+    document.getElementById(
+        "numeroPregunta"
+    ).innerHTML =
+        "Desafío matemático - Nivel " +
+        nivelActual;
+
+    generarAlternativas();
+
+}
+
+
+/* =====================================
+   GENERAR ALTERNATIVAS
+===================================== */
+
+function generarAlternativas() {
+
+    var alternativas = [];
+
+    alternativas.push(
+        respuestaCorrecta
+    );
+
+    while (
+        alternativas.length < 4
+    ) {
+
+        var diferencia =
+            numeroAleatorio(
+                -10,
+                10
+            );
+
+        if (diferencia == 0) {
+
+            diferencia = 5;
+
+        }
+
+        var alternativa =
+            respuestaCorrecta +
+            diferencia;
+
+        if (
+            alternativa >= 0 &&
+            alternativas.indexOf(
+                alternativa
+            ) == -1
+        ) {
+
+            alternativas.push(
+                alternativa
+            );
+
+        }
+
+    }
+
+    alternativas.sort(
+        function() {
+
+            return Math.random() - 0.5;
+
+        }
+    );
+
+    var contenido = "";
+
+    var contador = 0;
+
+    while (contador < 4) {
+
+        contenido =
+            contenido +
+            '<button class="respuesta" onclick="comprobarRespuesta(' +
+            alternativas[contador] +
+            ')">' +
+            alternativas[contador] +
+            '</button>';
+
+        contador++;
+
+    }
+
+    document.getElementById(
+        "alternativas"
+    ).innerHTML =
+        contenido;
+
+    document.getElementById(
+        "feedback"
+    ).innerHTML = "";
+
+}
+
+
+/* =====================================
+   COMPROBAR RESPUESTA
+===================================== */
+
+function comprobarRespuesta(
+    respuesta
+) {
+
+    var botones =
+        document.getElementsByClassName(
+            "respuesta"
+        );
+
+    var contador = 0;
+
+    while (
+        contador < botones.length
+    ) {
+
+        botones[contador].disabled =
+            true;
+
+        contador++;
+
+    }
+
+    var mensaje;
+
+    if (
+        respuesta ==
+        respuestaCorrecta
+    ) {
+
+        puntaje++;
+
+        mensaje =
+            mensajesCorrectos[
+                numeroAleatorio(
+                    0,
+                    mensajesCorrectos.length - 1
+                )
+            ];
+
+        document.getElementById(
+            "feedback"
+        ).className =
+            "correcto";
+
+        document.getElementById(
+            "feedback"
+        ).innerHTML =
+            "✅ " + mensaje;
+
+    } else {
+
+        mensaje =
+            mensajesIncorrectos[
+                numeroAleatorio(
+                    0,
+                    mensajesIncorrectos.length - 1
+                )
+            ];
+
+        document.getElementById(
+            "feedback"
+        ).className =
+            "incorrecto";
+
+        document.getElementById(
+            "feedback"
+        ).innerHTML =
+            "❌ " + mensaje;
+
+    }
+
+    document.getElementById(
+        "puntaje"
+    ).innerHTML =
+        puntaje;
+
+    setTimeout(
+        siguienteNivel,
+        1800
+    );
+
+}
+
+
+/* =====================================
+   SIGUIENTE NIVEL
+===================================== */
+
+function siguienteNivel() {
+
+    document.getElementById(
+        "panelPregunta"
+    ).style.display =
+        "none";
+
+    preguntaAbierta = false;
+
+    if (nivelActual >= 10) {
+
+        terminarJuego();
+
+    } else {
+
+        nivelActual++;
+
+        crearNivel();
+
+    }
+
+}
+
+
+/* =====================================
+   TERMINAR JUEGO
+===================================== */
+
+function terminarJuego() {
+
+    juegoIniciado = false;
+
+    document.getElementById(
+        "resultado"
+    ).innerHTML =
+        puntaje + "/10";
+
+    var mensajeFinal;
+
+    if (puntaje == 10) {
+
+        mensajeFinal =
+            "🌟 ¡Puntuación perfecta! " +
+            "Has demostrado que eres un verdadero maestro de las matemáticas.";
+
+    } else if (puntaje == 9) {
+
+        mensajeFinal =
+            "🔥 ¡Increíble! Solo fallaste un desafío. " +
+            "Tu habilidad matemática es impresionante.";
+
+    } else if (puntaje == 8) {
+
+        mensajeFinal =
+            "🏆 ¡Excelente trabajo! " +
+            "Has superado casi todos los desafíos.";
+
+    } else if (puntaje == 7) {
+
+        mensajeFinal =
+            "👏 ¡Muy bien! " +
+            "Tienes una buena base matemática. ¡Sigue practicando!";
+
+    } else if (puntaje == 6) {
+
+        mensajeFinal =
+            "💪 ¡Buen trabajo! " +
+            "Ya tienes bastante dominio. Puedes mejorar todavía más.";
+
+    } else if (puntaje >= 4) {
+
+        mensajeFinal =
+            "🙂 ¡Buen intento! " +
+            "La aventura fue difícil, pero cada error sirve para aprender.";
+
+    } else {
+
+        mensajeFinal =
+            "🚀 ¡No te rindas! " +
+            "Vuelve a intentarlo y seguro conseguirás una mejor puntuación.";
+
+    }
+
+    document.getElementById(
+        "mensajeFinal"
+    ).innerHTML =
+        mensajeFinal;
+
+    document.getElementById(
+        "pantallaFinal"
+    ).style.display =
+        "block";
+
+}
+
+
+/* =====================================
+   REINICIAR JUEGO
+===================================== */
+
+function reiniciarJuego() {
+
+    puntaje = 0;
+
+    nivelActual = 1;
+
+    respuestaCorrecta = 0;
+
+    posicionJugador = 100;
+
+    posicionVertical = 90;
+
+    velocidadJugador = 0;
+
+    velocidadVertical = 0;
+
+    preguntaAbierta = false;
+
+    juegoIniciado = true;
+
+    document.getElementById(
+        "puntaje"
+    ).innerHTML =
+        "0";
+
+    document.getElementById(
+        "pantallaFinal"
+    ).style.display =
+        "none";
+
+    crearNivel();
+
+    actualizarJuego();
+
+}
+
+
+</script>
+
+</body>
+
+</html>
