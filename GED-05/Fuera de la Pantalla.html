@@ -1,0 +1,4171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Fuera de la Pantalla</title>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+<style>
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg: #070912;
+    --panel: rgba(8, 12, 23, 0.94);
+
+    --blue: #7188ff;
+    --blue2: #9b7cff;
+
+    --pink: #f1789a;
+    --pink2: #ffabc0;
+
+    --green: #62d9a5;
+    --red: #ff647b;
+
+    --text: #eef1fa;
+    --muted: #929bb0;
+
+    --border: rgba(255,255,255,0.12);
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+
+    font-family:
+        Inter,
+        "Segoe UI",
+        system-ui,
+        sans-serif;
+}
+
+button {
+    font-family: inherit;
+}
+
+
+/* =========================================================
+   GAME
+========================================================= */
+
+#game {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: #080b14;
+}
+
+
+/* =========================================================
+   BACKGROUND
+========================================================= */
+
+#background {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+}
+
+.sky {
+    position: absolute;
+    inset: 0;
+
+    background:
+        linear-gradient(
+            180deg,
+            #7890b2 0%,
+            #9aa6b8 48%,
+            #495568 100%
+        );
+
+    transition: background 1.2s ease;
+}
+
+.ground {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 30%;
+
+    background:
+        linear-gradient(
+            180deg,
+            #222a3b,
+            #090c14
+        );
+}
+
+.buildings {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 28%;
+    height: 28%;
+
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+
+    opacity: 0.5;
+}
+
+.building {
+    position: relative;
+
+    width: clamp(55px, 10vw, 130px);
+    height: var(--height);
+
+    background:
+        linear-gradient(
+            90deg,
+            #242d40,
+            #121827
+        );
+}
+
+.building::after {
+    content: "";
+
+    position: absolute;
+    inset: 10px;
+
+    background:
+        repeating-linear-gradient(
+            90deg,
+            transparent 0 15px,
+            rgba(255,220,130,.35) 16px 19px,
+            transparent 20px 30px
+        );
+
+    opacity: .4;
+}
+
+.floorLines {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+
+    width: 100%;
+    height: 30%;
+
+    opacity: .15;
+
+    background:
+        repeating-linear-gradient(
+            90deg,
+            transparent 0 10%,
+            rgba(255,255,255,.08) 10.1% 10.2%,
+            transparent 10.3% 20%
+        );
+}
+
+.night .sky {
+    background:
+        linear-gradient(
+            180deg,
+            #12182c,
+            #151a2a 50%,
+            #080a11
+        );
+}
+
+.night .ground {
+    background:
+        linear-gradient(
+            180deg,
+            #141a28,
+            #05070c
+        );
+}
+
+
+/* =========================================================
+   ATMOSPHERE
+========================================================= */
+
+#atmosphere {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+
+    pointer-events: none;
+
+    background:
+        rgba(30, 40, 100, .03);
+
+    transition: background .8s ease;
+}
+
+#vignette {
+    position: absolute;
+    inset: 0;
+    z-index: 80;
+
+    pointer-events: none;
+
+    background:
+        radial-gradient(
+            ellipse at center,
+            transparent 25%,
+            rgba(0,0,0,.2) 65%,
+            rgba(0,0,0,.82) 100%
+        );
+}
+
+
+/* =========================================================
+   HUD
+========================================================= */
+
+#topHUD {
+    position: absolute;
+
+    top: 18px;
+    left: 22px;
+    right: 22px;
+
+    z-index: 40;
+
+    display: flex;
+    justify-content: space-between;
+
+    pointer-events: none;
+}
+
+.hudPanel {
+    padding: 9px 15px;
+
+    border-radius: 8px;
+
+    background:
+        rgba(5,8,15,.6);
+
+    border:
+        1px solid var(--border);
+
+    backdrop-filter: blur(14px);
+}
+
+.chapter {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: #a9b5ff;
+}
+
+.gameTitle {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: #8e97ab;
+}
+
+
+/* =========================================================
+   TRUST
+========================================================= */
+
+#trustPanel {
+    position: absolute;
+
+    top: 65px;
+    right: 22px;
+
+    width: 230px;
+
+    padding: 13px;
+
+    z-index: 41;
+
+    border-radius: 9px;
+
+    background:
+        rgba(5,8,15,.68);
+
+    border:
+        1px solid var(--border);
+
+    backdrop-filter: blur(14px);
+}
+
+.trustTop {
+    display: flex;
+    justify-content: space-between;
+
+    margin-bottom: 9px;
+}
+
+.trustLabel {
+    color: #a3acc0;
+
+    font-size: 10px;
+    letter-spacing: 1px;
+}
+
+#trustValue {
+    color: var(--pink);
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.trustBar {
+    width: 100%;
+    height: 6px;
+
+    overflow: hidden;
+
+    border-radius: 10px;
+
+    background: #1b2131;
+}
+
+#trustFill {
+    width: 50%;
+    height: 100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            #ff5e78,
+            #ef7d9e,
+            #8294ff
+        );
+
+    transition: width .5s ease;
+}
+
+
+/* =========================================================
+   CHARACTERS
+========================================================= */
+
+#stage {
+    position: absolute;
+    inset: 0;
+
+    z-index: 10;
+
+    pointer-events: none;
+}
+
+.character {
+    position: absolute;
+
+    bottom: 150px;
+
+    width: 320px;
+    height: 550px;
+
+    opacity: 0;
+
+    transform:
+        translateY(35px)
+        scale(.97);
+
+    transition:
+        opacity .5s ease,
+        filter .6s ease;
+}
+
+.character.visible {
+    opacity: 1;
+
+    transform:
+        translateY(0)
+        scale(1);
+}
+
+.character.left {
+    left: clamp(1%, 8vw, 10%);
+}
+
+.character.right {
+    right: clamp(1%, 8vw, 10%);
+}
+
+.character.dim {
+    filter:
+        brightness(.48)
+        saturate(.35);
+}
+
+
+/* =========================================================
+   CHARACTER ART
+========================================================= */
+
+.characterArt {
+    position: absolute;
+    inset: 0;
+}
+
+.charShadow {
+    position: absolute;
+
+    left: 50%;
+    bottom: 0;
+
+    width: 220px;
+    height: 35px;
+
+    transform: translateX(-50%);
+
+    background:
+        radial-gradient(
+            ellipse,
+            rgba(0,0,0,.65),
+            transparent 70%
+        );
+}
+
+.torso {
+    position: absolute;
+
+    left: 50%;
+    bottom: 20px;
+
+    width: 180px;
+    height: 280px;
+
+    transform: translateX(-50%);
+
+    border-radius:
+        90px 90px 25px 25px;
+
+    box-shadow:
+        0 25px 50px rgba(0,0,0,.35);
+}
+
+.neck {
+    position: absolute;
+
+    left: 50%;
+    bottom: 280px;
+
+    width: 48px;
+    height: 45px;
+
+    transform: translateX(-50%);
+
+    border-radius: 10px;
+}
+
+.head {
+    position: absolute;
+
+    left: 50%;
+    bottom: 310px;
+
+    width: 140px;
+    height: 165px;
+
+    transform: translateX(-50%);
+
+    border-radius:
+        47% 47% 45% 45%;
+
+    box-shadow:
+        0 20px 40px rgba(0,0,0,.25);
+
+    z-index: 3;
+}
+
+.ear {
+    position: absolute;
+
+    top: 65px;
+
+    width: 25px;
+    height: 45px;
+
+    border-radius: 50%;
+}
+
+.ear.left {
+    left: -14px;
+}
+
+.ear.right {
+    right: -14px;
+}
+
+.hair {
+    position: absolute;
+
+    left: -6px;
+    top: -20px;
+
+    width: 152px;
+    height: 105px;
+
+    border-radius:
+        65% 65% 35% 25%;
+
+    z-index: 5;
+}
+
+.hair::after {
+    content: "";
+
+    position: absolute;
+
+    left: 20px;
+    bottom: -20px;
+
+    width: 80px;
+    height: 55px;
+
+    border-radius:
+        0 0 50% 50%;
+
+    transform: rotate(-10deg);
+
+    background: inherit;
+}
+
+.eye {
+    position: absolute;
+
+    top: 77px;
+
+    width: 13px;
+    height: 16px;
+
+    border-radius: 50%;
+
+    background: #242535;
+
+    z-index: 7;
+}
+
+.eye.left {
+    left: 37px;
+}
+
+.eye.right {
+    right: 37px;
+}
+
+.eye::after {
+    content: "";
+
+    position: absolute;
+
+    left: 3px;
+    top: 3px;
+
+    width: 4px;
+    height: 5px;
+
+    border-radius: 50%;
+
+    background: white;
+}
+
+.brow {
+    position: absolute;
+
+    top: 66px;
+
+    width: 29px;
+    height: 5px;
+
+    border-radius: 20px;
+
+    background: #472d31;
+
+    z-index: 7;
+}
+
+.brow.left {
+    left: 29px;
+    transform: rotate(-5deg);
+}
+
+.brow.right {
+    right: 29px;
+    transform: rotate(5deg);
+}
+
+.mouth {
+    position: absolute;
+
+    left: 50%;
+    top: 118px;
+
+    width: 31px;
+    height: 10px;
+
+    transform: translateX(-50%);
+
+    border-bottom:
+        2px solid rgba(92,46,55,.7);
+
+    border-radius: 50%;
+
+    z-index: 7;
+}
+
+
+/* Markus */
+
+#markus .torso {
+    background:
+        linear-gradient(
+            135deg,
+            #4c6b99,
+            #18253d
+        );
+}
+
+#markus .head,
+#markus .ear {
+    background: #c78970;
+}
+
+#markus .neck {
+    background: #b97664;
+}
+
+#markus .hair {
+    background:
+        linear-gradient(
+            135deg,
+            #20222d,
+            #080a10
+        );
+}
+
+
+/* Sofia */
+
+#sofia .torso {
+    background:
+        linear-gradient(
+            135deg,
+            #995e7e,
+            #281b32
+        );
+}
+
+#sofia .head,
+#sofia .ear {
+    background: #d69a7d;
+}
+
+#sofia .neck {
+    background: #c7836d;
+}
+
+#sofia .hair {
+    background:
+        linear-gradient(
+            135deg,
+            #4c293e,
+            #21131f
+        );
+
+    height: 125px;
+}
+
+
+/* =========================================================
+   NAME TAG
+========================================================= */
+
+.nameTag {
+    position: absolute;
+
+    left: 50%;
+    bottom: 4px;
+
+    min-width: 150px;
+
+    transform: translateX(-50%);
+
+    padding: 9px 25px;
+
+    text-align: center;
+
+    border-radius: 7px;
+
+    background:
+        rgba(7,10,18,.94);
+
+    border:
+        1px solid rgba(255,255,255,.14);
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.35);
+
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.nameTag::after {
+    content: "";
+
+    position: absolute;
+
+    left: 15px;
+    right: 15px;
+    bottom: -1px;
+
+    height: 2px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            var(--pink),
+            transparent
+        );
+}
+
+
+/* =========================================================
+   DIALOGUE
+========================================================= */
+
+#dialogue {
+    position: absolute;
+
+    left: 4%;
+    right: 4%;
+    bottom: 18px;
+
+    min-height: 155px;
+
+    z-index: 45;
+
+    padding:
+        37px 35px 28px;
+
+    border-radius: 13px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(8,11,20,.96),
+            rgba(14,18,30,.96)
+        );
+
+    border:
+        1px solid var(--border);
+
+    box-shadow:
+        0 25px 80px rgba(0,0,0,.65);
+
+    backdrop-filter: blur(18px);
+
+    cursor: pointer;
+}
+
+#dialogue::before {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+    right: 0;
+
+    height: 2px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            var(--blue),
+            var(--pink),
+            transparent
+        );
+}
+
+#speaker {
+    position: absolute;
+
+    left: 28px;
+    top: -18px;
+
+    padding: 9px 28px;
+
+    border-radius: 7px;
+
+    background:
+        linear-gradient(
+            100deg,
+            #7186ed,
+            #9a7cff
+        );
+
+    box-shadow:
+        0 8px 25px rgba(100,110,230,.3);
+
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+}
+
+#text {
+    max-width: 1100px;
+
+    color: #e9ecf5;
+
+    font-size: 17px;
+    line-height: 1.75;
+}
+
+#continue {
+    position: absolute;
+
+    right: 20px;
+    bottom: 10px;
+
+    color: #677188;
+
+    font-size: 9px;
+    letter-spacing: 1px;
+
+    animation: blink 1.4s infinite;
+}
+
+@keyframes blink {
+    50% {
+        opacity: .15;
+    }
+}
+
+
+/* =========================================================
+   CHOICES
+========================================================= */
+
+#choicePanel {
+    display: none;
+
+    position: absolute;
+    inset: 0;
+
+    z-index: 100;
+
+    align-items: center;
+    justify-content: center;
+
+    background:
+        rgba(3,5,10,.84);
+
+    backdrop-filter: blur(8px);
+}
+
+.choiceBox {
+    width: min(650px, 92%);
+
+    padding: 28px;
+
+    border-radius: 15px;
+
+    background:
+        rgba(9,13,23,.98);
+
+    border:
+        1px solid var(--border);
+
+    box-shadow:
+        0 40px 100px rgba(0,0,0,.7);
+}
+
+.choiceTitle {
+    margin-bottom: 7px;
+
+    font-size: 21px;
+}
+
+.choiceSubtitle {
+    margin-bottom: 20px;
+
+    color: var(--muted);
+
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.choice {
+    display: block;
+
+    width: 100%;
+
+    margin-top: 9px;
+    padding: 15px;
+
+    text-align: left;
+
+    border:
+        1px solid rgba(255,255,255,.1);
+
+    border-radius: 8px;
+
+    background: #141a29;
+
+    color: #e5e8f2;
+
+    cursor: pointer;
+
+    transition: .2s;
+}
+
+.choice:hover {
+    transform: translateX(5px);
+
+    border-color: var(--blue);
+
+    background: #1a2134;
+}
+
+
+/* =========================================================
+   MINIGAME WINDOW
+========================================================= */
+
+#minigame {
+    display: none;
+
+    position: absolute;
+    inset: 0;
+
+    z-index: 120;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(28,39,70,.96),
+            rgba(2,4,9,.99)
+        );
+}
+
+.miniWindow {
+    width: min(850px, 96%);
+    max-height: 92vh;
+
+    overflow: auto;
+
+    border-radius: 15px;
+
+    background:
+        rgba(8,12,21,.99);
+
+    border:
+        1px solid var(--border);
+
+    box-shadow:
+        0 40px 120px rgba(0,0,0,.8);
+}
+
+.miniHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 16px 20px;
+
+    border-bottom:
+        1px solid rgba(255,255,255,.08);
+}
+
+.miniHeader h2 {
+    font-size: 17px;
+}
+
+.miniHeader span {
+    color: #737d94;
+
+    font-size: 10px;
+    letter-spacing: 1px;
+}
+
+.miniContent {
+    padding: 25px;
+}
+
+.miniDescription {
+    margin-bottom: 20px;
+
+    color: #929bb0;
+
+    font-size: 13px;
+    line-height: 1.65;
+}
+
+.miniButton {
+    width: 100%;
+
+    margin-top: 20px;
+    padding: 13px;
+
+    border: 0;
+    border-radius: 8px;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--blue),
+            var(--blue2)
+        );
+
+    color: white;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.miniButton:hover {
+    filter: brightness(1.1);
+}
+
+
+/* =========================================================
+   EVIDENCE
+========================================================= */
+
+.evidenceGrid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 10px;
+}
+
+.evidence {
+    aspect-ratio: 1.2;
+
+    padding: 12px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    border-radius: 9px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #171e30,
+            #101522
+        );
+
+    border:
+        1px solid rgba(255,255,255,.08);
+
+    cursor: pointer;
+
+    transition: .2s;
+}
+
+.evidence:hover {
+    transform: translateY(-3px);
+    border-color: var(--blue);
+}
+
+.evidence.selected {
+    border-color: var(--pink);
+
+    background:
+        rgba(100,40,65,.35);
+
+    box-shadow:
+        0 0 20px rgba(242,123,154,.12);
+}
+
+.evidenceIcon {
+    font-size: 28px;
+}
+
+.evidenceText {
+    color: #c3c9d7;
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   CHAT
+========================================================= */
+
+.chatWindow {
+    padding: 18px;
+
+    border-radius: 10px;
+
+    background: #0e1420;
+
+    margin-bottom: 20px;
+}
+
+.chatMessage {
+    max-width: 75%;
+
+    margin: 8px 0;
+    padding: 11px 14px;
+
+    border-radius: 12px;
+
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.chatOther {
+    background: #1b2435;
+}
+
+.chatMarkus {
+    margin-left: auto;
+
+    background: #5365c9;
+}
+
+
+/* =========================================================
+   TETRIS
+========================================================= */
+
+.tetrisLayout {
+    display: flex;
+
+    justify-content: center;
+    align-items: flex-start;
+
+    gap: 25px;
+}
+
+#tetris {
+    position: relative;
+
+    width: 300px;
+    height: 420px;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(10, 1fr);
+
+    grid-template-rows:
+        repeat(14, 1fr);
+
+    overflow: hidden;
+
+    background:
+        #090d16;
+
+    border:
+        2px solid #29344e;
+
+    box-shadow:
+        0 0 30px rgba(70,90,180,.12);
+}
+
+.tCell {
+    border:
+        1px solid rgba(255,255,255,.025);
+
+    transition:
+        background .05s;
+}
+
+.tCell.block {
+    background:
+        linear-gradient(
+            135deg,
+            #7188ff,
+            #a47cff
+        );
+
+    border:
+        1px solid rgba(255,255,255,.18);
+
+    box-shadow:
+        inset 0 0 10px rgba(255,255,255,.15);
+}
+
+.tCell.active {
+    background:
+        linear-gradient(
+            135deg,
+            #ff7da2,
+            #a87cff
+        );
+
+    box-shadow:
+        0 0 12px rgba(255,110,160,.35),
+        inset 0 0 10px rgba(255,255,255,.2);
+}
+
+.tetrisInfo {
+    width: 210px;
+
+    color: #929bb0;
+
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.tetrisScore {
+    color: white;
+
+    font-size: 24px;
+    font-weight: bold;
+
+    margin: 5px 0 15px;
+}
+
+.tetrisLines {
+    color: var(--green);
+}
+
+.tetrisControls {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 7px;
+
+    margin-top: 18px;
+}
+
+.tetrisControls button {
+    min-height: 42px;
+
+    border: 0;
+    border-radius: 7px;
+
+    background: #202a42;
+
+    color: white;
+
+    cursor: pointer;
+}
+
+.tetrisControls button:hover {
+    background: #2d3a5c;
+}
+
+#tetrisDown {
+    grid-column: 2;
+}
+
+
+/* =========================================================
+   RESULT
+========================================================= */
+
+#resultOverlay {
+    display: none;
+
+    position: absolute;
+    inset: 0;
+
+    z-index: 200;
+
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    background:
+        rgba(2,4,9,.93);
+}
+
+.resultBox {
+    width: min(560px, 90%);
+}
+
+#resultTitle {
+    margin-bottom: 15px;
+
+    font-size: 42px;
+}
+
+#resultDescription {
+    color: #a1a9bb;
+
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+#resultContinue {
+    margin-top: 25px;
+
+    padding: 12px 28px;
+
+    border: 0;
+    border-radius: 7px;
+
+    background: var(--blue);
+
+    color: white;
+
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   ENDING
+========================================================= */
+
+#ending {
+    display: none;
+
+    position: absolute;
+    inset: 0;
+
+    z-index: 500;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 30px;
+
+    text-align: center;
+
+    background:
+        radial-gradient(
+            circle,
+            #18233d,
+            #03050a 75%
+        );
+}
+
+.endBox {
+    max-width: 720px;
+}
+
+.endTag {
+    margin-bottom: 20px;
+
+    color: var(--pink);
+
+    font-size: 10px;
+    letter-spacing: 3px;
+}
+
+#endTitle {
+    margin-bottom: 20px;
+
+    font-size:
+        clamp(
+            40px,
+            7vw,
+            75px
+        );
+
+    letter-spacing: -2px;
+}
+
+#endText {
+    color: #aab2c4;
+
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+.endButton {
+    margin-top: 30px;
+
+    padding: 13px 28px;
+
+    border: 0;
+    border-radius: 7px;
+
+    background: var(--blue);
+
+    color: white;
+
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+    #trustPanel {
+        width: 175px;
+        right: 10px;
+    }
+
+    .character {
+        width: 220px;
+        height: 450px;
+        bottom: 155px;
+    }
+
+    .torso {
+        width: 130px;
+        height: 220px;
+    }
+
+    .head {
+        width: 105px;
+        height: 125px;
+        bottom: 245px;
+    }
+
+    .neck {
+        bottom: 215px;
+    }
+
+    .eye {
+        top: 60px;
+    }
+
+    .brow {
+        top: 50px;
+    }
+
+    .mouth {
+        top: 90px;
+    }
+
+    #dialogue {
+        left: 2%;
+        right: 2%;
+        bottom: 8px;
+
+        min-height: 175px;
+
+        padding:
+            35px 20px 25px;
+    }
+
+    #text {
+        font-size: 14px;
+    }
+
+    .evidenceGrid {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .tetrisLayout {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .tetrisInfo {
+        width: 300px;
+    }
+}
+
+</style>
+</head>
+
+
+<body>
+
+<div id="game">
+
+
+<!-- ======================================================
+     BACKGROUND
+====================================================== -->
+
+<div id="background">
+
+    <div class="sky"></div>
+
+    <div class="buildings">
+
+        <div class="building" style="--height:65%"></div>
+        <div class="building" style="--height:85%"></div>
+        <div class="building" style="--height:55%"></div>
+        <div class="building" style="--height:75%"></div>
+        <div class="building" style="--height:45%"></div>
+        <div class="building" style="--height:70%"></div>
+
+    </div>
+
+    <div class="ground"></div>
+
+    <div class="floorLines"></div>
+
+</div>
+
+
+<div id="atmosphere"></div>
+
+<div id="vignette"></div>
+
+
+<!-- ======================================================
+     HUD
+====================================================== -->
+
+<div id="topHUD">
+
+    <div class="hudPanel">
+
+        <div id="chapter" class="chapter">
+            LUNES · 07:42
+        </div>
+
+    </div>
+
+    <div class="hudPanel">
+
+        <div class="gameTitle">
+            FUERA DE LA PANTALLA
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ======================================================
+     TRUST
+====================================================== -->
+
+<div id="trustPanel">
+
+    <div class="trustTop">
+
+        <span class="trustLabel">
+            CONFIANZA · SOFÍA
+        </span>
+
+        <span id="trustValue">
+            50
+        </span>
+
+    </div>
+
+    <div class="trustBar">
+
+        <div id="trustFill"></div>
+
+    </div>
+
+</div>
+
+
+<!-- ======================================================
+     CHARACTERS
+====================================================== -->
+
+<div id="stage">
+
+
+    <!-- MARKUS -->
+
+    <div id="markus" class="character left">
+
+        <div class="characterArt">
+
+            <div class="charShadow"></div>
+
+            <div class="torso"></div>
+
+            <div class="neck"></div>
+
+            <div class="head">
+
+                <div class="ear left"></div>
+                <div class="ear right"></div>
+
+                <div class="hair"></div>
+
+                <div class="brow left"></div>
+                <div class="brow right"></div>
+
+                <div class="eye left"></div>
+                <div class="eye right"></div>
+
+                <div class="mouth"></div>
+
+            </div>
+
+        </div>
+
+        <div class="nameTag">
+            MARKUS
+        </div>
+
+    </div>
+
+
+    <!-- SOFIA -->
+
+    <div id="sofia" class="character right">
+
+        <div class="characterArt">
+
+            <div class="charShadow"></div>
+
+            <div class="torso"></div>
+
+            <div class="neck"></div>
+
+            <div class="head">
+
+                <div class="ear left"></div>
+                <div class="ear right"></div>
+
+                <div class="hair"></div>
+
+                <div class="brow left"></div>
+                <div class="brow right"></div>
+
+                <div class="eye left"></div>
+                <div class="eye right"></div>
+
+                <div class="mouth"></div>
+
+            </div>
+
+        </div>
+
+        <div class="nameTag">
+            SOFÍA
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ======================================================
+     DIALOGUE
+====================================================== -->
+
+<div id="dialogue">
+
+    <div id="speaker">
+        MARKUS
+    </div>
+
+    <div id="text"></div>
+
+    <div id="continue">
+        CLIC PARA CONTINUAR
+    </div>
+
+</div>
+
+
+<!-- ======================================================
+     CHOICES
+====================================================== -->
+
+<div id="choicePanel">
+
+    <div class="choiceBox">
+
+        <div class="choiceTitle">
+            ¿QUÉ HARÁ MARKUS?
+        </div>
+
+        <div class="choiceSubtitle">
+            Esta decisión determina la ruta principal
+            de la historia.
+        </div>
+
+        <div id="choices"></div>
+
+    </div>
+
+</div>
+
+
+<!-- ======================================================
+     MINIGAME
+====================================================== -->
+
+<div id="minigame">
+
+    <div class="miniWindow">
+
+        <div class="miniHeader">
+
+            <h2 id="miniTitle">
+                ACTIVIDAD
+            </h2>
+
+            <span id="miniType">
+                MINIJUEGO
+            </span>
+
+        </div>
+
+        <div id="miniContent" class="miniContent"></div>
+
+    </div>
+
+</div>
+
+
+<!-- ======================================================
+     RESULT
+====================================================== -->
+
+<div id="resultOverlay">
+
+    <div class="resultBox">
+
+        <h2 id="resultTitle">
+            RESULTADO
+        </h2>
+
+        <p id="resultDescription"></p>
+
+        <button id="resultContinue">
+            CONTINUAR
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- ======================================================
+     ENDING
+====================================================== -->
+
+<div id="ending">
+
+    <div class="endBox">
+
+        <div class="endTag">
+            FINAL
+        </div>
+
+        <h1 id="endTitle">
+            ...
+        </h1>
+
+        <p id="endText">
+            ...
+        </p>
+
+        <button
+            class="endButton"
+            id="restartButton">
+
+            VOLVER A JUGAR
+
+        </button>
+
+    </div>
+
+</div>
+
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   GAME STATE
+========================================================= */
+
+let state = {
+    scene: 0,
+    trust: 50,
+
+    route: null,
+
+    ignored: false,
+    shared: false,
+    defended: false,
+    reported: false,
+
+    evidence: 0,
+
+    miniWins: 0,
+    miniLosses: 0,
+
+    spreading: 0
+};
+
+
+/* =========================================================
+   STORY
+========================================================= */
+
+const scenes = [
+
+    {
+        bg: "day",
+        speaker: "MARKUS",
+        char: "markus",
+        text:
+            "El aula todavía está medio vacía. Markus revisa el teléfono antes de que empiece la primera clase."
+    },
+
+    {
+        bg: "day",
+        speaker: "MARKUS",
+        char: "markus",
+        text:
+            "Hay un nuevo mensaje en el grupo de la clase. Una fotografía de Sofía. Después aparece otra. Y otra."
+    },
+
+    {
+        bg: "day",
+        speaker: "SOFÍA",
+        char: "sofia",
+        text:
+            "¿Puedes venir un momento?"
+    },
+
+    {
+        bg: "day",
+        speaker: "MARKUS",
+        char: "markus",
+        text:
+            "Markus se acerca. Sofía mantiene el teléfono boca abajo sobre la mesa."
+    },
+
+    {
+        bg: "day",
+        speaker: "SOFÍA",
+        char: "sofia",
+        text:
+            "No importa. Estoy bien."
+    },
+
+    {
+        bg: "day",
+        speaker: "MARKUS",
+        char: "markus",
+        text:
+            "Pero no parece estar bien."
+    },
+
+    {
+        bg: "day",
+        speaker: "MARKUS",
+        char: "markus",
+        text:
+            "Durante el recreo, Markus vuelve a mirar el grupo.",
+        minigame: "evidence"
+    },
+
+    {
+        bg: "day",
+        speaker: "MARKUS",
+        char: "markus",
+        text:
+            "Ahora hay suficiente información para entender que las publicaciones no son simples bromas."
+    },
+
+    {
+        bg: "day",
+        speaker: "SOFÍA",
+        char: "sofia",
+        text:
+            "¿Por qué nadie dice nada?"
+    },
+
+    {
+        bg: "day",
+        speaker: "MARKUS",
+        char: "markus",
+        text:
+            "Markus mira el mensaje. Tiene cuatro opciones.",
+        choice: true
+    },
+
+    {
+        bg: "day",
+        speaker: "MARKUS",
+        char: "markus",
+        text:
+            "La decisión parece pequeña. Pero el contenido ya está circulando."
+    },
+
+    {
+        bg: "night",
+        speaker: "MARKUS",
+        char: "markus",
+        text:
+            "Esa noche, el teléfono de Markus no deja de vibrar."
+    },
+
+    {
+        bg: "night",
+        speaker: "MARKUS",
+        char: "markus",
+        text:
+            "Una nueva publicación utiliza información privada de Sofía.",
+        minigame: "phone"
+    },
+
+    {
+        bg: "night",
+        speaker: "MARKUS",
+        char: "markus",
+        text:
+            "El problema ya no está solamente en una publicación."
+    },
+
+    {
+        bg: "night",
+        speaker: "MARKUS",
+        char: "markus",
+        text:
+            "Está en todas las personas que deciden qué hacer con ella."
+    },
+
+    {
+        bg: "night",
+        speaker: "MARKUS",
+        char: "markus",
+        text:
+            "El contenido comienza a propagarse rápidamente.",
+        minigame: "tetris"
+    },
+
+    {
+        bg: "day",
+        speaker: "SOFÍA",
+        char: "sofia",
+        text:
+            "Hoy no quería venir."
+    },
+
+    {
+        bg: "day",
+        speaker: "MARKUS",
+        char: "markus",
+        text:
+            "¿Por qué?"
+    },
+
+    {
+        bg: "day",
+        speaker: "SOFÍA",
+        char: "sofia",
+        text:
+            "Porque siento que todos saben lo que pasó."
+    },
+
+    {
+        bg: "day",
+        speaker: "MARKUS",
+        char: "markus",
+        text:
+            "Markus recuerda todas las veces que vio el teléfono y decidió no hacer nada."
+    },
+
+    {
+        bg: "day",
+        speaker: "SOFÍA",
+        char: "sofia",
+        text:
+            "¿Tú también pensabas que era divertido?"
+    },
+
+    {
+        bg: "day",
+        speaker: "MARKUS",
+        char: "markus",
+        text:
+            "Esta vez Markus no puede esconderse detrás de la pantalla.",
+        minigame: "chat"
+    },
+
+    {
+        bg: "night",
+        speaker: "MARKUS",
+        char: "markus",
+        text:
+            "Al final del día, Markus entiende algo que antes no había querido aceptar."
+    },
+
+    {
+        bg: "night",
+        speaker: "MARKUS",
+        char: "markus",
+        text:
+            "Cada clic podía parecer pequeño. Pero juntos habían construido algo mucho más grande."
+    },
+
+    {
+        bg: "night",
+        speaker: "SOFÍA",
+        char: "sofia",
+        text:
+            "Gracias por quedarte."
+    },
+
+    {
+        bg: "night",
+        speaker: "MARKUS",
+        char: "markus",
+        text:
+            "Markus no sabe si puede arreglar todo. Pero ahora sabe que no tiene que mirar hacia otro lado."
+    }
+
+];
+
+
+/* =========================================================
+   BACKGROUND
+========================================================= */
+
+function setBackground(type) {
+
+    if (type === "night") {
+        $("#background").addClass("night");
+    } else {
+        $("#background").removeClass("night");
+    }
+
+}
+
+
+/* =========================================================
+   TRUST
+========================================================= */
+
+function updateTrust() {
+
+    state.trust = Math.max(
+        0,
+        Math.min(
+            100,
+            state.trust
+        )
+    );
+
+    $("#trustValue").text(
+        state.trust
+    );
+
+    $("#trustFill").css(
+        "width",
+        state.trust + "%"
+    );
+
+    if (state.trust >= 70) {
+
+        $("#atmosphere").css(
+            "background",
+            "rgba(80,100,170,.03)"
+        );
+
+        $("#sofia").removeClass("dim");
+
+    } else if (state.trust >= 40) {
+
+        $("#atmosphere").css(
+            "background",
+            "rgba(40,45,90,.09)"
+        );
+
+    } else {
+
+        $("#atmosphere").css(
+            "background",
+            "rgba(90,20,45,.18)"
+        );
+
+        $("#sofia").addClass("dim");
+    }
+
+}
+
+
+/* =========================================================
+   CHARACTER
+========================================================= */
+
+function showCharacter(name) {
+
+    $(".character").removeClass("visible");
+
+    if (name) {
+
+        $("#" + name).addClass("visible");
+
+    }
+
+}
+
+
+/* =========================================================
+   TYPEWRITER
+========================================================= */
+
+let typingTimer = null;
+let isTyping = false;
+
+function typeText(text) {
+
+    if (typingTimer !== null) {
+        clearInterval(typingTimer);
+    }
+
+    isTyping = true;
+
+    $("#text").text("");
+
+    let index = 0;
+
+    typingTimer = setInterval(
+        function() {
+
+            $("#text").text(
+                text.substring(
+                    0,
+                    index
+                )
+            );
+
+            index++;
+
+            if (index > text.length) {
+
+                clearInterval(
+                    typingTimer
+                );
+
+                typingTimer = null;
+
+                isTyping = false;
+            }
+
+        },
+        18
+    );
+
+}
+
+
+/* =========================================================
+   SHOW SCENE
+========================================================= */
+
+function showScene() {
+
+    if (state.scene >= scenes.length) {
+
+        ending();
+
+        return;
+    }
+
+    const scene = scenes[state.scene];
+
+    setBackground(
+        scene.bg
+    );
+
+    showCharacter(
+        scene.char
+    );
+
+    if (scene.bg === "night") {
+
+        $("#chapter").text(
+            "MARTES · 21:43"
+        );
+
+    } else {
+
+        $("#chapter").text(
+            "MARTES · 08:17"
+        );
+
+    }
+
+    $("#speaker").text(
+        scene.speaker
+    );
+
+    typeText(
+        scene.text
+    );
+
+}
+
+
+/* =========================================================
+   DIALOGUE
+========================================================= */
+
+$("#dialogue").on(
+    "click",
+    function() {
+
+        if (isTyping) {
+
+            if (typingTimer !== null) {
+                clearInterval(
+                    typingTimer
+                );
+            }
+
+            typingTimer = null;
+
+            $("#text").text(
+                scenes[state.scene].text
+            );
+
+            isTyping = false;
+
+            return;
+        }
+
+        const scene =
+            scenes[state.scene];
+
+        if (scene.minigame) {
+
+            openMiniGame(
+                scene.minigame
+            );
+
+            return;
+        }
+
+        if (scene.choice) {
+
+            openChoices();
+
+            return;
+        }
+
+        state.scene++;
+
+        showScene();
+
+    }
+);
+
+
+/* =========================================================
+   CHOICES
+========================================================= */
+
+function openChoices() {
+
+    $("#choices").empty();
+
+    const choices = [
+
+        {
+            text:
+                "Ignorar el mensaje.",
+            route:
+                "ignore"
+        },
+
+        {
+            text:
+                "Compartir la publicación con otros compañeros.",
+            route:
+                "share"
+        },
+
+        {
+            text:
+                "Defender a Sofía en el grupo.",
+            route:
+                "defend"
+        },
+
+        {
+            text:
+                "Denunciar la publicación y pedir ayuda.",
+            route:
+                "report"
+        }
+
+    ];
+
+    choices.forEach(
+        function(choice) {
+
+            $("<button>")
+                .addClass("choice")
+                .text(choice.text)
+                .appendTo("#choices")
+                .on(
+                    "click",
+                    function() {
+
+                        selectRoute(
+                            choice.route
+                        );
+
+                    }
+                );
+
+        }
+    );
+
+    $("#choicePanel").css(
+        "display",
+        "flex"
+    );
+
+}
+
+
+function selectRoute(route) {
+
+    state.route = route;
+
+    if (route === "ignore") {
+
+        state.ignored = true;
+        state.trust -= 15;
+
+    } else if (route === "share") {
+
+        state.shared = true;
+        state.trust -= 20;
+        state.spreading += 3;
+
+    } else if (route === "defend") {
+
+        state.defended = true;
+        state.trust += 15;
+
+    } else if (route === "report") {
+
+        state.reported = true;
+        state.trust += 10;
+
+    }
+
+    updateTrust();
+
+    $("#choicePanel").fadeOut(
+        300,
+        function() {
+
+            state.scene++;
+
+            showScene();
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   MINIGAME OPEN
+========================================================= */
+
+function openMiniGame(type) {
+
+    $("#dialogue").hide();
+
+    $("#minigame").css(
+        "display",
+        "flex"
+    );
+
+    if (type === "evidence") {
+
+        evidenceGame();
+
+    } else if (type === "phone") {
+
+        phoneGame();
+
+    } else if (type === "tetris") {
+
+        tetrisGame();
+
+    } else if (type === "chat") {
+
+        chatGame();
+
+    }
+
+}
+
+
+/* =========================================================
+   MINI RESULT
+========================================================= */
+
+function miniResult(
+    success,
+    title,
+    description,
+    trustChange
+) {
+
+    if (success) {
+
+        state.miniWins++;
+
+        state.trust += trustChange;
+
+        $("#resultTitle").css(
+            "color",
+            "var(--green)"
+        );
+
+    } else {
+
+        state.miniLosses++;
+
+        state.trust -= Math.abs(
+            trustChange
+        );
+
+        $("#resultTitle").css(
+            "color",
+            "var(--red)"
+        );
+
+    }
+
+    updateTrust();
+
+    $("#resultTitle").text(
+        title
+    );
+
+    $("#resultDescription").text(
+        description
+    );
+
+    $("#minigame").hide();
+
+    $("#resultOverlay").css(
+        "display",
+        "flex"
+    );
+
+}
+
+
+/* =========================================================
+   EVIDENCE GAME
+========================================================= */
+
+function evidenceGame() {
+
+    $("#miniTitle").text(
+        "BUSCA LAS PRUEBAS"
+    );
+
+    $("#miniType").text(
+        "INVESTIGACIÓN"
+    );
+
+    $("#miniContent").html(`
+        <div class="miniDescription">
+            Encuentra las cuatro pruebas importantes.
+            Algunas tarjetas son información normal y
+            otras permiten reconstruir lo ocurrido.
+        </div>
+
+        <div
+            id="evidenceGrid"
+            class="evidenceGrid">
+        </div>
+
+        <button
+            id="evidenceCheck"
+            class="miniButton">
+            REVISAR EVIDENCIAS
+        </button>
+    `);
+
+    const evidence = [
+
+        ["📷", "Foto manipulada", true],
+        ["💬", "Mensaje normal", false],
+        ["🔗", "Enlace de publicación", true],
+        ["📚", "Horario escolar", false],
+        ["🕵️", "Cuenta anónima", true],
+        ["🎧", "Audio del grupo", false],
+        ["📱", "Captura del rumor", true],
+        ["☀️", "Foto del recreo", false]
+
+    ];
+
+    evidence.forEach(
+        function(item) {
+
+            $("<div>")
+                .addClass("evidence")
+                .attr(
+                    "data-correct",
+                    String(item[2])
+                )
+                .html(`
+                    <div class="evidenceIcon">
+                        ${item[0]}
+                    </div>
+
+                    <div class="evidenceText">
+                        ${item[1]}
+                    </div>
+                `)
+                .appendTo("#evidenceGrid")
+                .on(
+                    "click",
+                    function() {
+
+                        $(this).toggleClass(
+                            "selected"
+                        );
+
+                    }
+                );
+
+        }
+    );
+
+    $("#evidenceCheck").on(
+        "click",
+        function() {
+
+            let score = 0;
+
+            $(".evidence").each(
+                function() {
+
+                    const selected =
+                        $(this).hasClass(
+                            "selected"
+                        );
+
+                    const correct =
+                        $(this).attr(
+                            "data-correct"
+                        ) === "true";
+
+                    if (
+                        selected &&
+                        correct
+                    ) {
+
+                        score++;
+
+                    }
+
+                }
+            );
+
+            if (score === 4) {
+
+                state.evidence = 4;
+
+                miniResult(
+                    true,
+                    "EVIDENCIAS ENCONTRADAS",
+                    "Markus consigue reconstruir parte de lo ocurrido. Sofía nota que alguien está intentando comprender la situación.",
+                    12
+                );
+
+            } else {
+
+                miniResult(
+                    false,
+                    "FALTAN PIEZAS",
+                    "Algunas pruebas importantes quedaron fuera. Markus todavía no tiene una imagen completa.",
+                    8
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   PHONE GAME
+========================================================= */
+
+function phoneGame() {
+
+    $("#miniTitle").text(
+        "REVISA EL TELÉFONO"
+    );
+
+    $("#miniType").text(
+        "INVESTIGACIÓN"
+    );
+
+    $("#miniContent").html(`
+        <div class="miniDescription">
+            Encuentra las señales que indican que
+            el problema está aumentando.
+        </div>
+
+        <div
+            id="phoneItems"
+            class="evidenceGrid">
+        </div>
+
+        <button
+            id="phoneCheck"
+            class="miniButton">
+            TERMINAR INVESTIGACIÓN
+        </button>
+    `);
+
+    const items = [
+
+        ["💬", "Mensaje de Sofía", true],
+        ["😂", "Meme reenviado", true],
+        ["📖", "Grupo de estudio", false],
+        ["⚠️", "Amenaza indirecta", true],
+        ["🎮", "Conversación de juego", false],
+        ["📸", "Captura manipulada", true],
+        ["📝", "Tarea de matemáticas", false],
+        ["🔒", "Información privada", true]
+
+    ];
+
+    items.forEach(
+        function(item) {
+
+            $("<div>")
+                .addClass("evidence")
+                .attr(
+                    "data-correct",
+                    String(item[2])
+                )
+                .html(`
+                    <div class="evidenceIcon">
+                        ${item[0]}
+                    </div>
+
+                    <div class="evidenceText">
+                        ${item[1]}
+                    </div>
+                `)
+                .appendTo("#phoneItems")
+                .on(
+                    "click",
+                    function() {
+
+                        $(this).toggleClass(
+                            "selected"
+                        );
+
+                    }
+                );
+
+        }
+    );
+
+    $("#phoneCheck").on(
+        "click",
+        function() {
+
+            let score = 0;
+
+            $(".evidence").each(
+                function() {
+
+                    if (
+                        $(this).hasClass(
+                            "selected"
+                        ) &&
+                        $(this).attr(
+                            "data-correct"
+                        ) === "true"
+                    ) {
+
+                        score++;
+
+                    }
+
+                }
+            );
+
+            if (score === 5) {
+
+                miniResult(
+                    true,
+                    "SEÑALES IDENTIFICADAS",
+                    "Markus encuentra las señales que muestran que el problema ya no es una simple broma.",
+                    12
+                );
+
+            } else {
+
+                miniResult(
+                    false,
+                    "ALGUNAS SEÑALES PASARON",
+                    "Markus encontró parte del problema, pero no consiguió identificar todas las señales.",
+                    8
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   TETRIS VARIABLES
+========================================================= */
+
+const TETRIS_ROWS = 14;
+const TETRIS_COLS = 10;
+
+let tetrisBoard = [];
+let currentPiece = null;
+let currentX = 0;
+let currentY = 0;
+
+let tetrisScore = 0;
+let tetrisLines = 0;
+
+let tetrisTimer = null;
+let tetrisActive = false;
+
+let tetrisGameOver = false;
+
+
+/* =========================================================
+   TETRIS PIECES
+========================================================= */
+
+const TETRIS_PIECES = [
+
+    {
+        color: "#62d9a5",
+        shape: [
+            [1, 1, 1, 1]
+        ]
+    },
+
+    {
+        color: "#7188ff",
+        shape: [
+            [1, 0, 0],
+            [1, 1, 1]
+        ]
+    },
+
+    {
+        color: "#ff7d9c",
+        shape: [
+            [0, 0, 1],
+            [1, 1, 1]
+        ]
+    },
+
+    {
+        color: "#f3c969",
+        shape: [
+            [1, 1],
+            [1, 1]
+        ]
+    },
+
+    {
+        color: "#9c7cff",
+        shape: [
+            [0, 1, 0],
+            [1, 1, 1]
+        ]
+    },
+
+    {
+        color: "#63b8ff",
+        shape: [
+            [1, 1, 0],
+            [0, 1, 1]
+        ]
+    },
+
+    {
+        color: "#ff9b68",
+        shape: [
+            [0, 1, 1],
+            [1, 1, 0]
+        ]
+    }
+
+];
+
+
+/* =========================================================
+   TETRIS GAME
+========================================================= */
+
+function tetrisGame() {
+
+    stopTetris();
+
+    $("#miniTitle").text(
+        "DETÉN LA PROPAGACIÓN"
+    );
+
+    $("#miniType").text(
+        "MINI TETRIS"
+    );
+
+    $("#miniContent").html(`
+        <div class="miniDescription">
+            Completa <b>3 líneas</b> para frenar la
+            propagación. Usa las flechas del teclado
+            o los botones. También puedes rotar las piezas.
+        </div>
+
+        <div class="tetrisLayout">
+
+            <div id="tetris"></div>
+
+            <div class="tetrisInfo">
+
+                <div>
+                    PUNTUACIÓN
+                </div>
+
+                <div
+                    id="tetrisScore"
+                    class="tetrisScore">
+                    0
+                </div>
+
+                <div>
+                    LÍNEAS:
+                    <span
+                        id="tetrisLines"
+                        class="tetrisLines">
+                        0
+                    </span>
+                    / 3
+                </div>
+
+                <br>
+
+                <div>
+                    <b>CONTROLES</b>
+                    <br>
+                    ← → mover
+                    <br>
+                    ↑ rotar
+                    <br>
+                    ↓ bajar
+                    <br>
+                    ESPACIO caída rápida
+                </div>
+
+                <div class="tetrisControls">
+
+                    <button id="tetrisLeft">
+                        ◀
+                    </button>
+
+                    <button id="tetrisRotate">
+                        ↻
+                    </button>
+
+                    <button id="tetrisRight">
+                        ▶
+                    </button>
+
+                    <button id="tetrisDown">
+                        ▼
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <button
+            id="finishTetris"
+            class="miniButton">
+            SALIR DEL MINIJUEGO
+        </button>
+    `);
+
+    initTetris();
+
+}
+
+
+/* =========================================================
+   INITIALIZE TETRIS
+========================================================= */
+
+function initTetris() {
+
+    tetrisBoard = [];
+
+    tetrisScore = 0;
+    tetrisLines = 0;
+
+    tetrisGameOver = false;
+    tetrisActive = true;
+
+    for (
+        let row = 0;
+        row < TETRIS_ROWS;
+        row++
+    ) {
+
+        tetrisBoard[row] = [];
+
+        for (
+            let col = 0;
+            col < TETRIS_COLS;
+            col++
+        ) {
+
+            tetrisBoard[row][col] = null;
+
+        }
+
+    }
+
+    /*
+       Añadimos algunos bloques inferiores
+       para que el jugador tenga que completar
+       líneas realmente.
+    */
+
+    for (
+        let row = TETRIS_ROWS - 3;
+        row < TETRIS_ROWS;
+        row++
+    ) {
+
+        for (
+            let col = 0;
+            col < TETRIS_COLS;
+            col++
+        ) {
+
+            if (Math.random() < 0.52) {
+
+                tetrisBoard[row][col] =
+                    "#40517f";
+
+            }
+
+        }
+
+    }
+
+    spawnPiece();
+
+    renderTetris();
+
+    bindTetrisControls();
+
+    tetrisTimer = setInterval(
+        function() {
+
+            if (!tetrisActive) {
+                return;
+            }
+
+            movePieceDown();
+
+        },
+        700
+    );
+
+}
+
+
+/* =========================================================
+   SPAWN
+========================================================= */
+
+function spawnPiece() {
+
+    const randomIndex =
+        Math.floor(
+            Math.random() *
+            TETRIS_PIECES.length
+        );
+
+    const template =
+        TETRIS_PIECES[randomIndex];
+
+    currentPiece = {
+        color: template.color,
+        shape: template.shape.map(
+            function(row) {
+                return row.slice();
+            }
+        )
+    };
+
+    currentX =
+        Math.floor(
+            (TETRIS_COLS -
+            currentPiece.shape[0].length) /
+            2
+        );
+
+    currentY = 0;
+
+    if (
+        collision(
+            currentPiece.shape,
+            currentX,
+            currentY
+        )
+    ) {
+
+        tetrisGameOver = true;
+        tetrisActive = false;
+
+        setTimeout(
+            function() {
+
+                miniResult(
+                    false,
+                    "LA PROPAGACIÓN CONTINÚA",
+                    "El tablero se llenó antes de que Markus pudiera frenar la cadena de publicaciones.",
+                    10
+                );
+
+            },
+            300
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   COLLISION
+========================================================= */
+
+function collision(
+    shape,
+    x,
+    y
+) {
+
+    for (
+        let row = 0;
+        row < shape.length;
+        row++
+    ) {
+
+        for (
+            let col = 0;
+            col < shape[row].length;
+            col++
+        ) {
+
+            if (!shape[row][col]) {
+                continue;
+            }
+
+            const boardX = x + col;
+            const boardY = y + row;
+
+            if (
+                boardX < 0 ||
+                boardX >= TETRIS_COLS ||
+                boardY >= TETRIS_ROWS
+            ) {
+
+                return true;
+
+            }
+
+            if (
+                boardY >= 0 &&
+                tetrisBoard[boardY][boardX] !== null
+            ) {
+
+                return true;
+
+            }
+
+        }
+
+    }
+
+    return false;
+
+}
+
+
+/* =========================================================
+   MOVE LEFT / RIGHT
+========================================================= */
+
+function movePieceHorizontal(direction) {
+
+    if (
+        !tetrisActive ||
+        !currentPiece
+    ) {
+        return;
+    }
+
+    const newX =
+        currentX + direction;
+
+    if (
+        !collision(
+            currentPiece.shape,
+            newX,
+            currentY
+        )
+    ) {
+
+        currentX = newX;
+
+        renderTetris();
+
+    }
+
+}
+
+
+/* =========================================================
+   MOVE DOWN
+========================================================= */
+
+function movePieceDown() {
+
+    if (
+        !tetrisActive ||
+        !currentPiece
+    ) {
+        return;
+    }
+
+    const newY =
+        currentY + 1;
+
+    if (
+        !collision(
+            currentPiece.shape,
+            currentX,
+            newY
+        )
+    ) {
+
+        currentY = newY;
+
+        renderTetris();
+
+        return;
+    }
+
+    lockPiece();
+
+}
+
+
+/* =========================================================
+   HARD DROP
+========================================================= */
+
+function hardDrop() {
+
+    if (
+        !tetrisActive ||
+        !currentPiece
+    ) {
+        return;
+    }
+
+    let safety = 0;
+
+    while (
+        !collision(
+            currentPiece.shape,
+            currentX,
+            currentY + 1
+        ) &&
+        safety < 30
+    ) {
+
+        currentY++;
+
+        safety++;
+
+    }
+
+    lockPiece();
+
+}
+
+
+/* =========================================================
+   LOCK PIECE
+========================================================= */
+
+function lockPiece() {
+
+    if (!currentPiece) {
+        return;
+    }
+
+    for (
+        let row = 0;
+        row < currentPiece.shape.length;
+        row++
+    ) {
+
+        for (
+            let col = 0;
+            col < currentPiece.shape[row].length;
+            col++
+        ) {
+
+            if (!currentPiece.shape[row][col]) {
+                continue;
+            }
+
+            const boardX =
+                currentX + col;
+
+            const boardY =
+                currentY + row;
+
+            if (
+                boardY >= 0 &&
+                boardY < TETRIS_ROWS &&
+                boardX >= 0 &&
+                boardX < TETRIS_COLS
+            ) {
+
+                tetrisBoard[boardY][boardX] =
+                    currentPiece.color;
+
+            }
+
+        }
+
+    }
+
+    clearCompletedLines();
+
+    if (tetrisLines >= 3) {
+
+        tetrisActive = false;
+
+        stopTetris();
+
+        miniResult(
+            true,
+            "PROPAGACIÓN REDUCIDA",
+            "Markus consigue frenar parte de la cadena. No puede borrar lo que ya fue visto, pero evita que continúe creciendo.",
+            10
+        );
+
+        return;
+    }
+
+    spawnPiece();
+
+    renderTetris();
+
+}
+
+
+/* =========================================================
+   CLEAR LINES
+========================================================= */
+
+function clearCompletedLines() {
+
+    let removed = 0;
+
+    for (
+        let row = TETRIS_ROWS - 1;
+        row >= 0;
+        row--
+    ) {
+
+        const complete =
+            tetrisBoard[row].every(
+                function(cell) {
+                    return cell !== null;
+                }
+            );
+
+        if (complete) {
+
+            tetrisBoard.splice(
+                row,
+                1
+            );
+
+            tetrisBoard.unshift(
+                new Array(
+                    TETRIS_COLS
+                ).fill(null)
+            );
+
+            removed++;
+
+            row++;
+        }
+
+    }
+
+    if (removed > 0) {
+
+        tetrisLines += removed;
+
+        tetrisScore +=
+            removed * 100;
+
+        $("#tetrisScore").text(
+            tetrisScore
+        );
+
+        $("#tetrisLines").text(
+            tetrisLines
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   ROTATION
+========================================================= */
+
+function rotateMatrix(matrix) {
+
+    const rows =
+        matrix.length;
+
+    const cols =
+        matrix[0].length;
+
+    const rotated = [];
+
+    for (
+        let col = 0;
+        col < cols;
+        col++
+    ) {
+
+        rotated[col] = [];
+
+        for (
+            let row = rows - 1;
+            row >= 0;
+            row--
+        ) {
+
+            rotated[col].push(
+                matrix[row][col]
+            );
+
+        }
+
+    }
+
+    return rotated;
+
+}
+
+
+function rotatePiece() {
+
+    if (
+        !tetrisActive ||
+        !currentPiece
+    ) {
+        return;
+    }
+
+    const rotated =
+        rotateMatrix(
+            currentPiece.shape
+        );
+
+    const tests = [
+        0,
+        -1,
+        1,
+        -2,
+        2
+    ];
+
+    for (
+        let i = 0;
+        i < tests.length;
+        i++
+    ) {
+
+        const testX =
+            currentX + tests[i];
+
+        if (
+            !collision(
+                rotated,
+                testX,
+                currentY
+            )
+        ) {
+
+            currentPiece.shape =
+                rotated;
+
+            currentX =
+                testX;
+
+            renderTetris();
+
+            return;
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   RENDER TETRIS
+========================================================= */
+
+function renderTetris() {
+
+    const boardElement =
+        $("#tetris");
+
+    if (!boardElement.length) {
+        return;
+    }
+
+    boardElement.empty();
+
+    for (
+        let row = 0;
+        row < TETRIS_ROWS;
+        row++
+    ) {
+
+        for (
+            let col = 0;
+            col < TETRIS_COLS;
+            col++
+        ) {
+
+            const cell =
+                $("<div>")
+                    .addClass("tCell");
+
+            const color =
+                tetrisBoard[row][col];
+
+            if (color) {
+
+                cell.addClass("block");
+
+                cell.css(
+                    "background",
+                    color
+                );
+
+            }
+
+            /*
+               Render de pieza activa.
+            */
+
+            if (
+                currentPiece &&
+                row >= currentY &&
+                row <
+                    currentY +
+                    currentPiece.shape.length &&
+                col >= currentX &&
+                col <
+                    currentX +
+                    currentPiece.shape[0].length
+            ) {
+
+                const pieceRow =
+                    row - currentY;
+
+                const pieceCol =
+                    col - currentX;
+
+                if (
+                    currentPiece.shape[
+                        pieceRow
+                    ][
+                        pieceCol
+                    ]
+                ) {
+
+                    cell
+                        .removeClass("block")
+                        .addClass("active");
+
+                    cell.css(
+                        "background",
+                        currentPiece.color
+                    );
+
+                }
+
+            }
+
+            boardElement.append(
+                cell
+            );
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   TETRIS CONTROLS
+========================================================= */
+
+function bindTetrisControls() {
+
+    $("#tetrisLeft")
+        .off("click")
+        .on(
+            "click",
+            function() {
+                movePieceHorizontal(-1);
+            }
+        );
+
+    $("#tetrisRight")
+        .off("click")
+        .on(
+            "click",
+            function() {
+                movePieceHorizontal(1);
+            }
+        );
+
+    $("#tetrisRotate")
+        .off("click")
+        .on(
+            "click",
+            function() {
+                rotatePiece();
+            }
+        );
+
+    $("#tetrisDown")
+        .off("click")
+        .on(
+            "click",
+            function() {
+                movePieceDown();
+            }
+        );
+
+    $("#finishTetris")
+        .off("click")
+        .on(
+            "click",
+            function() {
+
+                const currentLines =
+                    tetrisLines;
+
+                stopTetris();
+
+                if (
+                    currentLines >= 2
+                ) {
+
+                    miniResult(
+                        true,
+                        "PROPAGACIÓN REDUCIDA",
+                        "Markus consiguió frenar una parte importante de la cadena de publicaciones.",
+                        7
+                    );
+
+                } else {
+
+                    miniResult(
+                        false,
+                        "LA CADENA CONTINÚA",
+                        "Markus abandonó antes de conseguir bloquear suficientes líneas.",
+                        5
+                    );
+
+                }
+
+            }
+        );
+
+}
+
+
+/* =========================================================
+   KEYBOARD TETRIS
+========================================================= */
+
+function tetrisKeyboard(event) {
+
+    if (
+        !$("#minigame").is(":visible") ||
+        !tetrisActive
+    ) {
+        return;
+    }
+
+    /*
+       Evita que las flechas desplacen
+       la página.
+    */
+
+    const keys = [
+        "ArrowLeft",
+        "ArrowRight",
+        "ArrowDown",
+        "ArrowUp",
+        " "
+    ];
+
+    if (
+        keys.includes(event.key)
+    ) {
+
+        event.preventDefault();
+
+    }
+
+    if (event.key === "ArrowLeft") {
+
+        movePieceHorizontal(-1);
+
+    } else if (
+        event.key === "ArrowRight"
+    ) {
+
+        movePieceHorizontal(1);
+
+    } else if (
+        event.key === "ArrowDown"
+    ) {
+
+        movePieceDown();
+
+    } else if (
+        event.key === "ArrowUp"
+    ) {
+
+        rotatePiece();
+
+    } else if (
+        event.key === " "
+    ) {
+
+        hardDrop();
+
+    }
+
+}
+
+$(document)
+    .off("keydown.tetris")
+    .on(
+        "keydown.tetris",
+        tetrisKeyboard
+    );
+
+
+/* =========================================================
+   STOP TETRIS
+========================================================= */
+
+function stopTetris() {
+
+    tetrisActive = false;
+
+    if (tetrisTimer !== null) {
+
+        clearInterval(
+            tetrisTimer
+        );
+
+        tetrisTimer = null;
+
+    }
+
+}
+
+
+/* =========================================================
+   CHAT GAME
+========================================================= */
+
+function chatGame() {
+
+    $("#miniTitle").text(
+        "RESPONDE A SOFÍA"
+    );
+
+    $("#miniType").text(
+        "DECISIÓN"
+    );
+
+    $("#miniContent").html(`
+        <div class="miniDescription">
+            Sofía finalmente dice cómo se siente.
+            Elige una respuesta que permita abrir
+            la conversación.
+        </div>
+
+        <div class="chatWindow">
+
+            <div class="chatMessage chatOther">
+                Sofía: "¿Tú también pensabas que era divertido?"
+            </div>
+
+            <div class="chatMessage chatMarkus">
+                Markus está escribiendo...
+            </div>
+
+        </div>
+
+        <button
+            class="choice chatChoice"
+            data-chat="good">
+
+            "No. Creo que debí haber prestado atención
+            antes. ¿Quieres contarme qué está pasando?"
+
+        </button>
+
+        <button
+            class="choice chatChoice"
+            data-chat="neutral">
+
+            "No sé qué decir."
+
+        </button>
+
+        <button
+            class="choice chatChoice"
+            data-chat="bad">
+
+            "Era solamente una broma."
+
+        </button>
+    `);
+
+    $(".chatChoice").on(
+        "click",
+        function() {
+
+            const type =
+                $(this).data(
+                    "chat"
+                );
+
+            if (type === "good") {
+
+                miniResult(
+                    true,
+                    "SOFÍA RESPONDE",
+                    "Sofía tarda unos segundos, pero finalmente empieza a hablar. No necesitaba una solución inmediata. Primero necesitaba sentir que alguien estaba dispuesto a escuchar.",
+                    15
+                );
+
+            } else if (
+                type === "neutral"
+            ) {
+
+                miniResult(
+                    false,
+                    "LA CONVERSACIÓN SE CIERRA",
+                    "Sofía deja el teléfono unos minutos después. La respuesta no fue cruel, pero tampoco consiguió hacerla sentir acompañada.",
+                    5
+                );
+
+            } else {
+
+                miniResult(
+                    false,
+                    "LA DISTANCIA AUMENTA",
+                    "Sofía deja de responder. Para ella, aquello no se siente como una broma.",
+                    12
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   RESULT CONTINUE
+========================================================= */
+
+$("#resultContinue").on(
+    "click",
+    function() {
+
+        $("#resultOverlay").hide();
+
+        $("#dialogue").show();
+
+        state.scene++;
+
+        showScene();
+
+    }
+);
+
+
+/* =========================================================
+   ROUTE FINAL MODIFIER
+========================================================= */
+
+function routeModifier() {
+
+    if (state.route === "ignore") {
+
+        state.trust -= 10;
+        state.spreading += 2;
+
+    } else if (
+        state.route === "share"
+    ) {
+
+        state.trust -= 15;
+        state.spreading += 4;
+
+    } else if (
+        state.route === "defend"
+    ) {
+
+        state.trust += 5;
+
+    } else if (
+        state.route === "report"
+    ) {
+
+        state.trust += 5;
+
+    }
+
+    updateTrust();
+
+}
+
+
+/* =========================================================
+   ENDINGS
+========================================================= */
+
+function ending() {
+
+    routeModifier();
+
+    $("#dialogue").fadeOut(400);
+
+    $("#stage").fadeOut(400);
+
+    $("#trustPanel").fadeOut(400);
+
+    let title = "";
+    let text = "";
+    let tag = "";
+
+
+    /* -----------------------------------------
+       IGNORAR
+    ----------------------------------------- */
+
+    if (state.route === "ignore") {
+
+        tag = "RUTA · IGNORAR";
+
+        if (state.trust < 25) {
+
+            title =
+                "EL SILENCIO TAMBIÉN PESA";
+
+            text =
+                "Markus eligió no involucrarse. Las publicaciones continuaron circulando y Sofía comenzó a aislarse cada vez más. Finalmente dejó de asistir al colegio y fue necesaria la intervención de adultos responsables. Markus comprendió que mantenerse al margen no había detenido el daño.";
+
+        } else {
+
+            title =
+                "DEMASIADO TARDE";
+
+            text =
+                "Markus finalmente intentó acercarse a Sofía, pero el daño ya había avanzado. Comprendió que esperar a que el problema desapareciera por sí solo también había sido una decisión.";
+
+        }
+
+    }
+
+
+    /* -----------------------------------------
+       COMPARTIR
+    ----------------------------------------- */
+
+    else if (state.route === "share") {
+
+        tag = "RUTA · COMPARTIR";
+
+        title =
+            "UNA BROMA QUE CRECIÓ";
+
+        text =
+            "Markus compartió el contenido pensando que solamente estaba siguiendo una broma. Pero la publicación alcanzó a más personas de las que imaginaba. Cuando vio las consecuencias en Sofía, entendió que compartir no era una acción neutral: había ayudado a que el contenido siguiera circulando.";
+
+    }
+
+
+    /* -----------------------------------------
+       DEFENDER
+    ----------------------------------------- */
+
+    else if (state.route === "defend") {
+
+        tag = "RUTA · DEFENDER";
+
+        if (state.trust >= 55) {
+
+            title =
+                "NO ESTABA SOLA";
+
+            text =
+                "Markus decidió defender a Sofía aunque algunos compañeros comenzaron a burlarse de él. Sofía recuperó poco a poco la confianza necesaria para pedir ayuda. Markus descubrió que intervenir puede ser incómodo, pero también puede demostrarle a alguien que no tiene que enfrentarse solo al problema.";
+
+        } else {
+
+            title =
+                "BAJO PRESIÓN";
+
+            text =
+                "Markus intentó defender a Sofía, pero la presión del grupo hizo que dudara varias veces. No pudo solucionar todo, aunque su decisión permitió que otras personas comenzaran a prestar atención.";
+
+        }
+
+    }
+
+
+    /* -----------------------------------------
+       DENUNCIAR
+    ----------------------------------------- */
+
+    else if (state.route === "report") {
+
+        tag = "RUTA · DENUNCIAR";
+
+        title =
+            "DENUNCIAR NO ES EL FINAL";
+
+        text =
+            "Markus denunció el contenido y pidió ayuda a un adulto de confianza. Algunas publicaciones fueron retiradas, pero otras continuaron apareciendo. Markus comprendió que denunciar es importante, pero que también hace falta acompañar a la persona afectada y evitar que el contenido siga propagándose.";
+
+    }
+
+
+    $("#endTitle").text(
+        title
+    );
+
+    $(".endTag").text(
+        tag
+    );
+
+    $("#endText").text(
+        text
+    );
+
+    $("#ending")
+        .css(
+            "display",
+            "flex"
+        )
+        .hide()
+        .fadeIn(900);
+
+    gsap.from(
+        ".endBox",
+        {
+            y: 30,
+            opacity: 0,
+            duration: 1,
+            ease: "power3.out"
+        }
+    );
+
+}
+
+
+/* =========================================================
+   RESTART
+========================================================= */
+
+function restartGame() {
+
+    stopTetris();
+
+    state = {
+        scene: 0,
+        trust: 50,
+
+        route: null,
+
+        ignored: false,
+        shared: false,
+        defended: false,
+        reported: false,
+
+        evidence: 0,
+
+        miniWins: 0,
+        miniLosses: 0,
+
+        spreading: 0
+    };
+
+    $("#ending").hide();
+
+    $("#resultOverlay").hide();
+
+    $("#choicePanel").hide();
+
+    $("#minigame").hide();
+
+    $("#stage").show();
+
+    $("#dialogue").show();
+
+    $("#trustPanel").show();
+
+    updateTrust();
+
+    showScene();
+
+}
+
+
+/* =========================================================
+   RESTART BUTTON
+========================================================= */
+
+$("#restartButton").on(
+    "click",
+    function() {
+
+        restartGame();
+
+    }
+);
+
+
+/* =========================================================
+   SPACE TO ADVANCE
+========================================================= */
+
+$(document).on(
+    "keydown",
+    function(event) {
+
+        if (
+            event.code !== "Space"
+        ) {
+            return;
+        }
+
+        if (
+            $("#minigame").is(":visible") ||
+            $("#choicePanel").is(":visible")
+        ) {
+            return;
+        }
+
+        /*
+           Si el usuario está dentro del diálogo,
+           espacio avanza la historia.
+        */
+
+        $("#dialogue").trigger(
+            "click"
+        );
+
+    }
+);
+
+
+/* =========================================================
+   START ANIMATION
+========================================================= */
+
+function startGame() {
+
+    updateTrust();
+
+    showScene();
+
+    gsap.from(
+        "#topHUD",
+        {
+            y: -25,
+            opacity: 0,
+            duration: 1,
+            ease: "power3.out"
+        }
+    );
+
+}
+
+startGame();
+
+</script>
+
+</body>
+</html>
