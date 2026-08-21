@@ -24,10 +24,7 @@ El juego se basa en la **toma de decisiones** y el **impacto moral** de las acci
 | Acción | Tecla / Botón |
 |--------|----------------|
 | Moverse | `W / A / S / D` o `← / →` |
-| Interactuar / Seleccionar | `E` |
-| Confirmar decisión | `ENTER` |
-| Pausar juego | `ESC` |
-
+|Seleccionar opción| 'Click Izquiedo'|
 ---
 
 ## 📖 Storytelling 1 — Historia Lineal

@@ -36,9 +36,21 @@ nav {
 }
 
 .logo {
-    font-size: 28px; /* tamaño de letra del logo */
-    font-weight: bold; /* negrita */
+    font-size: 32px;              /* tamaño más grande */
+    font-weight: 800;             /* negrita más marcada */
+    letter-spacing: 2px;          /* espacio entre letras */
+    text-transform: uppercase;    /* todo en mayúsculas */
+    color: #00ffcc;               /* color neón llamativo */
+    text-shadow: 0 0 8px rgba(0,255,200,0.6); /* efecto glow */
+    font-family: 'Segoe UI', sans-serif; /* tipografía moderna */
+    transition: transform 0.3s ease, color 0.3s ease;
 }
+
+.logo:hover {
+    color: #00cc99;               /* cambio de color al pasar el mouse */
+    transform: scale(1.05);       /* efecto zoom sutil */
+}
+
 
 /* MENÚ */
 .menu {
@@ -81,7 +93,8 @@ nav {
 .foto-perfil {
     display: flex; /* Flexbox para centrar */
     justify-content: center; /* centra horizontalmente */
-    margin-top: 20px; /* margen superior */
+    margin-top: 10px; /* margen superior */
+    margin-bottom: 20px; /* margen inferior */  
 }
 
 .foto-perfil img {
@@ -218,7 +231,24 @@ section {
     gap: 40px; /* espacio entre columnas */
     padding: 60px 10%; /* espacio interno */
 }
-
+.lenguajes-imgs
+{
+    height: 150px;
+    overflow-y:scroll;
+    scrollbar-width: thin;         
+    scrollbar-color: #888888 #101010; 
+}
+.lenguajes-img ::-webkit-scrollbar-track {
+    background: #120d0d;
+    border-radius: 4px;
+  }
+  .lenguajes-img::-webkit-scrollbar-thumb {
+    background: #888888;
+    border-radius: 4px;
+  }
+  .lenguajes-img::-webkit-scrollbar-thumb:hover {
+    background: #555555;
+  }
 .lenguajes-imgs img {
     width: 120px;
     margin: 15px;

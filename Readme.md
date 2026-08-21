@@ -2,10 +2,12 @@
 
 Estudiante de **Ingeniería de Sistemas Informáticos en Univalle**  
 Apasionado por el desarrollo **Backend**, la **optimización de bases de datos** y la creación de **videojuegos**.  
+<img src="Images/perfil.png" width="150" alt="Avatar personal" align="right">
+
 Destaco por mi capacidad analítica y por mi perseverancia para resolver problemas complejos en soluciones simples y eficaces, así como por una alta adaptabilidad para aprender nuevos marcos de trabajo según las necesidades del proyecto. Busco integrarme a un equipo dinámico donde pueda aportar lógica de negocio sólida, continuar fortaleciendo mis habilidades técnicas y blandas, y contribuir al desarrollo de soluciones software de alto impacto.
 
 ---
-<img src="Images/perfil.png" width="150" alt="Avatar personal" align="right">
+
 ## 🎨 Presentación Visual
 
 ![Banner del Portafolio](Images/Banner.png)

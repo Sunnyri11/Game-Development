@@ -4,38 +4,6 @@ function toggleMenu() {
 }
 
 
-// FORMULARIOOO
-// Obtener el formulario
-const formulario = document.getElementById('formulario-contacto');
-
-formulario.addEventListener('submit', function(event) {
-    event.preventDefault(); // Evita que se envíe automáticamente
-
-    // Obtener los valores
-    const nombre = formulario.querySelector('input[type="text"]').value.trim();
-    const email = formulario.querySelector('input[type="email"]').value.trim();
-    const mensaje = formulario.querySelector('textarea').value.trim();
-
-    // Validación básica
-    if (nombre === "") {
-        alert("Por favor ingresa tu nombre.");
-        return;
-    }
-
-    // Validación sencilla de email
-    if (!(email.includes("@") && email.includes(".") && email.indexOf("@") < email.lastIndexOf("."))) {
-        alert("Por favor ingresa un correo electrónico válido.");
-        return;
-    }
-
-    if (mensaje === "") {
-        alert("Por favor ingresa un mensaje.");
-        return;
-    }
-
-    alert("¡Formulario enviado correctamente "+nombre+"!");
-    formulario.reset(); // Limpiar el formulario
-});
 
 function mostrarDescripcion(lenguaje) {
     const cuadro = document.getElementById("descripcionLenguaje");
@@ -64,6 +32,15 @@ function mostrarDescripcion(lenguaje) {
 
         case "sql":
             texto = "<b>SQL</b>: Lenguaje para crear, gestionar y consultar bases de datos. Fundamental para manejar información profesionalmente.";
+            break;
+        case "mysql":
+            texto = "<b>MySQL</b>: Sistema para gestionar bases de datos relacionales. Usa filas y columnas organizadas en tablas conectadas entre sí. Funciona con el lenguaje SQL y es de código abierto. Sirve para guardar y buscar datos de forma rápida."
+            break;
+        case "php":
+            texto = "<b>PHP</b>: Lenguaje de programación de código abierto que se ejecuta en el lado del servidor. Se usa para crear páginas web dinámicas, procesar datos de usuarios, conectarse a bases de datos y generar el código HTML que finalmente ve el usuario en el navegador."
+            break;
+        case "c++":
+            texto = "<b>C++</b>: Lenguaje de programación rápido y potente. Funciona como una versión avanzada del lenguaje C y permite controlar los recursos del equipo a bajo nivel. Sirve para crear software eficiente, como sistemas operativos, videojuegos y aplicaciones de escritorio."
             break;
     }
 

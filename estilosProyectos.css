@@ -16,7 +16,24 @@ body {
     color: white;
     /* texto blanco por defecto */
 }
-
+.codigo-proyecto
+{
+    height: 500px;
+    overflow-y:scroll;
+    scrollbar-width:inherit;        
+    scrollbar-color: #888888 #101010; 
+}
+.codigo-proyecto ::-webkit-scrollbar-track {
+    background: #120d0d;
+    border-radius: 4px;
+  }
+  .codigo-proyecto::-webkit-scrollbar-thumb {
+    background: #888888;
+    border-radius: 4px;
+  }
+  .codigo-proyecto::-webkit-scrollbar-thumb:hover {
+    background: #555555;
+  }
 /* HEADER*/
 header {
     background: linear-gradient(135deg, #28527A, #1B2A49);
@@ -350,6 +367,7 @@ pre {
     /* sombra azul translúcida */
     margin-bottom: 40px;
     /* separación inferior */
+    height: 150px;
 }
 
 .banner-proyecto h1 {
