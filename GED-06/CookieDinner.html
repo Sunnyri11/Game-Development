@@ -1,0 +1,3454 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Cookie Dinner</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    font-family:"Trebuchet MS","Segoe UI",sans-serif;
+    min-height:100vh;
+    background:
+        radial-gradient(circle at 10% 20%,#fff0b8 0 7%,transparent 8%),
+        radial-gradient(circle at 90% 80%,#ffd7e5 0 8%,transparent 9%),
+        linear-gradient(135deg,#fff8ef,#e8fff4);
+    color:#263238;
+}
+
+button{
+    font-family:inherit;
+}
+
+.screen{
+    display:none;
+    min-height:100vh;
+}
+
+.screen.active{
+    display:flex;
+}
+
+/* =====================================================
+   INICIO
+===================================================== */
+
+#startScreen{
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.start-card{
+    width:min(950px,95vw);
+    background:#fff;
+    border-radius:35px;
+    padding:40px;
+    text-align:center;
+    box-shadow:0 25px 70px #0002;
+}
+
+.logo{
+    font-size:clamp(42px,7vw,75px);
+    font-weight:900;
+    color:#ff6680;
+    text-shadow:
+        4px 4px #ffd166,
+        7px 7px #a6e8c9;
+}
+
+.subtitle{
+    max-width:700px;
+    margin:10px auto 25px;
+    color:#69757d;
+    font-size:19px;
+    line-height:1.5;
+}
+
+.start-button{
+    border:none;
+    background:linear-gradient(135deg,#ff6680,#ff9872);
+    color:white;
+    padding:17px 45px;
+    border-radius:50px;
+    font-size:21px;
+    font-weight:900;
+    cursor:pointer;
+    box-shadow:0 7px #d74f67;
+}
+
+.start-button:hover{
+    transform:translateY(-3px);
+}
+
+/* =====================================================
+   PERSONAJE
+===================================================== */
+
+.character{
+    position:relative;
+    width:170px;
+    height:235px;
+    margin:10px auto 25px;
+}
+
+.character:after{
+    content:"";
+    position:absolute;
+    width:130px;
+    height:20px;
+    background:#0002;
+    border-radius:50%;
+    bottom:0;
+    left:20px;
+}
+
+.hair{
+    position:absolute;
+    width:120px;
+    height:105px;
+    top:18px;
+    left:25px;
+    background:#56362e;
+    border-radius:55%;
+}
+
+.face{
+    position:absolute;
+    width:102px;
+    height:112px;
+    top:40px;
+    left:34px;
+    background:#ffd3b6;
+    border:3px solid #eca789;
+    border-radius:48%;
+    z-index:3;
+}
+
+.eye{
+    position:absolute;
+    width:15px;
+    height:20px;
+    top:40px;
+    background:#29333a;
+    border-radius:50%;
+}
+
+.eye:after{
+    content:"";
+    position:absolute;
+    width:5px;
+    height:5px;
+    top:3px;
+    left:3px;
+    background:white;
+    border-radius:50%;
+}
+
+.eye.left{
+    left:22px;
+}
+
+.eye.right{
+    right:22px;
+}
+
+.mouth{
+    position:absolute;
+    width:35px;
+    height:17px;
+    left:32px;
+    top:72px;
+    border-bottom:5px solid #a94757;
+    border-radius:0 0 50% 50%;
+}
+
+.cheek{
+    position:absolute;
+    width:22px;
+    height:12px;
+    top:65px;
+    background:#ff8f9c;
+    opacity:.5;
+    border-radius:50%;
+}
+
+.cheek.left{
+    left:7px;
+}
+
+.cheek.right{
+    right:7px;
+}
+
+.chef-hat{
+    position:absolute;
+    width:105px;
+    height:45px;
+    top:2px;
+    left:32px;
+    background:white;
+    border:3px solid #ddd;
+    border-radius:40px 40px 12px 12px;
+    z-index:5;
+}
+
+.chef-hat:before,
+.chef-hat:after{
+    content:"";
+    position:absolute;
+    width:42px;
+    height:42px;
+    top:-20px;
+    background:white;
+    border-radius:50%;
+}
+
+.chef-hat:before{
+    left:3px;
+}
+
+.chef-hat:after{
+    right:3px;
+}
+
+.body{
+    position:absolute;
+    width:115px;
+    height:90px;
+    top:145px;
+    left:28px;
+    background:#ff6680;
+    border:3px solid #db5068;
+    border-radius:30px 30px 15px 15px;
+}
+
+.apron{
+    position:absolute;
+    width:75px;
+    height:78px;
+    top:155px;
+    left:48px;
+    background:#fff8ef;
+    border:3px solid #e3ddd5;
+    border-radius:15px 15px 20px 20px;
+    z-index:3;
+}
+
+.apron:after{
+    content:"AJ";
+    position:absolute;
+    top:27px;
+    left:23px;
+    color:#ff6680;
+    font-weight:900;
+    font-size:20px;
+}
+
+.arm{
+    position:absolute;
+    width:32px;
+    height:78px;
+    top:150px;
+    background:#ffd3b6;
+    border:3px solid #eca789;
+    border-radius:25px;
+}
+
+.arm.left{
+    left:7px;
+    transform:rotate(22deg);
+}
+
+.arm.right{
+    right:7px;
+    transform:rotate(-22deg);
+}
+
+/* =====================================================
+   JUEGO
+===================================================== */
+
+#gameScreen{
+    flex-direction:column;
+    width:100%;
+    padding:12px;
+    gap:12px;
+}
+
+.topbar{
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:10px;
+}
+
+.stat{
+    background:white;
+    padding:10px;
+    border-radius:18px;
+    text-align:center;
+    box-shadow:0 5px 18px #0001;
+}
+
+.stat small{
+    display:block;
+    color:#8a949a;
+    font-weight:900;
+}
+
+.stat strong{
+    font-size:22px;
+}
+
+.money{
+    color:#16a56b;
+}
+
+.game-layout{
+    flex:1;
+    display:grid;
+    grid-template-columns:300px 1fr 280px;
+    gap:12px;
+}
+
+.panel{
+    background:#fffffff2;
+    border-radius:25px;
+    padding:16px;
+    box-shadow:0 8px 25px #0001;
+}
+
+.panel-title{
+    color:#ff6680;
+    font-size:22px;
+    font-weight:900;
+    margin-bottom:12px;
+}
+
+/* =====================================================
+   CLIENTES
+===================================================== */
+
+.main-client{
+    background:#fff4dc;
+    border:3px solid #ffd166;
+    border-radius:20px;
+    padding:13px;
+}
+
+.main-client-header{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.client-face{
+    font-size:48px;
+}
+
+.client-name{
+    font-weight:900;
+    font-size:17px;
+}
+
+.client-order{
+    font-weight:900;
+    margin-top:3px;
+}
+
+.patience-text{
+    display:flex;
+    justify-content:space-between;
+    margin-top:9px;
+    font-weight:900;
+}
+
+.timer{
+    height:15px;
+    background:#e5e5e5;
+    border-radius:20px;
+    overflow:hidden;
+    margin-top:5px;
+}
+
+.timer-fill{
+    height:100%;
+    width:100%;
+    background:#56c596;
+    transition:width 1s linear;
+}
+
+.timer-fill.warning{
+    background:#ffb703;
+}
+
+.timer-fill.danger{
+    background:#ff536b;
+}
+
+.waiting-title{
+    font-weight:900;
+    margin:16px 0 8px;
+}
+
+.waiting-client{
+    background:#f5f7f8;
+    border-radius:15px;
+    padding:9px;
+    margin-bottom:7px;
+}
+
+.waiting-header{
+    display:flex;
+    align-items:center;
+    gap:7px;
+}
+
+.waiting-face{
+    font-size:29px;
+}
+
+.waiting-name{
+    font-weight:900;
+}
+
+.waiting-order{
+    font-size:13px;
+}
+
+.waiting-timer{
+    margin-top:5px;
+}
+
+/* =====================================================
+   COCINA
+===================================================== */
+
+.kitchen{
+    background:
+        linear-gradient(#fffdf8 0 73%,#bce5c9 73%);
+    border-radius:25px;
+    padding:18px;
+    box-shadow:0 8px 25px #0001;
+}
+
+.kitchen-title{
+    text-align:center;
+    font-size:28px;
+    font-weight:900;
+}
+
+.order-instructions{
+    max-width:850px;
+    margin:10px auto;
+    padding:13px;
+    background:#fff3c7;
+    border:3px solid #ffd166;
+    border-radius:18px;
+}
+
+.order-instructions strong{
+    color:#b87600;
+}
+
+.recipe{
+    display:flex;
+    justify-content:center;
+    gap:7px;
+    flex-wrap:wrap;
+    margin-top:7px;
+}
+
+.recipe-item{
+    background:white;
+    padding:7px 11px;
+    border-radius:12px;
+    font-weight:900;
+}
+
+.recipe-item.optional{
+    border:2px solid #56c596;
+    background:#edfff6;
+}
+
+.recipe-item.expensive{
+    border:2px solid #ff6680;
+    background:#fff0f3;
+}
+
+.food-display{
+    max-width:500px;
+    height:150px;
+    margin:10px auto;
+    background:#fff6e6;
+    border:5px solid #e6d6bd;
+    border-radius:25px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+}
+
+.food{
+    font-size:70px;
+    animation:float 2s infinite ease-in-out;
+}
+
+@keyframes float{
+    50%{
+        transform:translateY(-7px);
+    }
+}
+
+.status{
+    font-weight:900;
+    color:#647078;
+}
+
+.ingredients-title{
+    text-align:center;
+    font-weight:900;
+    margin:8px;
+}
+
+.ingredients{
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:8px;
+}
+
+.ingredient{
+    background:white;
+    border:3px solid #eee;
+    border-radius:15px;
+    padding:8px 3px;
+    text-align:center;
+    cursor:pointer;
+    transition:.15s;
+}
+
+.ingredient:hover{
+    transform:translateY(-3px);
+    border-color:#ffd166;
+}
+
+.ingredient.selected{
+    background:#fff0ae;
+    border-color:#ffb703;
+    transform:translateY(-3px);
+}
+
+.ingredient.expensive{
+    border-color:#ff9b9b;
+}
+
+.ingredient span{
+    display:block;
+    font-size:29px;
+}
+
+.ingredient small{
+    display:block;
+    font-size:10px;
+    font-weight:900;
+}
+
+.price-tag{
+    color:#e35d6a;
+}
+
+.cook-button{
+    width:100%;
+    margin-top:12px;
+    padding:15px;
+    border:none;
+    border-radius:18px;
+    background:#56c596;
+    color:white;
+    font-size:19px;
+    font-weight:900;
+    cursor:pointer;
+    box-shadow:0 6px #328f68;
+}
+
+.cook-button:active{
+    transform:translateY(4px);
+    box-shadow:0 2px #328f68;
+}
+
+/* =====================================================
+   FINANZAS
+===================================================== */
+
+.finance{
+    background:#f5faf7;
+    border-radius:18px;
+    padding:14px;
+    line-height:2;
+}
+
+.finance-row{
+    display:flex;
+    justify-content:space-between;
+    border-bottom:1px dashed #ccd7d0;
+}
+
+.tip{
+    margin-top:12px;
+    padding:14px;
+    background:#fff3cc;
+    border-radius:18px;
+    line-height:1.45;
+}
+
+.tip strong{
+    color:#b87500;
+}
+
+/* =====================================================
+   MENSAJES
+===================================================== */
+
+.message{
+    position:fixed;
+    top:20px;
+    left:50%;
+    transform:translate(-50%,-150%);
+    min-width:min(560px,90vw);
+    background:white;
+    padding:15px 22px;
+    border-radius:20px;
+    text-align:center;
+    border:4px solid #56c596;
+    box-shadow:0 15px 50px #0003;
+    transition:.35s;
+    z-index:100;
+}
+
+.message.show{
+    transform:translate(-50%,0);
+}
+
+.message.bad{
+    border-color:#ff536b;
+}
+
+.message.warning{
+    border-color:#ffb703;
+}
+
+.message-title{
+    font-size:20px;
+    font-weight:900;
+}
+
+.message-text{
+    color:#68747d;
+    margin-top:5px;
+}
+
+/* =====================================================
+   MODALES
+===================================================== */
+
+.modal{
+    position:fixed;
+    inset:0;
+    background:#263238aa;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:200;
+}
+
+.modal.show{
+    display:flex;
+}
+
+.modal-card{
+    width:min(650px,95vw);
+    background:white;
+    padding:30px;
+    border-radius:30px;
+    text-align:center;
+}
+
+.modal-card h1{
+    color:#ff6680;
+    margin-bottom:15px;
+}
+
+.summary{
+    text-align:left;
+    background:#f5faf7;
+    border-radius:18px;
+    padding:15px;
+    line-height:2;
+}
+
+.lesson{
+    margin:15px 0;
+    padding:17px;
+    text-align:left;
+    line-height:1.5;
+    background:#fff3cc;
+    border-radius:18px;
+}
+
+.big-button{
+    border:none;
+    background:linear-gradient(135deg,#ff6680,#ff9872);
+    color:white;
+    padding:16px 40px;
+    border-radius:50px;
+    font-size:20px;
+    font-weight:900;
+    cursor:pointer;
+    box-shadow:0 6px #d74f67;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media(max-width:1100px){
+
+    .game-layout{
+        grid-template-columns:1fr;
+    }
+
+    .topbar{
+        grid-template-columns:repeat(3,1fr);
+    }
+
+    .ingredients{
+        grid-template-columns:repeat(4,1fr);
+    }
+}
+
+@media(max-width:600px){
+
+    .topbar{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .ingredients{
+        grid-template-columns:repeat(3,1fr);
+    }
+
+    .start-card{
+        padding:25px 15px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- =====================================================
+     INICIO
+===================================================== -->
+
+<section id="startScreen" class="screen active">
+
+<div class="start-card">
+
+    <div class="logo">
+        🍳 Cookie Diner
+    </div>
+
+    <p class="subtitle">
+        Convierte tu cocina en un pequeño negocio.
+        Atiende clientes, toma decisiones sobre tus ingredientes
+        y aprende que <b>ganar más no siempre significa vender más</b>.
+    </p>
+
+    <div class="character">
+
+        <div class="hair"></div>
+
+        <div class="chef-hat"></div>
+
+        <div class="face">
+            <div class="eye left"></div>
+            <div class="eye right"></div>
+
+            <div class="cheek left"></div>
+            <div class="cheek right"></div>
+
+            <div class="mouth"></div>
+        </div>
+
+        <div class="arm left"></div>
+        <div class="arm right"></div>
+
+        <div class="body"></div>
+        <div class="apron"></div>
+
+    </div>
+
+    <p style="
+        margin-bottom:22px;
+        color:#68747d;
+        line-height:1.7;
+    ">
+
+        👤 Atiende clientes<br>
+        📖 Lee cuidadosamente sus pedidos<br>
+        🧺 Escoge los ingredientes que quieras<br>
+        💰 Busca alternativas económicas<br>
+        🔥 Cocina correctamente<br>
+        ⏱️ Atiende antes de que se enfaden<br>
+        📊 ¡Controla tus ganancias!
+
+    </p>
+
+    <button
+        class="start-button"
+        onclick="startGame()"
+    >
+        👩‍🍳 ABRIR LA COCINA
+    </button>
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+     JUEGO
+===================================================== -->
+
+<section
+    id="gameScreen"
+    class="screen"
+>
+
+<div class="topbar">
+
+    <div class="stat">
+        <small>💰 DINERO</small>
+        <strong id="money" class="money">$30</strong>
+    </div>
+
+    <div class="stat">
+        <small>📅 DÍA</small>
+        <strong id="day">1/3</strong>
+    </div>
+
+    <div class="stat">
+        <small>🍽️ PEDIDOS</small>
+        <strong id="orders">0/10</strong>
+    </div>
+
+    <div class="stat">
+        <small>🔥 COMBO</small>
+        <strong id="combo">x0</strong>
+    </div>
+
+    <div class="stat">
+        <small>⏱️ CLIENTE</small>
+        <strong id="time">--</strong>
+    </div>
+
+    <div class="stat">
+        <small>📦 GASTO ÚLTIMO</small>
+        <strong id="lastCost">$0</strong>
+    </div>
+
+</div>
+
+
+<div class="game-layout">
+
+<!-- =====================================================
+     CLIENTES
+===================================================== -->
+
+<aside class="panel">
+
+    <div class="panel-title">
+        👥 Clientes
+    </div>
+
+    <div id="mainClient"></div>
+
+    <div class="waiting-title">
+        ⏳ En espera
+    </div>
+
+    <div id="waitingClients"></div>
+
+</aside>
+
+
+<!-- =====================================================
+     COCINA
+===================================================== -->
+
+<main class="kitchen">
+
+    <div class="kitchen-title">
+        👩‍🍳 Cocina
+    </div>
+
+    <div class="order-instructions">
+
+        <strong>
+            📖 ¿Cómo preparar el pedido?
+        </strong>
+
+        <div id="instructions">
+            Selecciona un cliente.
+        </div>
+
+        <div
+            id="recipe"
+            class="recipe"
+        ></div>
+
+    </div>
+
+
+    <div class="food-display">
+
+        <div
+            id="food"
+            class="food"
+        >
+            🍽️
+        </div>
+
+        <div
+            id="status"
+            class="status"
+        >
+            Selecciona ingredientes
+        </div>
+
+    </div>
+
+
+    <div class="ingredients-title">
+        🧺 Elige libremente tus ingredientes
+    </div>
+
+    <div
+        id="ingredients"
+        class="ingredients"
+    ></div>
+
+    <button
+        class="cook-button"
+        onclick="cookOrder()"
+    >
+        🔥 COCINAR Y ENTREGAR
+    </button>
+
+</main>
+
+
+<!-- =====================================================
+     FINANZAS
+===================================================== -->
+
+<aside class="panel">
+
+    <div class="panel-title">
+        💰 Finanzas
+    </div>
+
+    <div class="finance">
+
+        <div class="finance-row">
+            <span>📈 Ingresos</span>
+            <strong id="income">$0</strong>
+        </div>
+
+        <div class="finance-row">
+            <span>🧾 Gastos</span>
+            <strong id="expenses">$0</strong>
+        </div>
+
+        <div class="finance-row">
+            <span>💵 Ganancia</span>
+            <strong id="profit">$0</strong>
+        </div>
+
+    </div>
+
+
+    <div class="tip">
+
+        <strong>
+            💡 Decisión financiera
+        </strong>
+
+        <br><br>
+
+        Algunos ingredientes son baratos
+        y otros son mucho más caros.
+
+        <br><br>
+
+        Cuando el pedido permita alternativas,
+        intenta usar la opción más económica.
+
+        <br><br>
+
+        <b>
+            Ganancia =
+            ingreso − costo de ingredientes
+        </b>
+
+        <br><br>
+
+        ⚠️ Pero cuidado:
+        algunos clientes exigirán
+        ingredientes específicos y caros.
+
+    </div>
+
+
+    <div
+        id="financeMessage"
+        style="
+            margin-top:12px;
+            color:#69757d;
+            line-height:1.45;
+            font-weight:800;
+        "
+    >
+        Atiende bien a tus clientes.
+    </div>
+
+</aside>
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+     MENSAJE
+===================================================== -->
+
+<div
+    id="message"
+    class="message"
+>
+
+    <div
+        id="messageTitle"
+        class="message-title"
+    >
+        🎉 ¡Bien!
+    </div>
+
+    <div
+        id="messageText"
+        class="message-text"
+    >
+        Ganaste dinero.
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     FIN DEL DÍA
+===================================================== -->
+
+<div
+    id="dayModal"
+    class="modal"
+>
+
+<div class="modal-card">
+
+    <h1 id="dayTitle">
+        🌟 ¡Día terminado!
+    </h1>
+
+    <div
+        id="summary"
+        class="summary"
+    ></div>
+
+    <div
+        id="lesson"
+        class="lesson"
+    ></div>
+
+    <button
+        class="big-button"
+        onclick="nextDay()"
+    >
+        🚀 SIGUIENTE DÍA
+    </button>
+
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     DERROTA
+===================================================== -->
+
+<div
+    id="loseModal"
+    class="modal"
+>
+
+<div class="modal-card">
+
+    <h1>
+        😢 ¡Día terminado en pérdidas!
+    </h1>
+
+    <div class="lesson">
+
+        <strong>
+            💡 ¿Qué pasó?
+        </strong>
+
+        <br><br>
+
+        Durante el día podías tener dinero negativo,
+        pero al terminar el día necesitas tener
+        un saldo de al menos <b>$0</b>.
+
+        <br><br>
+
+        Recuerda que utilizar ingredientes caros
+        cuando existe una alternativa barata puede
+        reducir mucho tu ganancia.
+
+        <br><br>
+
+        También pierdes dinero cuando un cliente
+        se enfada o cuando preparas incorrectamente
+        un pedido.
+
+    </div>
+
+    <button
+        class="big-button"
+        onclick="restart()"
+    >
+        🔄 INTENTAR DE NUEVO
+    </button>
+
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     VICTORIA
+===================================================== -->
+
+<div
+    id="winModal"
+    class="modal"
+>
+
+<div class="modal-card">
+
+    <h1>
+        🏆 ¡Chef financiero!
+    </h1>
+
+    <div class="lesson">
+
+        <strong>
+            🎓 ¡Completaste los 3 días!
+        </strong>
+
+        <br><br>
+
+        Lograste mantener el negocio funcionando
+        mientras atendías cada vez más clientes.
+
+        <br><br>
+
+        Aprendiste:
+
+        <br><br>
+
+        🧺 Comparar precios<br>
+        💰 Buscar ingredientes económicos<br>
+        📈 Diferenciar ingresos y ganancias<br>
+        🧾 Controlar gastos<br>
+        ⏱️ Administrar tu tiempo<br>
+        📊 Tomar decisiones financieras
+
+        <br><br>
+
+        <strong>
+            ¡Gastar menos cuando es posible
+            puede aumentar muchísimo tu ganancia!
+        </strong>
+
+    </div>
+
+    <button
+        class="big-button"
+        onclick="restart()"
+    >
+        🔄 JUGAR OTRA VEZ
+    </button>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   INGREDIENTES
+
+   Existen alternativas dentro de varias categorías.
+   El jugador puede elegir libremente.
+
+   Algunos son baratos.
+   Otros son caros y ciertos pedidos los exigen.
+===================================================== */
+
+const INGREDIENTS={
+
+    /* PANES */
+
+    pan_blanco:{
+        emoji:"🍞",
+        name:"Pan blanco",
+        category:"pan",
+        cost:1
+    },
+
+    pan_integral:{
+        emoji:"🥖",
+        name:"Pan integral",
+        category:"pan",
+        cost:2
+    },
+
+    pan_brioche:{
+        emoji:"🍞",
+        name:"Pan brioche",
+        category:"pan",
+        cost:4
+    },
+
+    /* CARNES */
+
+    carne_res:{
+        emoji:"🥩",
+        name:"Carne de res",
+        category:"carne",
+        cost:4
+    },
+
+    carne_pollo:{
+        emoji:"🍗",
+        name:"Pechuga de pollo",
+        category:"carne",
+        cost:3
+    },
+
+    carne_premium:{
+        emoji:"🥩",
+        name:"Carne premium",
+        category:"carne",
+        cost:7
+    },
+
+    pescado:{
+        emoji:"🐟",
+        name:"Pescado",
+        category:"carne",
+        cost:5
+    },
+
+    /* QUESOS */
+
+    queso_normal:{
+        emoji:"🧀",
+        name:"Queso normal",
+        category:"queso",
+        cost:1
+    },
+
+    queso_cheddar:{
+        emoji:"🧀",
+        name:"Cheddar",
+        category:"queso",
+        cost:3
+    },
+
+    queso_premium:{
+        emoji:"🧀",
+        name:"Queso premium",
+        category:"queso",
+        cost:5
+    },
+
+    /* VERDURAS */
+
+    lechuga:{
+        emoji:"🥬",
+        name:"Lechuga",
+        category:"verdura",
+        cost:1
+    },
+
+    tomate:{
+        emoji:"🍅",
+        name:"Tomate",
+        category:"verdura",
+        cost:1
+    },
+
+    cebolla:{
+        emoji:"🧅",
+        name:"Cebolla",
+        category:"verdura",
+        cost:1
+    },
+
+    zanahoria:{
+        emoji:"🥕",
+        name:"Zanahoria",
+        category:"verdura",
+        cost:1
+    },
+
+    pepino:{
+        emoji:"🥒",
+        name:"Pepino",
+        category:"verdura",
+        cost:1
+    },
+
+    aguacate:{
+        emoji:"🥑",
+        name:"Aguacate",
+        category:"verdura",
+        cost:3
+    },
+
+    aguacate_premium:{
+        emoji:"🥑",
+        name:"Aguacate premium",
+        category:"verdura",
+        cost:5
+    },
+
+    /* OTROS */
+
+    huevo:{
+        emoji:"🥚",
+        name:"Huevo",
+        category:"extra",
+        cost:1
+    },
+
+    huevo_premium:{
+        emoji:"🥚",
+        name:"Huevo de granja",
+        category:"extra",
+        cost:3
+    },
+
+    tortilla:{
+        emoji:"🌮",
+        name:"Tortilla",
+        category:"pan",
+        cost:1
+    },
+
+    tortilla_maiz:{
+        emoji:"🌮",
+        name:"Tortilla de maíz",
+        category:"pan",
+        cost:2
+    },
+
+    arroz:{
+        emoji:"🍚",
+        name:"Arroz",
+        category:"extra",
+        cost:1
+    },
+
+    papa:{
+        emoji:"🥔",
+        name:"Papa",
+        category:"extra",
+        cost:1
+    },
+
+    frijoles:{
+        emoji:"🫘",
+        name:"Frijoles",
+        category:"extra",
+        cost:2
+    },
+
+    tocino:{
+        emoji:"🥓",
+        name:"Tocino",
+        category:"carne",
+        cost:4
+    },
+
+    salsa:{
+        emoji:"🌶️",
+        name:"Salsa",
+        category:"extra",
+        cost:1
+    },
+
+    salsa_premium:{
+        emoji:"🌶️",
+        name:"Salsa especial",
+        category:"extra",
+        cost:4
+    }
+};
+
+
+/* =====================================================
+   RECETAS
+
+   Cada receta tiene:
+   fixed = ingredientes obligatorios
+
+   alternatives = grupos donde basta escoger
+   UNA opción.
+
+   expensive = ingrediente que obligatoriamente
+   debe utilizarse.
+===================================================== */
+
+const RECIPES={
+
+    hamburguesa:{
+        name:"Hamburguesa clásica",
+        emoji:"🍔",
+        price:15,
+
+        fixed:["tomate","lechuga"],
+
+        alternatives:[
+            ["pan_blanco","pan_integral","pan_brioche"],
+            ["carne_res","carne_pollo"]
+        ]
+    },
+
+    hamburguesa_premium:{
+        name:"Hamburguesa premium",
+        emoji:"🍔",
+        price:24,
+
+        fixed:["tomate","lechuga"],
+
+        alternatives:[
+            ["pan_brioche"],
+            ["carne_premium"],
+            ["queso_premium"]
+        ],
+
+        expensive:true
+    },
+
+    cheeseburger:{
+        name:"Cheeseburger",
+        emoji:"🍔",
+        price:18,
+
+        fixed:["tomate"],
+
+        alternatives:[
+            ["pan_blanco","pan_integral","pan_brioche"],
+            ["carne_res","carne_pollo"],
+            ["queso_normal","queso_cheddar"]
+        ]
+    },
+
+    pizza:{
+        name:"Pizza",
+        emoji:"🍕",
+        price:16,
+
+        fixed:["tomate"],
+
+        alternatives:[
+            ["pan_blanco","pan_integral"],
+            ["queso_normal","queso_cheddar"]
+        ]
+    },
+
+    pizza_especial:{
+        name:"Pizza especial",
+        emoji:"🍕",
+        price:23,
+
+        fixed:["tomate","cebolla"],
+
+        alternatives:[
+            ["pan_blanco","pan_brioche"],
+            ["queso_cheddar","queso_premium"],
+            ["carne_res","tocino"]
+        ]
+    },
+
+    ensalada:{
+        name:"Ensalada fresca",
+        emoji:"🥗",
+        price:13,
+
+        fixed:["lechuga","tomate","zanahoria"],
+
+        alternatives:[
+            ["pepino","aguacate"]
+        ]
+    },
+
+    ensalada_premium:{
+        name:"Ensalada premium",
+        emoji:"🥗",
+        price:20,
+
+        fixed:["lechuga","tomate"],
+
+        alternatives:[
+            ["aguacate_premium"],
+            ["queso_premium"]
+        ],
+
+        expensive:true
+    },
+
+    tacos:{
+        name:"Tacos",
+        emoji:"🌮",
+        price:17,
+
+        fixed:["lechuga","tomate"],
+
+        alternatives:[
+            ["tortilla","tortilla_maiz"],
+            ["carne_pollo","carne_res"]
+        ]
+    },
+
+    tacos_premium:{
+        name:"Tacos premium",
+        emoji:"🌮",
+        price:25,
+
+        fixed:["lechuga","tomate"],
+
+        alternatives:[
+            ["tortilla_maiz"],
+            ["carne_premium"],
+            ["aguacate_premium"]
+        ],
+
+        expensive:true
+    },
+
+    hotdog:{
+        name:"Hot Dog",
+        emoji:"🌭",
+        price:14,
+
+        fixed:["queso_normal"],
+
+        alternatives:[
+            ["pan_blanco","pan_integral"],
+            ["carne_pollo","tocino"]
+        ]
+    },
+
+    hotdog_especial:{
+        name:"Hot Dog especial",
+        emoji:"🌭",
+        price:21,
+
+        fixed:["queso_cheddar","salsa"],
+
+        alternatives:[
+            ["pan_brioche"],
+            ["tocino"]
+        ],
+
+        expensive:true
+    },
+
+    pollo_arroz:{
+        name:"Pollo con arroz",
+        emoji:"🍗",
+        price:18,
+
+        fixed:["arroz"],
+
+        alternatives:[
+            ["carne_pollo"],
+            ["aguacate","zanahoria"]
+        ]
+    },
+
+    pollo_premium:{
+        name:"Pollo premium",
+        emoji:"🍗",
+        price:25,
+
+        fixed:["arroz"],
+
+        alternatives:[
+            ["carne_premium"],
+            ["aguacate_premium"],
+            ["salsa_premium"]
+        ],
+
+        expensive:true
+    },
+
+    desayuno:{
+        name:"Desayuno",
+        emoji:"🍳",
+        price:16,
+
+        fixed:["huevo","pan_blanco"],
+
+        alternatives:[
+            ["aguacate","tomate"],
+            ["queso_normal","queso_cheddar"]
+        ]
+    },
+
+    desayuno_premium:{
+        name:"Desayuno premium",
+        emoji:"🍳",
+        price:22,
+
+        fixed:["huevo_premium"],
+
+        alternatives:[
+            ["pan_brioche"],
+            ["aguacate_premium"],
+            ["queso_premium"]
+        ],
+
+        expensive:true
+    },
+
+    burrito:{
+        name:"Burrito",
+        emoji:"🌯",
+        price:19,
+
+        fixed:["tortilla","frijoles"],
+
+        alternatives:[
+            ["carne_pollo","carne_res"],
+            ["queso_normal","queso_cheddar"],
+            ["tomate","aguacate"]
+        ]
+    },
+
+    burrito_premium:{
+        name:"Burrito premium",
+        emoji:"🌯",
+        price:26,
+
+        fixed:["tortilla_maiz","frijoles"],
+
+        alternatives:[
+            ["carne_premium"],
+            ["queso_premium"],
+            ["aguacate_premium"]
+        ],
+
+        expensive:true
+    },
+
+    plato_mixto:{
+        name:"Plato mixto",
+        emoji:"🍱",
+        price:21,
+
+        fixed:["arroz","papa"],
+
+        alternatives:[
+            ["carne_pollo","carne_res"],
+            ["lechuga","zanahoria"],
+            ["salsa","salsa_premium"]
+        ]
+    },
+
+    plato_casa:{
+        name:"Plato de la casa",
+        emoji:"🍛",
+        price:28,
+
+        fixed:["arroz","frijoles"],
+
+        alternatives:[
+            ["carne_premium"],
+            ["aguacate_premium"],
+            ["queso_premium"]
+        ],
+
+        expensive:true
+    }
+
+};
+
+
+/* =====================================================
+   CLIENTES
+===================================================== */
+
+const PEOPLE=[
+
+    ["🧑‍🎓","Alex"],
+    ["👩‍🎓","Sofía"],
+    ["🧑‍💻","Diego"],
+    ["👩‍🎨","Valentina"],
+    ["🧑‍🔬","Mateo"],
+    ["👩‍🚀","Camila"],
+    ["🧑‍🎤","Lucas"],
+    ["👩‍💼","Daniela"],
+    ["🧑‍🏫","Samuel"],
+    ["👩‍💻","Emma"],
+    ["🧑‍🍳","Nicolás"],
+    ["👩‍🎤","Lucía"],
+    ["🧑‍🚀","Bruno"],
+    ["👩‍🔬","Isabella"],
+    ["🧑‍🎨","Tomás"]
+];
+
+
+/* =====================================================
+   VARIABLES
+===================================================== */
+
+let money=30;
+
+let day=1;
+
+let completed=0;
+
+let totalOrders=10;
+
+let income=0;
+
+let expenses=0;
+
+let combo=0;
+
+let selected=[];
+
+let customers=[];
+
+let currentCustomer=null;
+
+let idCounter=0;
+
+let gameRunning=false;
+
+let timer;
+
+let arrivalTimers=[];
+
+let messageTimeout;
+
+
+/* =====================================================
+   DIFICULTAD
+===================================================== */
+
+function maxWaiting(){
+
+    if(day===1)
+        return 1;
+
+    if(day===2)
+        return 2;
+
+    return 3;
+}
+
+
+function arrivalSpeed(){
+
+    if(day===1)
+        return 18000;
+
+    if(day===2)
+        return 12000;
+
+    return 8000;
+}
+
+
+/* =====================================================
+   RECETAS SEGÚN DÍA
+===================================================== */
+
+function getAllowedRecipes(){
+
+    const keys=Object.keys(RECIPES);
+
+    if(day===1){
+
+        return keys.filter(key=>
+            [
+                "hamburguesa",
+                "pizza",
+                "ensalada",
+                "tacos",
+                "hotdog",
+                "pollo_arroz",
+                "desayuno"
+            ].includes(key)
+        );
+
+    }
+
+    if(day===2){
+
+        return keys.filter(key=>
+            ![
+                "hamburguesa_premium",
+                "ensalada_premium",
+                "tacos_premium",
+                "hotdog_especial",
+                "pollo_premium",
+                "desayuno_premium",
+                "burrito_premium",
+                "plato_casa"
+            ].includes(key)
+        );
+
+    }
+
+    return keys;
+}
+
+
+/* =====================================================
+   INICIAR
+===================================================== */
+
+function startGame(){
+
+    document
+        .getElementById("startScreen")
+        .classList.remove("active");
+
+    document
+        .getElementById("gameScreen")
+        .classList.add("active");
+
+    money=30;
+
+    day=1;
+
+    completed=0;
+
+    totalOrders=10;
+
+    income=0;
+
+    expenses=0;
+
+    combo=0;
+
+    customers=[];
+
+    currentCustomer=null;
+
+    selected=[];
+
+    idCounter=0;
+
+    gameRunning=true;
+
+    clearArrivalTimers();
+
+    addCustomer();
+
+    selectNextCustomer();
+
+    clearInterval(timer);
+
+    timer=setInterval(
+        gameTick,
+        1000
+    );
+
+    updateUI();
+}
+
+
+/* =====================================================
+   CREAR CLIENTE
+===================================================== */
+
+function addCustomer(){
+
+    if(
+        customers.length>=maxWaiting()
+    ){
+        return;
+    }
+
+    const recipeKeys=getAllowedRecipes();
+
+    const recipeKey=
+        recipeKeys[
+            Math.floor(
+                Math.random()*recipeKeys.length
+            )
+        ];
+
+    const person=
+        PEOPLE[
+            Math.floor(
+                Math.random()*PEOPLE.length
+            )
+        ];
+
+    customers.push({
+
+        id:idCounter++,
+
+        person:person,
+
+        recipe:RECIPES[recipeKey],
+
+        time:60,
+
+        maxTime:60
+
+    });
+
+    renderCustomers();
+}
+
+
+/* =====================================================
+   SELECCIONAR SIGUIENTE
+===================================================== */
+
+function selectNextCustomer(){
+
+    if(currentCustomer){
+        return;
+    }
+
+    if(customers.length===0){
+
+        if(completed<totalOrders){
+            addCustomer();
+        }
+
+    }
+
+    if(customers.length===0){
+        return;
+    }
+
+    currentCustomer=customers.shift();
+
+    selected=[];
+
+    showOrder();
+
+    renderCustomers();
+}
+
+
+/* =====================================================
+   MOSTRAR PEDIDO
+===================================================== */
+
+function showOrder(){
+
+    const c=currentCustomer;
+
+    document.getElementById("food").textContent=
+        c.recipe.emoji;
+
+    let instruction=
+        `<b>${c.person[1]}</b> quiere un `
+        +`<b>${c.recipe.name}</b>.<br><br>`;
+
+    instruction+=
+        `👉 Debes elegir exactamente <b>una opción</b> `
+        +`de cada grupo y todos los ingredientes obligatorios.`;
+
+    if(c.recipe.expensive){
+
+        instruction+=
+            `<br><br><span style="color:#d94b62;font-weight:900">
+            💎 Este pedido necesita ingredientes costosos.
+            </span>`;
+    }
+
+    document.getElementById("instructions").innerHTML=
+        instruction;
+
+    renderRecipe();
+
+    document.getElementById("status").textContent=
+        "🧺 Selecciona los ingredientes";
+
+    renderIngredients();
+}
+
+
+/* =====================================================
+   MOSTRAR RECETA
+===================================================== */
+
+function renderRecipe(){
+
+    const c=currentCustomer;
+
+    const recipeBox=
+        document.getElementById("recipe");
+
+    recipeBox.innerHTML="";
+
+    c.recipe.fixed.forEach(
+        (key,index)=>{
+
+            const item=
+                document.createElement("div");
+
+            item.className="recipe-item";
+
+            item.textContent=
+                `✓ ${INGREDIENTS[key].emoji} ${INGREDIENTS[key].name}`;
+
+            recipeBox.appendChild(item);
+        }
+    );
+
+    c.recipe.alternatives.forEach(
+        (group,index)=>{
+
+            const item=
+                document.createElement("div");
+
+            item.className="recipe-item optional";
+
+            item.innerHTML=
+                `🔀 Opción ${index+1}: `+
+                group.map(key=>
+                    `${INGREDIENTS[key].emoji} ${INGREDIENTS[key].name}`
+                ).join(" / ");
+
+            recipeBox.appendChild(item);
+        }
+    );
+}
+
+
+/* =====================================================
+   INGREDIENTES
+
+   Se mezclan cada vez que se muestra el pedido.
+===================================================== */
+
+function renderIngredients(){
+
+    const box=
+        document.getElementById("ingredients");
+
+    box.innerHTML="";
+
+    const entries=
+        Object.entries(INGREDIENTS);
+
+    shuffle(entries);
+
+    entries.forEach(
+        ([key,item])=>{
+
+            const button=
+                document.createElement("div");
+
+            button.className="ingredient";
+
+            if(item.cost>=4){
+                button.classList.add("expensive");
+            }
+
+            button.innerHTML=`
+
+                <span>${item.emoji}</span>
+
+                <small>
+                    ${item.name}
+                </small>
+
+                <small class="price-tag">
+                    $${item.cost}
+                </small>
+
+            `;
+
+            button.onclick=()=>{
+
+                toggleIngredient(
+                    button,
+                    key
+                );
+
+            };
+
+            box.appendChild(button);
+
+        }
+    );
+}
+
+
+/* =====================================================
+   MEZCLAR ARRAY
+===================================================== */
+
+function shuffle(array){
+
+    for(
+        let i=array.length-1;
+        i>0;
+        i--
+    ){
+
+        const j=
+            Math.floor(
+                Math.random()*(i+1)
+            );
+
+        [
+            array[i],
+            array[j]
+        ]=[
+            array[j],
+            array[i]
+        ];
+    }
+
+    return array;
+}
+
+
+/* =====================================================
+   SELECCIONAR INGREDIENTE
+===================================================== */
+
+function toggleIngredient(
+    button,
+    key
+){
+
+    if(selected.includes(key)){
+
+        selected=
+            selected.filter(
+                x=>x!==key
+            );
+
+        button.classList.remove(
+            "selected"
+        );
+
+    }else{
+
+        selected.push(key);
+
+        button.classList.add(
+            "selected"
+        );
+    }
+
+    document.getElementById("status").textContent=
+        `${selected.length} ingrediente(s) seleccionado(s)`;
+}
+
+
+/* =====================================================
+   COMPROBAR PEDIDO
+===================================================== */
+
+function isCorrectOrder(){
+
+    const recipe=currentCustomer.recipe;
+
+    /* Obligatorios */
+
+    for(const required of recipe.fixed){
+
+        if(!selected.includes(required)){
+            return false;
+        }
+    }
+
+    /* Alternativas */
+
+    for(const group of recipe.alternatives){
+
+        const hasOne=
+            group.some(
+                ingredient=>
+                    selected.includes(ingredient)
+            );
+
+        if(!hasOne){
+            return false;
+        }
+
+        /* No permitir dos del mismo grupo */
+
+        const count=
+            group.filter(
+                ingredient=>
+                    selected.includes(ingredient)
+            ).length;
+
+        if(count!==1){
+            return false;
+        }
+    }
+
+    /*
+       No puede haber ingredientes
+       que no formen parte del pedido.
+    */
+
+    const allowed=new Set(
+        recipe.fixed.concat(
+            recipe.alternatives.flat()
+        )
+    );
+
+    for(const ingredient of selected){
+
+        if(!allowed.has(ingredient)){
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
+/* =====================================================
+   COCINAR
+===================================================== */
+
+function cookOrder(){
+
+    if(
+        !gameRunning ||
+        !currentCustomer
+    ){
+        return;
+    }
+
+    const correct=isCorrectOrder();
+
+    if(!correct){
+
+        wrongRecipe();
+
+        return;
+    }
+
+    completeOrder();
+}
+
+
+/* =====================================================
+   PEDIDO INCORRECTO
+===================================================== */
+
+function wrongRecipe(){
+
+    /*
+       Una oportunidad por pedido.
+       Se paga desperdicio.
+    */
+
+    const waste=4;
+
+    money-=waste;
+
+    expenses+=waste;
+
+    combo=0;
+
+    completed++;
+
+    showMessage(
+
+        "😵 ¡Pedido incorrecto!",
+
+        `Perdiste $${waste} por desperdiciar ingredientes. `
+        +`El pedido cuenta como atendido. `
+        +`Lee con cuidado las opciones.`,
+
+        "bad"
+
+    );
+
+    document.getElementById("status").textContent=
+        "❌ Pedido fallido";
+
+    updateUI();
+
+    currentCustomer=null;
+
+    selected=[];
+
+    renderCustomers();
+
+    continueAfterOrder();
+}
+
+
+/* =====================================================
+   PEDIDO CORRECTO
+===================================================== */
+
+function completeOrder(){
+
+    const recipe=
+        currentCustomer.recipe;
+
+    let cost=0;
+
+    selected.forEach(
+        key=>{
+            cost+=INGREDIENTS[key].cost;
+        }
+    );
+
+    let tip=0;
+
+    if(currentCustomer.time>=40){
+
+        tip=3;
+
+    }else if(currentCustomer.time>=20){
+
+        tip=1;
+    }
+
+    const earned=
+        recipe.price+tip;
+
+    const profit=
+        earned-cost;
+
+    money+=profit;
+
+    income+=earned;
+
+    expenses+=cost;
+
+    completed++;
+
+    combo++;
+
+    document.getElementById("lastCost").textContent=
+        "$"+cost;
+
+    /*
+       Mensaje especial si tomó una
+       decisión económica.
+    */
+
+    const minimumPossible=
+        calculateMinimumCost(recipe);
+
+    if(cost===minimumPossible){
+
+        showMessage(
+
+            "💚 ¡Excelente decisión!",
+
+            `Vendiste por $${earned}, gastaste solo $${cost} `
+            +`y ganaste $${profit}. Elegiste una opción económica.`,
+
+            "good"
+
+        );
+
+    }else if(cost>minimumPossible+3){
+
+        showMessage(
+
+            "💸 Podías gastar menos",
+
+            `Vendiste por $${earned}, pero gastaste $${cost}. `
+            +`Tu ganancia fue $${profit}. `
+            +`Había una alternativa más económica.`,
+
+            "warning"
+
+        );
+
+    }else{
+
+        showMessage(
+
+            "🍽️ ¡Pedido entregado!",
+
+            `Ingresaste $${earned}, gastaste $${cost} `
+            +`y tu ganancia fue $${profit}.`,
+
+            "good"
+
+        );
+    }
+
+    if(tip>0){
+
+        setTimeout(()=>{
+
+            showMessage(
+
+                "⭐ ¡Propina!",
+
+                `El cliente quedó satisfecho con la rapidez. `
+                +`Recibiste $${tip} extra.`,
+
+                "good"
+
+            );
+
+        },700);
+    }
+
+    if(combo===3){
+
+        money+=3;
+
+        showMessage(
+
+            "🔥 ¡COMBO DE 3!",
+
+            "Tres pedidos correctos seguidos. "
+            +"Recibiste un bono de $3.",
+
+            "good"
+
+        );
+    }
+
+    currentCustomer=null;
+
+    selected=[];
+
+    updateUI();
+
+    renderCustomers();
+
+    continueAfterOrder();
+}
+
+
+/* =====================================================
+   COSTO MÍNIMO POSIBLE
+===================================================== */
+
+function calculateMinimumCost(recipe){
+
+    let total=0;
+
+    recipe.fixed.forEach(
+        key=>{
+            total+=INGREDIENTS[key].cost;
+        }
+    );
+
+    recipe.alternatives.forEach(
+        group=>{
+
+            let cheapest=Infinity;
+
+            group.forEach(
+                key=>{
+
+                    cheapest=
+                        Math.min(
+                            cheapest,
+                            INGREDIENTS[key].cost
+                        );
+
+                }
+            );
+
+            total+=cheapest;
+        }
+    );
+
+    return total;
+}
+
+
+/* =====================================================
+   CONTINUAR DESPUÉS DEL PEDIDO
+===================================================== */
+
+function continueAfterOrder(){
+
+    if(completed>=totalOrders){
+
+        setTimeout(
+            endDay,
+            800
+        );
+
+        return;
+    }
+
+    /*
+       El siguiente cliente pasa inmediatamente.
+    */
+
+    setTimeout(
+        selectNextCustomer,
+        600
+    );
+
+    /*
+       Después de cada pedido
+       intentamos traer otro cliente.
+    */
+
+    setTimeout(
+        tryAddWaitingCustomer,
+        2200
+    );
+}
+
+
+/* =====================================================
+   NUEVO CLIENTE
+===================================================== */
+
+function tryAddWaitingCustomer(){
+
+    if(!gameRunning){
+        return;
+    }
+
+    if(
+        customers.length<maxWaiting()
+    ){
+
+        addCustomer();
+
+        showMessage(
+
+            "👋 ¡Nuevo cliente!",
+
+            "Se puso en la fila. "
+            +"Su paciencia también está disminuyendo.",
+
+            "warning"
+
+        );
+    }
+
+    renderCustomers();
+}
+
+
+/* =====================================================
+   TEMPORIZADOR
+===================================================== */
+
+function gameTick(){
+
+    if(!gameRunning){
+        return;
+    }
+
+    /*
+       CLIENTE PRINCIPAL
+    */
+
+    if(currentCustomer){
+
+        currentCustomer.time--;
+    }
+
+
+    /*
+       CLIENTES ESPERANDO
+    */
+
+    customers.forEach(
+        customer=>{
+            customer.time--;
+        }
+    );
+
+
+    /*
+       PRINCIPAL
+    */
+
+    if(
+        currentCustomer &&
+        currentCustomer.time<=0
+    ){
+
+        const leaving=
+            currentCustomer;
+
+        currentCustomer=null;
+
+        combo=0;
+
+        customerLeft(
+            leaving,
+            true
+        );
+
+        completed++;
+
+        selected=[];
+
+        setTimeout(
+            selectNextCustomer,
+            500
+        );
+    }
+
+
+    /*
+       ESPERANDO
+    */
+
+    for(
+        let i=customers.length-1;
+        i>=0;
+        i--
+    ){
+
+        const customer=
+            customers[i];
+
+        if(customer.time<=0){
+
+            customerLeft(
+                customer,
+                false
+            );
+
+            customers.splice(
+                i,
+                1
+            );
+
+        }
+    }
+
+    renderCustomers();
+
+    updateUI();
+}
+
+
+/* =====================================================
+   CLIENTE SE ENFADA
+===================================================== */
+
+function customerLeft(
+    customer,
+    wasMain
+){
+
+    /*
+       La pérdida ocurre aunque
+       el dinero pueda quedar negativo.
+    */
+
+    const penalty=5;
+
+    money-=penalty;
+
+    expenses+=penalty;
+
+    combo=0;
+
+    showMessage(
+
+        "😡 ¡Cliente enfadado!",
+
+        `${customer.person[1]} esperó demasiado y se fue. `
+        +`Perdiste $${penalty}.`,
+
+        "bad"
+
+    );
+
+    if(wasMain){
+
+        document.getElementById("status").textContent=
+            "😡 El cliente se fue";
+    }
+}
+
+
+/* =====================================================
+   RENDER CLIENTES
+===================================================== */
+
+function renderCustomers(){
+
+    const main=
+        document.getElementById("mainClient");
+
+    const waiting=
+        document.getElementById("waitingClients");
+
+    main.innerHTML="";
+
+    waiting.innerHTML="";
+
+
+    /*
+       PRINCIPAL
+    */
+
+    if(currentCustomer){
+
+        const c=currentCustomer;
+
+        const percent=
+            Math.max(
+                0,
+                Math.min(
+                    100,
+                    (c.time/c.maxTime)*100
+                )
+            );
+
+        let color="";
+
+        if(percent<=30){
+
+            color="danger";
+
+        }else if(percent<=60){
+
+            color="warning";
+        }
+
+        main.innerHTML=`
+
+            <div class="main-client">
+
+                <div class="main-client-header">
+
+                    <div class="client-face">
+                        ${c.person[0]}
+                    </div>
+
+                    <div>
+
+                        <div class="client-name">
+                            ${c.person[1]}
+                        </div>
+
+                        <div class="client-order">
+                            ${c.recipe.emoji}
+                            ${c.recipe.name}
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="patience-text">
+
+                    <span>
+                        😐 Paciencia
+                    </span>
+
+                    <span>
+                        ${c.time}s
+                    </span>
+
+                </div>
+
+
+                <div class="timer">
+
+                    <div
+                        class="timer-fill ${color}"
+                        style="width:${percent}%"
+                    ></div>
+
+                </div>
+
+            </div>
+
+        `;
+
+    }else{
+
+        main.innerHTML=`
+
+            <div class="main-client">
+
+                <div style="
+                    text-align:center;
+                    padding:15px;
+                ">
+
+                    ⏳
+
+                    <br><br>
+
+                    Esperando al siguiente cliente...
+
+                </div>
+
+            </div>
+
+        `;
+    }
+
+
+    /*
+       CLIENTES ESPERANDO
+    */
+
+    if(customers.length===0){
+
+        waiting.innerHTML=`
+
+            <div style="
+                color:#879198;
+                padding:10px;
+                text-align:center;
+            ">
+
+                No hay clientes esperando.
+
+            </div>
+
+        `;
+
+        return;
+    }
+
+
+    customers.forEach(
+        c=>{
+
+            const percent=
+                Math.max(
+                    0,
+                    Math.min(
+                        100,
+                        (c.time/c.maxTime)*100
+                    )
+                );
+
+            let color="";
+
+            if(percent<=30){
+
+                color="danger";
+
+            }else if(percent<=60){
+
+                color="warning";
+            }
+
+            const div=
+                document.createElement("div");
+
+            div.className=
+                "waiting-client";
+
+            div.innerHTML=`
+
+                <div class="waiting-header">
+
+                    <div class="waiting-face">
+                        ${c.person[0]}
+                    </div>
+
+                    <div>
+
+                        <div class="waiting-name">
+                            ${c.person[1]}
+                        </div>
+
+                        <div class="waiting-order">
+                            ${c.recipe.emoji}
+                            ${c.recipe.name}
+                        </div>
+
+                    </div>
+
+                    <strong>
+                        ${c.time}s
+                    </strong>
+
+                </div>
+
+
+                <div class="timer waiting-timer">
+
+                    <div
+                        class="timer-fill ${color}"
+                        style="width:${percent}%"
+                    ></div>
+
+                </div>
+
+            `;
+
+            waiting.appendChild(div);
+        }
+    );
+}
+
+
+/* =====================================================
+   UI
+===================================================== */
+
+function updateUI(){
+
+    document.getElementById("money").textContent=
+        "$"+money;
+
+    document.getElementById("day").textContent=
+        `${day}/3`;
+
+    document.getElementById("orders").textContent=
+        `${completed}/${totalOrders}`;
+
+    document.getElementById("combo").textContent=
+        "x"+combo;
+
+    document.getElementById("income").textContent=
+        "$"+income;
+
+    document.getElementById("expenses").textContent=
+        "$"+expenses;
+
+    document.getElementById("profit").textContent=
+        "$"+(income-expenses);
+
+    document.getElementById("time").textContent=
+        currentCustomer
+        ?
+        currentCustomer.time+"s"
+        :
+        "--";
+
+
+    const message=
+        document.getElementById("financeMessage");
+
+
+    if(money<0){
+
+        message.textContent=
+            "🔴 Estás temporalmente en negativo. "
+            +"Todavía puedes recuperarte, pero debes terminar el día con $0 o más.";
+
+    }else if(money<10){
+
+        message.textContent=
+            "⚠️ Tienes poco dinero. Busca ingredientes económicos.";
+
+    }else if(income-expenses>20){
+
+        message.textContent=
+            "🌟 ¡Excelente! Tus ingresos están superando tus gastos.";
+
+    }else{
+
+        message.textContent=
+            "💡 Recuerda: vender más no siempre significa ganar más.";
+    }
+}
+
+
+/* =====================================================
+   MENSAJES
+===================================================== */
+
+function showMessage(
+    title,
+    text,
+    type="good"
+){
+
+    const box=
+        document.getElementById("message");
+
+    document.getElementById("messageTitle").textContent=
+        title;
+
+    document.getElementById("messageText").textContent=
+        text;
+
+    box.className=
+        "message show "+type;
+
+    clearTimeout(messageTimeout);
+
+    messageTimeout=
+        setTimeout(
+            ()=>{
+                box.classList.remove("show");
+            },
+            3200
+        );
+}
+
+
+/* =====================================================
+   FIN DEL DÍA
+===================================================== */
+
+function endDay(){
+
+    if(!gameRunning){
+        return;
+    }
+
+    gameRunning=false;
+
+    clearInterval(timer);
+
+    clearArrivalTimers();
+
+
+    /*
+       REGLA IMPORTANTE:
+
+       Se puede estar negativo DURANTE el día.
+
+       Pero al terminar el día:
+
+       money < 0 => DERROTA.
+    */
+
+    if(money<0){
+
+        document.getElementById(
+            "loseModal"
+        ).classList.add("show");
+
+        return;
+    }
+
+
+    const profit=
+        income-expenses;
+
+    document.getElementById(
+        "dayTitle"
+    ).textContent=
+        `🌟 ¡Día ${day} completado!`;
+
+    document.getElementById(
+        "summary"
+    ).innerHTML=`
+
+        🍽️ Pedidos atendidos:
+        <b>${completed}</b>
+
+        <br>
+
+        📈 Ingresos:
+        <b style="color:#16a56b">
+            $${income}
+        </b>
+
+        <br>
+
+        🧾 Gastos:
+        <b style="color:#ff536b">
+            $${expenses}
+        </b>
+
+        <br>
+
+        💵 Ganancia:
+        <b>
+            $${profit}
+        </b>
+
+        <br>
+
+        💰 Dinero disponible:
+        <b>
+            $${money}
+        </b>
+
+    `;
+
+
+    let lesson;
+
+
+    if(profit>40){
+
+        lesson=`
+
+            <strong>
+                🌟 ¡Excelente administración!
+            </strong>
+
+            <br><br>
+
+            Lograste generar una gran diferencia
+            entre tus ingresos y tus gastos.
+
+            <br><br>
+
+            Elegir ingredientes económicos
+            cuando era posible ayudó a aumentar
+            tu ganancia.
+
+        `;
+
+    }else if(profit>0){
+
+        lesson=`
+
+            <strong>
+                👍 Terminaste con ganancias.
+            </strong>
+
+            <br><br>
+
+            Vas por buen camino.
+
+            <br><br>
+
+            Recuerda comparar los precios
+            antes de elegir ingredientes.
+            Una pequeña diferencia por pedido
+            puede convertirse en una gran cantidad
+            al final del día.
+
+        `;
+
+    }else{
+
+        lesson=`
+
+            <strong>
+                ⚠️ Terminaste con pérdidas.
+            </strong>
+
+            <br><br>
+
+            Tus gastos fueron mayores
+            que tus ingresos.
+
+            <br><br>
+
+            En el siguiente día intenta buscar
+            alternativas económicas y evita
+            desperdiciar ingredientes.
+
+        `;
+    }
+
+
+    document.getElementById("lesson").innerHTML=
+        lesson;
+
+
+    /*
+       Si es día 3, directamente victoria.
+    */
+
+    if(day===3){
+
+        document.querySelector(
+            "#dayModal .big-button"
+        ).textContent=
+            "🏆 FINALIZAR";
+
+        document.querySelector(
+            "#dayModal .big-button"
+        ).onclick=
+            ()=>{
+                document.getElementById(
+                    "dayModal"
+                ).classList.remove("show");
+
+                document.getElementById(
+                    "winModal"
+                ).classList.add("show");
+            };
+    }else{
+
+        document.querySelector(
+            "#dayModal .big-button"
+        ).textContent=
+            "🚀 SIGUIENTE DÍA";
+
+        document.querySelector(
+            "#dayModal .big-button"
+        ).onclick=
+            nextDay;
+    }
+
+
+    document.getElementById(
+        "dayModal"
+    ).classList.add("show");
+}
+
+
+/* =====================================================
+   SIGUIENTE DÍA
+===================================================== */
+
+function nextDay(){
+
+    document.getElementById(
+        "dayModal"
+    ).classList.remove("show");
+
+    day++;
+
+    if(day>3){
+
+        document.getElementById(
+            "winModal"
+        ).classList.add("show");
+
+        return;
+    }
+
+
+    /*
+       10 → 15 → 20
+    */
+
+    if(day===1){
+
+        totalOrders=10;
+
+    }else if(day===2){
+
+        totalOrders=15;
+
+    }else{
+
+        totalOrders=20;
+    }
+
+
+    completed=0;
+
+    income=0;
+
+    expenses=0;
+
+    combo=0;
+
+    customers=[];
+
+    currentCustomer=null;
+
+    selected=[];
+
+    gameRunning=true;
+
+
+    clearArrivalTimers();
+
+
+    /*
+       Un cliente inicial.
+    */
+
+    addCustomer();
+
+    selectNextCustomer();
+
+
+    clearInterval(timer);
+
+    timer=
+        setInterval(
+            gameTick,
+            1000
+        );
+
+
+    scheduleArrivals();
+
+    updateUI();
+
+
+    showMessage(
+
+        "🌞 ¡Día "+day+"!",
+
+        day===2
+
+        ?
+
+        "Ahora tendrás 15 pedidos y aparecerán más clientes en espera."
+
+        :
+
+        "¡Día final! Tendrás 20 pedidos y pueden aparecer hasta 3 clientes esperando.",
+
+        "warning"
+
+    );
+}
+
+
+/* =====================================================
+   APARICIÓN PROGRESIVA
+===================================================== */
+
+function scheduleArrivals(){
+
+    clearArrivalTimers();
+
+    const arrivals=
+        maxWaiting();
+
+    const interval=
+        arrivalSpeed();
+
+
+    for(
+        let i=0;
+        i<arrivals;
+        i++
+    ){
+
+        const timeout=
+            setTimeout(
+                ()=>{
+
+                    if(
+                        gameRunning &&
+                        customers.length<maxWaiting() &&
+                        completed<totalOrders
+                    ){
+
+                        addCustomer();
+
+                        showMessage(
+
+                            "👋 ¡Nuevo cliente!",
+
+                            "Recuerda: aunque esté esperando, "
+                            +"su tiempo también está corriendo.",
+
+                            "warning"
+
+                        );
+                    }
+
+                },
+                interval*(i+1)
+            );
+
+        arrivalTimers.push(timeout);
+    }
+}
+
+
+/* =====================================================
+   LIMPIAR LLEGADAS
+===================================================== */
+
+function clearArrivalTimers(){
+
+    arrivalTimers.forEach(
+        timeout=>{
+            clearTimeout(timeout);
+        }
+    );
+
+    arrivalTimers=[];
+}
+
+
+/* =====================================================
+   DERROTA
+===================================================== */
+
+function loseGame(){
+
+    /*
+       Ya no se usa para detener el juego
+       simplemente por estar negativo.
+
+       La derrota se comprueba al FINAL
+       del día.
+
+       Esta función queda como protección
+       para eventos externos.
+    */
+
+    gameRunning=false;
+
+    clearInterval(timer);
+
+    clearArrivalTimers();
+
+    document.getElementById(
+        "loseModal"
+    ).classList.add("show");
+}
+
+
+/* =====================================================
+   REINICIAR
+===================================================== */
+
+function restart(){
+
+    location.reload();
+}
+
+</script>
+
+</body>
+</html>

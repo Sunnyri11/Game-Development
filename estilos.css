@@ -1,0 +1,604 @@
+/* ESTILO GENERAL*/
+* {
+    margin: 0; /* elimina márgenes por defecto de todos los elementos */
+    padding: 0; /* elimina padding por defecto */
+    box-sizing: border-box; /* hace que el padding y border se incluyan en el ancho y alto total */
+    font-family: Arial, Helvetica, sans-serif; /* define tipo de letra general */
+}
+
+body {
+    background: linear-gradient(180deg, #0d0d0d, #1a1a1a);
+    color: #f0f0f0; /* color de texto principal */
+}
+
+/* ENCABEZADO */
+header {
+    background: #142a50; /* fondo azul profundo */
+    color: white; /* color del texto dentro del header */
+    padding-bottom: 80px; /* espacio inferior del header */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3); 
+    /* box-shadow: 
+       0 = desplazamiento horizontal de la sombra
+       4px = desplazamiento vertical
+       15px = difuminado (blur)
+       rgba(0,0,0,0.3) = color negro con 30% de opacidad */
+       
+}
+
+nav {
+    display: flex; /* activa Flexbox para distribuir contenido */
+    justify-content: space-between; /* separa logo y menú al máximo posible */
+    align-items: center; /* centra verticalmente los elementos */
+    padding: 25px; /* espacio interno */
+    position: sticky; /* hace que se quede pegado al top */
+    top: 0;           /* posición desde la parte superior */
+    z-index: 1000;    /* asegura que quede encima de otros elementos */
+}
+
+.logo {
+    font-size: 28px; /* tamaño de letra del logo */
+    font-weight: bold; /* negrita */
+}
+
+/* MENÚ */
+.menu {
+    display: flex; /* organiza los items horizontalmente */
+    list-style: none; /* elimina viñetas de lista */
+    gap: 25px; /* espacio entre items */
+    transition: all 0.3s ease; /* transición suave para cambios de estado */
+}
+
+.menu a {
+    color: #f0f0f0; /* color del texto del link */
+    text-decoration: none; /* quita subrayado por defecto */
+    font-weight: bold; /* negrita */
+    position: relative; /* necesario para el pseudo-elemento ::after */
+}
+
+.menu a::after {
+    content: ''; /* pseudo-elemento vacío, usado para subrayado animado */
+    display: block; /* hace que tenga bloque y se pueda manipular tamaño */
+    height: 2px; /* alto de la línea */
+    background: #00ffcc; /* verde neón */
+    transition: width 0.3s; /* animación de ancho suave */
+    width: 0; /* ancho inicial 0, invisible */
+    position: absolute; /* posicionamiento relativo al link */
+    bottom: -4px; /* lo coloca justo debajo del texto */
+    left: 0; /* inicia desde la izquierda */
+}
+
+.menu a:hover::after {
+    width: 100%; /* al pasar el mouse, subrayado cubre todo el ancho del enlace */
+}
+
+.menu-toggle {
+    display: none; /* oculto en escritorio */
+    font-size: 30px; /* tamaño del icono ☰ */
+    cursor: pointer; /* cambia cursor a puntero */
+}
+
+/* FOTO DE PERFIL */
+.foto-perfil {
+    display: flex; /* Flexbox para centrar */
+    justify-content: center; /* centra horizontalmente */
+    margin-top: 20px; /* margen superior */
+}
+
+.foto-perfil img {
+    width: 160px; /* ancho de la imagen */
+    height: 160px; /* alto de la imagen */
+    object-fit: cover; /* recorta imagen manteniendo proporción */
+    border-radius: 50%; /* hace la imagen circular */
+    border: 4px solid #00b0ff; /* borde azul */
+    box-shadow: 0 0 20px rgba(0,176,255,0.5); 
+    /* sombra difusa: 0 horizontal, 0 vertical, 20px blur, azul semitransparente */
+}
+
+.foto-perfil img:hover {
+    transform: scale(1.08); /* pequeño zoom */
+    box-shadow: 0 0 25px rgba(0, 224, 255, 0.7); /* brillo bonito */
+}
+
+/* PRESENTACIÓN*/
+.presentacion {
+    text-align: center;
+    padding: 60px 10%;
+    background: linear-gradient(180deg, #0d0d0d, #1a1a1a);
+    color: #eaeaea;
+    border-radius: 12px;
+    box-shadow: 0 0 25px rgba(0,255,200,0.2);
+    transition: transform 0.3s ease;
+}
+
+.presentacion:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 35px rgba(0,255,200,0.3);
+}
+
+.presentacion h2 {
+    font-size: 2.4rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    color: #00ffcc;
+    text-shadow: 0 0 10px rgba(0,255,200,0.4);
+}
+
+.presentacion p {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #dcdcdc;
+    max-width: 900px;
+    margin: 0 auto 30px auto;
+    text-align: justify;
+    background: rgba(26,26,26,0.6);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: inset 0 0 10px rgba(0,255,200,0.1);
+}
+
+.presentacion .boton {
+    background: #00ffcc;
+    color: black;
+    font-weight: bold;
+    padding: 12px 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,255,200,0.4);
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.presentacion .boton:hover {
+    background: #00cc99;
+    transform: translateY(-3px);
+}
+
+.proyectos a{
+    background: #00ffcc;
+    color: black;
+    font-weight: bold;
+    padding: 12px 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,255,200,0.4);
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.proyectos a:hover {
+    background: #00cc99;
+    transform: translateY(-3px);
+}
+.menu a{
+    background: #00ffcc;
+    color: black;
+    font-weight: bold;
+    padding: 12px 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,255,200,0.4);
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.menu a:hover {
+    background: #00cc99;
+    transform: translateY(-3px);
+}
+.resaltado {
+    color: #00b0ff; /* color para resaltar texto */
+}
+
+.boton {
+    background: #00b0ff; /* color de fondo azul */
+    padding: 12px 25px; /* espacio interno vertical y horizontal */
+    border-radius: 6px; /* esquinas redondeadas */
+    color: white; /* color de texto */
+    text-decoration: none; /* quita subrayado si es link */
+    display: inline-block; /* permite margen y padding */
+    margin-top: 20px; /* espacio superior */
+    font-weight: bold; /* negrita */
+    border: none; /* sin borde por defecto */
+    cursor: pointer; /* cursor puntero */
+    box-shadow: 0 4px 12px rgba(0,176,255,0.4); 
+    /* sombra: 0 horizontal, 4px vertical, 12px blur, azul semitransparente */
+    transition: transform 0.2s, background 0.2s; /* animación suave al cambiar color y posición */
+}
+
+.boton:hover {
+    background: #0080cc; /* cambia color al pasar mouse */
+    transform: translateY(-3px); /* levanta el botón 3px */
+}
+
+/* SECCIONES GENERALES */
+section {
+    padding: 60px 10%; /* espacio interno vertical y horizontal */
+}
+
+/* SOBRE MÍ y LENGUAJES */
+.sobre-lenguajes {
+    display: flex; /* Flexbox horizontal */
+    justify-content: space-between; /* espacio entre bloques */
+    align-items: stretch; /* estira bloques verticalmente */
+    gap: 40px; /* espacio entre columnas */
+    padding: 60px 10%; /* espacio interno */
+}
+
+.lenguajes-imgs img {
+    width: 120px;
+    margin: 15px;
+    transition: transform 0.3s ease, filter 0.3s ease;
+    cursor: pointer;
+}
+
+.lenguajes-imgs img:hover {
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 10px #00e0ff);
+}
+
+/* Descripción del lenguaje */
+.descripcion-lenguaje {
+    margin-top: 20px;
+    padding: 15px;
+    background: #1b2a49;
+    color: white;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    display: none; /* Se activa al hacer clic */
+}
+
+.descripcion-lenguaje.activo {
+    display: block;
+}
+
+/*CUADRO SOBRE MÍ= */
+.sobre {
+    flex: 1; /* ocupa el mismo espacio que otros flex items */
+    background: #142a50; /* fondo azul profundo */
+    padding: 35px; /* espacio interno */
+    border-radius: 16px; /* esquinas redondeadas */
+    box-shadow: 0 0 20px rgba(0,176,255,0.3); /* sombra difusa azul */
+    font-size: 20px; /* tamaño de letra */
+}
+
+.sobre h2 {
+    font-size: 30px; /* tamaño de subtítulo */
+    margin-bottom: 15px; /* margen inferior */
+    border-bottom: 2px solid #00b0ff; /* línea azul debajo del título */
+    display: inline-block; /* necesario para que el border-bottom solo abarque el texto */
+    padding-bottom: 5px; /* espacio entre texto y línea */
+}
+
+/* CUADRO LENGUAJES */
+.lenguajes {
+    flex: 1; /* ocupa espacio igual que otros flex items */
+    background: #142a50; /* azul oscuro */
+    padding: 35px; /* espacio interno */
+    border-radius: 16px; /* esquinas redondeadas */
+    box-shadow: 0 0 20px rgba(0,176,255,0.3); /* sombra difusa */
+    text-align: center; /* centra texto y contenido */
+}
+
+.lenguajes h2 {
+    font-size: 30px; /* tamaño subtítulo */
+    border-bottom: 2px solid #00b0ff; /* línea decorativa */
+    display: inline-block; /* línea solo bajo el texto */
+    padding-bottom: 5px; /* espacio debajo del texto */
+}
+
+/*GRID DE IMÁGENES DE LENGUAJES */
+.lenguajes-imgs {
+    margin-top: 25px; /* espacio superior */
+    display: grid; /* activa Grid */
+    grid-template-columns: repeat(4, 1fr); /* 4 columnas de igual tamaño */
+    gap: 25px; /* espacio entre elementos */
+    padding: 10px; /* espacio interno */
+    align-items: center; /* centra elementos verticalmente */
+    justify-items: center; /* centra elementos horizontalmente */
+}
+
+.lenguajes-imgs img {
+    width: 90px; /* ancho imagen */
+    height: 90px; /* alto imagen */
+    object-fit: contain; /* escala manteniendo proporción */
+    transform: rotate(var(--rotation, 0deg)); /* rotación opcional mediante variable CSS */
+}
+
+/* SECCIÓN HABILIDADES */
+.habilidades {
+    background: linear-gradient(135deg, #0d1f3c, #1a3a6e); /* azul degradado intenso */
+    padding: 60px 10%; /* espacio interno */
+    border-radius: 20px; /* esquinas redondeadas */
+    margin: 60px auto; /* margen superior e inferior centrado */
+    box-shadow: 0 8px 30px rgba(0,176,255,0.3); /* sombra difusa azul */
+}
+
+.habilidades  h2 {
+    text-align: center; /* centra título */
+    font-size: 34px; /* tamaño de título */
+    color: #00b0ff; /* color azul */
+    margin-bottom: 40px; /* espacio inferior */
+    position: relative; /* necesario para ::after */
+}
+
+.habilidades h2::after {
+    content: ''; /* línea decorativa */
+    width: 60px; /* ancho de línea */
+    height: 3px; /* alto de línea */
+    background: #00b0ff; /* color línea */
+    display: block; /* bloque para poder mostrar */
+    margin: 10px auto 0 auto; /* centrado horizontal con margen superior */
+    border-radius: 2px; /* esquinas redondeadas de línea */
+}
+
+.proyectos  h2 {
+    text-align: center; /* centra título */
+    font-size: 34px; /* tamaño de título */
+    color: #00b0ff; /* color azul */
+    margin-bottom: 40px; /* espacio inferior */
+    position: relative; /* necesario para ::after */
+}
+
+.proyectos h2::after {
+    content: ''; /* línea decorativa */
+    width: 60px; /* ancho de línea */
+    height: 3px; /* alto de línea */
+    background: #00b0ff; /* color línea */
+    display: block; /* bloque para poder mostrar */
+    margin: 10px auto 0 auto; /* centrado horizontal con margen superior */
+    border-radius: 2px; /* esquinas redondeadas de línea */
+}
+
+.habilidades ul {
+    list-style: none; /* sin viñetas */
+    display: flex; /* Flexbox horizontal */
+    flex-wrap: wrap; /* permite varias filas */
+    justify-content: center; /* centra horizontalmente */
+    gap: 20px; /* espacio entre items */
+    padding: 0; /* elimina padding por defecto */
+}
+
+.habilidades ul li {
+    background: #142a50; /* fondo azul sólido */
+    color: #00b0ff; /* texto azul */
+    padding: 15px 25px; /* espacio interno */
+    border-radius: 12px; /* esquinas redondeadas */
+    font-weight: bold; /* negrita */
+    font-size: 18px; /* tamaño letra */
+    box-shadow: 0 0 15px rgba(0,176,255,0.4); /* sombra azul difusa */
+    transition: transform 0.2s, box-shadow 0.2s; /* animación suave */
+}
+
+.habilidades ul li:hover {
+    transform: translateY(-3px); /* levanta el elemento 3px */
+    box-shadow: 0 0 25px rgba(0,224,255,0.6); /* aumenta sombra al pasar mouse */
+}
+
+/*PROYECTOS */
+.cuadricula-proyectos {
+    display: grid; /* activa Grid */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+    /* tantas columnas como quepan, mínimo 280px cada una */
+    gap: 25px; /* espacio entre tarjetas */
+}
+
+.tarjeta-proyecto {
+    background: #142a50; /* fondo azul oscuro */
+    padding: 20px; /* espacio interno */
+    border-radius: 14px; /* esquinas redondeadas */
+    text-align: center; /* centra contenido */
+    box-shadow: 0 0 20px rgba(0,176,255,0.2); /* sombra azul difusa */
+    border: 1px solid #0d1f3c; /* borde azul oscuro */
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s; /* animación hover */
+    display: flex; /* Flexbox vertical */
+    flex-direction: column; /* items en columna */
+    gap: 10px; /* espacio interno entre elementos */
+}
+
+.tarjeta-proyecto:hover {
+    transform: scale(1.05); /* agranda tarjeta */
+    box-shadow: 0 0 30px rgba(0,176,255,0.4); /* aumenta sombra */
+}
+
+.tarjeta-proyecto img {
+    width: 100%; /* ocupa todo ancho */
+    height: 400px; /* alto fijo */
+    object-fit: cover; /* recorta imagen manteniendo proporción */
+    border-radius: 10px; /* esquinas redondeadas */
+    background: #0d1f3c; /* fondo por si imagen no carga */
+}
+
+.tarjeta-proyecto a {
+    display: inline-block; /* permite margen y padding */
+    margin-top: auto; /* empuja enlace hacia abajo */
+    color: #00b0ff; /* color azul */
+    text-decoration: none; /* quita subrayado */
+    font-weight: bold; /* negrita */
+}
+
+.tarjeta-proyecto a:hover {
+    color: #0080cc; /* cambia color al pasar mouse */
+}
+
+/* CONTACTO*/
+#contacto {
+    background: linear-gradient(135deg, #0d1f3c, #1a3a6e); /* azul degradado */
+    padding: 80px 10%; /* espacio interno */
+    border-radius: 20px; /* esquinas redondeadas */
+    margin: 60px auto; /* centrado vertical */
+    box-shadow: 0 8px 30px rgba(0,176,255,0.3); /* sombra difusa azul */
+}
+
+#contacto h2 {
+    text-align: center; /* centra título */
+    font-size: 34px; /* tamaño de título */
+    color: #00b0ff; /* color azul */
+    margin-bottom: 40px; /* espacio inferior */
+    position: relative; /* necesario para ::after */
+}
+
+#contacto h2::after {
+    content: ''; /* línea decorativa */
+    width: 60px; /* ancho línea */
+    height: 3px; /* alto línea */
+    background: #00b0ff; /* color línea */
+    display: block; /* bloque */
+    margin: 10px auto 0 auto; /* centrado horizontal */
+    border-radius: 2px; /* esquinas redondeadas */
+}
+
+.tarjeta-contacto {
+    background: #142a50; /* azul oscuro sólido */
+    padding: 40px; /* espacio interno */
+    max-width: 600px; /* ancho máximo */
+    margin: auto; /* centrado horizontal */
+    border-radius: 16px; /* esquinas redondeadas */
+    text-align: center; /* centra contenido */
+    box-shadow: 0 0 25px rgba(0,176,255,0.4); /* sombra azul */
+    border: 1px solid #00b0ff; /* borde azul */
+}
+
+.tarjeta-contacto p {
+    font-size: 18px; /* tamaño texto */
+    margin-bottom: 25px; /* espacio inferior */
+    color: #00b0ff; /* color azul */
+    font-weight: bold; /* negrita */
+}
+
+form {
+    display: flex; /* Flexbox */
+    flex-direction: column; /* columna vertical */
+    gap: 20px; /* espacio entre elementos */
+}
+
+input, textarea {
+    padding: 14px; /* espacio interno */
+    border-radius: 8px; /* esquinas redondeadas */
+    border: 1px solid #00b0ff; /* borde azul */
+    background: #0b1b3a; /* fondo azul oscuro */
+    color: white; /* color texto */
+    font-size: 16px; /* tamaño texto */
+    transition: all 0.3s ease; /* animación suave */
+}
+
+input:focus, textarea:focus {
+    border-color: #00e0ff; /* borde al enfocar */
+    box-shadow: 0 0 10px rgba(0,224,255,0.5); /* sombra azul al enfocar */
+    outline: none; /* quita outline por defecto */
+}
+
+button.boton {
+    background: #00b0ff; /* fondo azul */
+    color: white; /* color texto */
+    font-weight: bold; /* negrita */
+    padding: 14px; /* espacio interno */
+    border-radius: 8px; /* esquinas redondeadas */
+    border: none; /* sin borde */
+    cursor: pointer; /* cursor puntero */
+    font-size: 18px; /* tamaño texto */
+    transition: transform 0.2s, background 0.2s, box-shadow 0.2s; /* transición animaciones */
+}
+
+button.boton:hover {
+    background: #0080cc; /* color hover */
+    transform: translateY(-3px); /* levanta botón */
+    box-shadow: 0 0 15px rgba(0,176,255,0.6); /* sombra hover */
+}
+
+/* BOTON VOLVER A SUBIR */
+.boton-volver {
+    background-color: #00e0ff; /* Azul brillante */
+    color: black;
+    border: none;
+    border-radius: 50%; /* Botón redondo */
+    width: 50px;
+    height: 50px;
+    font-size: 3rem; /* Flecha grande */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    float: right; /* A la derecha */
+    margin: 0 0 50px 0; /* Separa del footer 50px hacia arriba */
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.boton-volver:hover {
+    background-color: #00b8cc; /* Azul más oscuro al pasar el mouse */
+    transform: translateY(-3px);
+}
+
+/* Quitar estilos por defecto del <a> dentro del botón */
+.boton-volver a {
+    color: inherit;
+    text-decoration: none;
+    font-size: 2rem; /* Tamaño de la flecha */
+    display: block;
+    text-align: center;
+    line-height: 1;
+}
+
+/* FOOTER*/
+footer {
+    padding: 20px; /* espacio interno */
+    text-align: center; /* centra texto */
+    background: #0b1b3a; /* color fondo */
+    color: white; /* color texto */
+    box-shadow: 0 -4px 10px rgba(0,0,0,0.3); /* sombra hacia arriba */
+}
+
+/* RESPONSIVO */
+@media (max-width: 900px) {
+    .sobre-lenguajes {
+        flex-direction: column; /* apila los bloques */
+        padding: 40px; /* reduce padding */
+    }
+
+    .lenguajes-imgs {
+        grid-template-columns: repeat(2, 1fr); /* 2 columnas */
+    }
+
+    .lenguajes-imgs img {
+        width: 80px; /* reduce tamaño imagen */
+        height: 80px;
+    }
+
+    .presentacion h2 {
+        font-size: 28px; /* reduce tamaño título */
+    }
+}
+
+/* MENÚ RESPONSIVO */
+@media (max-width: 768px) {
+    nav {
+        position: relative; /* contenedor del menú absoluto */
+    }
+
+    .menu {
+        flex-direction: column; /* vertical */
+        width: 100%; /* ancho completo */
+        background: #142a50; /* fondo azul */
+        position: absolute; /* se posiciona sobre el contenido */
+        top: 60px; /* debajo del nav */
+        left: 0;
+        overflow: hidden; /* oculta contenido extra */
+        max-height: 0; /* cerrado por defecto */
+        transition: max-height 0.3s ease-out; /* animación */
+        z-index: 10; /* encima de otros elementos */
+    }
+
+    .menu li {
+        padding: 15px 0; /* espacio interno vertical */
+        text-align: center; /* centra texto */
+    }
+
+    .menu-toggle {
+        display: block; /* visible en móvil */
+        font-size: 30px; /* tamaño icono */
+        cursor: pointer; /* cursor puntero */
+        color: #00b0ff; /* azul */
+        position: relative; /* para z-index */
+        z-index: 20; /* encima del menú */
+    }
+
+    /* clase que activa el menú */
+    .menu.active {
+        max-height: 500px; /* altura para mostrar items */
+        transition: max-height 0.3s ease-in; /* transición suave */
+    }
+}

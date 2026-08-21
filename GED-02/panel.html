@@ -1,0 +1,4267 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juegos</title>
+    <link rel="stylesheet" href="../estilosProyectos.css">
+</head>
+
+<body>
+
+    <header>
+        <nav>
+            <h1 class="logo">Portafolio</h1>
+            <ul class="menu">
+                <li><a href="../Portafolio.html">Inicio</a></li>
+                <li><a href="../Portafolio.html#proyectos">Proyectos</a></li>
+            </ul>
+            <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="banner-proyecto">
+            <h1>Reci-Trail</h1>
+        </div>
+        <div class="contenedor-proyecto">
+            <div class="video-proyecto">
+                <img src="../Images/reci-trail.png">
+                </img>
+
+            </div>
+
+            <!-- DESCRIPCIÓN DEL PROYECTO -->
+            <div class="descripcion-proyecto">
+                <h2>Descripción</h2>
+                <p>
+                    El jugador acelera una motocicleta Trail para subir la colina. Al pasar sobre un residuo, se detiene
+                    brevemente y debe presionar el botón del color correcto (Amarillo para plástico, Azul para papel,
+                    Verde para vidrio) para clasificarlo.
+                </p>
+            </div>
+        </div>
+
+        <!-- DESARROLLO DEL PROYECTO -->
+        <div class="desarrollo-proyecto">
+            <h2>Desarrollo</h2>
+            <ul>
+                <li><strong>Plataforma:</strong> HTML, CSS y JavaScript</li>
+                <li><strong>Lenguaje:</strong>JavaScript</li>
+                <li><strong>Gráficos:</strong> CSS</li>
+                <li><strong>Objetivo:</strong> El Jugador debera recorrer toda la pista con su motocicleta y
+                    tendra que limpiar el camino poniendo la basura en sus respectivos contenedores</li>
+            </ul>
+            <br>
+            <a id="botonjuego" target="_blank" href="Reci-Trail.html">EMPIEZA A JUGAR!!!!!!!</a>
+        </div>
+
+
+
+        <!-- CÓDIGO DEL PROYECTO -->
+        <section class="codigo-proyecto">
+            <h2>Código del Proyecto</h2>
+            <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;es&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+&lt;title&gt;Reci-Trail ♻️&lt;/title&gt;
+
+&lt;style&gt;
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#161b20;
+}
+
+#game{
+    position:fixed;
+    inset:0;
+    width:100vw;
+    height:100vh;
+    display:block;
+}
+
+/* ================================
+   HUD
+================================ */
+
+#hud{
+    position:fixed;
+    z-index:20;
+    top:18px;
+    left:18px;
+    right:18px;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+
+    pointer-events:none;
+}
+
+.hudGroup{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+}
+
+.panel{
+    min-width:145px;
+    padding:11px 15px;
+
+    color:white;
+
+    border-radius:16px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(20,29,32,.94),
+            rgba(30,42,45,.82)
+        );
+
+    border:1px solid rgba(255,255,255,.14);
+
+    box-shadow:
+        0 10px 28px rgba(0,0,0,.28),
+        inset 0 1px 0 rgba(255,255,255,.08);
+
+    backdrop-filter:blur(12px);
+}
+
+.panelTitle{
+    font-size:10px;
+    letter-spacing:1.4px;
+    font-weight:900;
+    color:#aebdbf;
+    text-transform:uppercase;
+}
+
+.panelValue{
+    margin-top:4px;
+    font-size:21px;
+    font-weight:950;
+}
+
+#energyPanel{
+    width:225px;
+}
+
+.energyBar{
+    height:12px;
+    margin-top:7px;
+
+    border-radius:99px;
+    overflow:hidden;
+
+    background:#121a1d;
+    border:1px solid rgba(255,255,255,.08);
+}
+
+#energyFill{
+    height:100%;
+    width:100%;
+
+    border-radius:99px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #30d579,
+            #a4eb61
+        );
+
+    transition:
+        width .2s,
+        background .2s;
+}
+
+#hint{
+    position:fixed;
+    z-index:20;
+
+    left:50%;
+    bottom:18px;
+
+    transform:translateX(-50%);
+
+    padding:10px 18px;
+
+    color:#fff;
+    font-size:13px;
+    font-weight:800;
+
+    background:rgba(17,25,28,.72);
+    border:1px solid rgba(255,255,255,.13);
+
+    border-radius:999px;
+
+    backdrop-filter:blur(10px);
+
+    pointer-events:none;
+}
+
+/* ================================
+   PREGUNTA
+================================ */
+
+#questionOverlay{
+    position:fixed;
+    inset:0;
+
+    z-index:50;
+
+    display:none;
+    justify-content:center;
+    align-items:center;
+
+    background:rgba(7,12,15,.72);
+
+    backdrop-filter:blur(6px);
+}
+
+#questionOverlay.show{
+    display:flex;
+}
+
+.questionCard{
+    width:min(570px,calc(100vw - 28px));
+
+    padding:26px;
+
+    color:white;
+    text-align:center;
+
+    border-radius:28px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #202d30,
+            #10181b
+        );
+
+    border:1px solid rgba(255,255,255,.14);
+
+    box-shadow:
+        0 30px 90px rgba(0,0,0,.55);
+
+    animation:cardIn .25s ease;
+}
+
+@keyframes cardIn{
+    from{
+        opacity:0;
+        transform:translateY(15px) scale(.96);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0) scale(1);
+    }
+}
+
+.questionLabel{
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:#aebfc1;
+}
+
+.trashEmoji{
+    width:125px;
+    height:125px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    margin:14px auto 7px;
+
+    font-size:72px;
+
+    border-radius:27px;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,255,255,.13),
+            rgba(255,255,255,.025)
+        );
+
+    border:1px solid rgba(255,255,255,.1);
+}
+
+#trashName{
+    font-size:26px;
+    font-weight:950;
+}
+
+#questionText{
+    margin-top:6px;
+    color:#b9c5c7;
+    font-size:14px;
+}
+
+.options{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+
+    margin-top:22px;
+}
+
+.option{
+    min-height:95px;
+
+    border:0;
+    border-radius:18px;
+
+    color:white;
+
+    font-size:14px;
+    font-weight:950;
+
+    cursor:pointer;
+
+    box-shadow:
+        0 8px 25px rgba(0,0,0,.25);
+
+    transition:
+        transform .15s,
+        filter .15s;
+}
+
+.option:hover{
+    transform:translateY(-3px);
+    filter:brightness(1.1);
+}
+
+.option:active{
+    transform:translateY(1px);
+}
+
+.option .emoji{
+    display:block;
+    font-size:29px;
+    margin-bottom:5px;
+}
+
+.option small{
+    display:block;
+    margin-top:4px;
+    opacity:.75;
+}
+
+.plastic{
+    background:linear-gradient(145deg,#f3bd36,#d58c0b);
+}
+
+.paper{
+    background:linear-gradient(145deg,#398ce9,#1657ad);
+}
+
+.glass{
+    background:linear-gradient(145deg,#36d17c,#188d54);
+}
+
+/* ================================
+   MENSAJE
+================================ */
+
+#message{
+    position:fixed;
+    z-index:80;
+
+    left:50%;
+    top:50%;
+
+    min-width:min(430px,calc(100vw - 35px));
+
+    padding:20px 25px;
+
+    transform:
+        translate(-50%,-50%)
+        scale(.8);
+
+    opacity:0;
+
+    color:white;
+    text-align:center;
+
+    background:rgba(17,27,30,.97);
+
+    border:2px solid rgba(255,255,255,.1);
+
+    border-radius:22px;
+
+    box-shadow:
+        0 25px 70px rgba(0,0,0,.5);
+
+    pointer-events:none;
+}
+
+#message.show{
+    animation:messagePop 2s ease forwards;
+}
+
+@keyframes messagePop{
+
+    0%{
+        opacity:0;
+        transform:translate(-50%,-50%) scale(.8);
+    }
+
+    12%{
+        opacity:1;
+        transform:translate(-50%,-50%) scale(1);
+    }
+
+    78%{
+        opacity:1;
+        transform:translate(-50%,-50%) scale(1);
+    }
+
+    100%{
+        opacity:0;
+        transform:translate(-50%,-50%) scale(.95);
+    }
+}
+
+.messageIcon{
+    font-size:42px;
+}
+
+.messageTitle{
+    margin-top:5px;
+    font-size:24px;
+    font-weight:950;
+}
+
+.messageText{
+    margin-top:5px;
+    color:#c0cbcd;
+    font-size:14px;
+}
+
+/* ================================
+   FIN
+================================ */
+
+#gameOver{
+    position:fixed;
+    inset:0;
+
+    z-index:100;
+
+    display:none;
+    align-items:center;
+    justify-content:center;
+
+    background:rgba(5,10,13,.78);
+
+    backdrop-filter:blur(8px);
+}
+
+#gameOver.show{
+    display:flex;
+}
+
+.endCard{
+    width:min(500px,calc(100vw - 28px));
+
+    padding:34px;
+
+    color:white;
+    text-align:center;
+
+    border-radius:28px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #202d30,
+            #10181b
+        );
+
+    border:1px solid rgba(255,255,255,.13);
+
+    box-shadow:
+        0 35px 90px rgba(0,0,0,.6);
+}
+
+.endIcon{
+    font-size:68px;
+}
+
+.endCard h1{
+    margin-top:8px;
+    font-size:34px;
+}
+
+.endCard p{
+    margin-top:8px;
+    color:#b9c6c8;
+    line-height:1.5;
+}
+
+.restart{
+    margin-top:23px;
+
+    border:0;
+
+    padding:14px 30px;
+
+    border-radius:14px;
+
+    color:#142119;
+    background:#83e95c;
+
+    font-size:16px;
+    font-weight:950;
+
+    cursor:pointer;
+}
+
+.restart:hover{
+    filter:brightness(1.08);
+    transform:translateY(-2px);
+}
+
+/* ================================
+   RESPONSIVE
+================================ */
+
+@media(max-width:650px){
+
+    #hud{
+        top:9px;
+        left:9px;
+        right:9px;
+    }
+
+    .panel{
+        min-width:110px;
+        padding:8px 11px;
+    }
+
+    .panelValue{
+        font-size:16px;
+    }
+
+    #energyPanel{
+        width:165px;
+    }
+
+    #hint{
+        bottom:9px;
+        font-size:11px;
+    }
+
+    .questionCard{
+        padding:18px;
+    }
+
+    .trashEmoji{
+        width:95px;
+        height:95px;
+        font-size:55px;
+    }
+
+    #trashName{
+        font-size:22px;
+    }
+
+    .option{
+        min-height:78px;
+        font-size:11px;
+    }
+}
+&lt;/style&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+
+&lt;canvas id=&quot;game&quot;&gt;&lt;/canvas&gt;
+
+&lt;!-- ================================
+     HUD
+================================ --&gt;
+
+&lt;div id=&quot;hud&quot;&gt;
+
+    &lt;div class=&quot;hudGroup&quot;&gt;
+
+        &lt;div class=&quot;panel&quot;&gt;
+            &lt;div class=&quot;panelTitle&quot;&gt;
+                ♻️ Reciclaje
+            &lt;/div&gt;
+
+            &lt;div class=&quot;panelValue&quot;&gt;
+                &lt;span id=&quot;score&quot;&gt;0&lt;/span&gt; pts
+            &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;div class=&quot;panel&quot;&gt;
+            &lt;div class=&quot;panelTitle&quot;&gt;
+                🏔️ Recorrido
+            &lt;/div&gt;
+
+            &lt;div class=&quot;panelValue&quot;&gt;
+                &lt;span id=&quot;distanceText&quot;&gt;0&lt;/span&gt; m
+            &lt;/div&gt;
+        &lt;/div&gt;
+
+    &lt;/div&gt;
+
+    &lt;div
+        class=&quot;panel&quot;
+        id=&quot;energyPanel&quot;
+    &gt;
+
+        &lt;div class=&quot;panelTitle&quot;&gt;
+            🔋 Energía
+        &lt;/div&gt;
+
+        &lt;div class=&quot;panelValue&quot;&gt;
+            &lt;span id=&quot;energyText&quot;&gt;100&lt;/span&gt;%
+        &lt;/div&gt;
+
+        &lt;div class=&quot;energyBar&quot;&gt;
+            &lt;div id=&quot;energyFill&quot;&gt;&lt;/div&gt;
+        &lt;/div&gt;
+
+    &lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div id=&quot;hint&quot;&gt;
+    A / D o ← / → para acelerar
+&lt;/div&gt;
+
+
+&lt;!-- ================================
+     PREGUNTA
+================================ --&gt;
+
+&lt;div id=&quot;questionOverlay&quot;&gt;
+
+    &lt;div class=&quot;questionCard&quot;&gt;
+
+        &lt;div class=&quot;questionLabel&quot;&gt;
+            🚨 ¡Encontraste un residuo!
+        &lt;/div&gt;
+
+        &lt;div
+            class=&quot;trashEmoji&quot;
+            id=&quot;trashEmoji&quot;
+        &gt;
+            🥤
+        &lt;/div&gt;
+
+        &lt;div id=&quot;trashName&quot;&gt;
+            Botella de plástico
+        &lt;/div&gt;
+
+        &lt;div id=&quot;questionText&quot;&gt;
+            ¿En qué contenedor debes depositarlo?
+        &lt;/div&gt;
+
+        &lt;div class=&quot;options&quot;&gt;
+
+            &lt;button
+                class=&quot;option plastic&quot;
+                data-type=&quot;plastic&quot;
+            &gt;
+                &lt;span class=&quot;emoji&quot;&gt;🟨&lt;/span&gt;
+                PLÁSTICO
+                &lt;small&gt;Contenedor amarillo&lt;/small&gt;
+            &lt;/button&gt;
+
+            &lt;button
+                class=&quot;option paper&quot;
+                data-type=&quot;paper&quot;
+            &gt;
+                &lt;span class=&quot;emoji&quot;&gt;🟦&lt;/span&gt;
+                PAPEL
+                &lt;small&gt;Contenedor azul&lt;/small&gt;
+            &lt;/button&gt;
+
+            &lt;button
+                class=&quot;option glass&quot;
+                data-type=&quot;glass&quot;
+            &gt;
+                &lt;span class=&quot;emoji&quot;&gt;🟩&lt;/span&gt;
+                VIDRIO
+                &lt;small&gt;Contenedor verde&lt;/small&gt;
+            &lt;/button&gt;
+
+        &lt;/div&gt;
+
+    &lt;/div&gt;
+
+&lt;/div&gt;
+
+
+&lt;!-- ================================
+     MENSAJE
+================================ --&gt;
+
+&lt;div id=&quot;message&quot;&gt;
+
+    &lt;div
+        class=&quot;messageIcon&quot;
+        id=&quot;messageIcon&quot;
+    &gt;
+        ✅
+    &lt;/div&gt;
+
+    &lt;div
+        class=&quot;messageTitle&quot;
+        id=&quot;messageTitle&quot;
+    &gt;
+        ¡Correcto!
+    &lt;/div&gt;
+
+    &lt;div
+        class=&quot;messageText&quot;
+        id=&quot;messageText&quot;
+    &gt;
+        ¡Muy bien!
+    &lt;/div&gt;
+
+&lt;/div&gt;
+
+
+&lt;!-- ================================
+     GAME OVER
+================================ --&gt;
+
+&lt;div id=&quot;gameOver&quot;&gt;
+
+    &lt;div class=&quot;endCard&quot;&gt;
+
+        &lt;div
+            class=&quot;endIcon&quot;
+            id=&quot;endIcon&quot;
+        &gt;
+            🔋
+        &lt;/div&gt;
+
+        &lt;h1 id=&quot;endTitle&quot;&gt;
+            ¡Se acabó!
+        &lt;/h1&gt;
+
+        &lt;p id=&quot;endText&quot;&gt;
+            Te quedaste sin energía.
+        &lt;/p&gt;
+
+        &lt;button
+            class=&quot;restart&quot;
+            onclick=&quot;restartGame()&quot;
+        &gt;
+            🔄 Volver a jugar
+        &lt;/button&gt;
+
+    &lt;/div&gt;
+
+&lt;/div&gt;
+
+
+&lt;script&gt;
+
+/* ============================================================
+   CANVAS
+============================================================ */
+
+const canvas =
+    document.getElementById(&quot;game&quot;);
+
+const ctx =
+    canvas.getContext(&quot;2d&quot;);
+
+let W = window.innerWidth;
+let H = window.innerHeight;
+
+let DPR =
+    Math.min(
+        window.devicePixelRatio || 1,
+        2
+    );
+
+
+function resize(){
+
+    W = window.innerWidth;
+    H = window.innerHeight;
+
+    DPR =
+        Math.min(
+            window.devicePixelRatio || 1,
+            2
+        );
+
+    canvas.width =
+        W * DPR;
+
+    canvas.height =
+        H * DPR;
+
+    canvas.style.width =
+        W + &quot;px&quot;;
+
+    canvas.style.height =
+        H + &quot;px&quot;;
+
+    ctx.setTransform(
+        DPR,
+        0,
+        0,
+        DPR,
+        0,
+        0
+    );
+}
+
+window.addEventListener(
+    &quot;resize&quot;,
+    resize
+);
+
+resize();
+
+
+/* ============================================================
+   ESTADO DEL JUEGO
+============================================================ */
+
+let gameRunning = true;
+
+let questionOpen = false;
+
+let currentTrash = null;
+
+let score = 0;
+
+let energy = 100;
+
+let distance = 0;
+
+let speed = 0;
+
+let lastTime =
+    performance.now();
+
+const keys = {
+    left:false,
+    right:false
+};
+
+
+/* ============================================================
+   TERRENO
+
+   Ahora el comienzo tiene un tramo especial:
+   el jugador aparece cerca del borde de la montaña.
+
+   0 - 160:
+   zona de inicio / borde.
+
+   Después:
+   carretera montañosa.
+============================================================ */
+
+const terrain = [
+
+    [0, 0],
+
+    [80, 5],
+
+    [160, 15],
+
+    [250, 20],
+
+    [340, 75],
+
+    [450, 145],
+
+    [560, 190],
+
+    [670, 120],
+
+    [790, 25],
+
+    [900, -5],
+
+    [1000, 75],
+
+    [1110, 175],
+
+    [1220, 225],
+
+    [1320, 125],
+
+    [1410, 30],
+
+    [1510, 100],
+
+    [1610, 205],
+
+    [1730, 270],
+
+    [1880, 280]
+
+];
+
+
+/* ============================================================
+   TERRENO INTERPOLADO
+============================================================ */
+
+function terrainHeight(x){
+
+    if(
+        x &lt;= terrain[0][0]
+    ){
+        return terrain[0][1];
+    }
+
+    for(
+        let i=0;
+        i&lt;terrain.length-1;
+        i++
+    ){
+
+        const a =
+            terrain[i];
+
+        const b =
+            terrain[i+1];
+
+        if(
+            x &gt;= a[0] &amp;&amp;
+            x &lt;= b[0]
+        ){
+
+            const t =
+                (x-a[0]) /
+                (b[0]-a[0]);
+
+            const smooth =
+                t*t*(3-2*t);
+
+            return (
+                a[1] +
+                (b[1]-a[1]) *
+                smooth
+            );
+        }
+    }
+
+    return terrain[
+        terrain.length-1
+    ][1];
+}
+
+
+function terrainSlope(x){
+
+    const dx = 2;
+
+    return (
+        terrainHeight(x+dx) -
+        terrainHeight(x-dx)
+    ) /
+    (dx*2);
+}
+
+
+/* ============================================================
+   CÁMARA / CARRETERA
+============================================================ */
+
+/*
+    La carretera comienza ligeramente después
+    del borde inicial.
+
+    Esto permite mostrar el &quot;inicio de montaña&quot;
+    antes de entrar completamente a la carretera.
+*/
+
+const ROAD_START = 115;
+
+
+/*
+    Posición vertical de la superficie.
+*/
+
+function roadY(x){
+
+    const base =
+        H * .67;
+
+    return (
+        base -
+        terrainHeight(x) * .67
+    );
+}
+
+
+/*
+    Posición X en pantalla.
+*/
+
+function worldToScreenX(worldX){
+
+    return (
+        W*.5 +
+        (worldX-distance)*2
+    );
+}
+
+
+/*
+    Punto central de la carretera.
+
+    Usamos una perspectiva sencilla:
+    el centro queda aproximadamente
+    en roadY + 20% de la altura.
+*/
+
+function roadCenterY(x){
+
+    return (
+        roadY(x) +
+        H*.20
+    );
+}
+
+
+/* ============================================================
+   CIELO
+============================================================ */
+
+function drawSky(){
+
+    const g =
+        ctx.createLinearGradient(
+            0,
+            0,
+            0,
+            H
+        );
+
+    g.addColorStop(
+        0,
+        &quot;#302657&quot;
+    );
+
+    g.addColorStop(
+        .23,
+        &quot;#654066&quot;
+    );
+
+    g.addColorStop(
+        .43,
+        &quot;#c95d68&quot;
+    );
+
+    g.addColorStop(
+        .62,
+        &quot;#f28a59&quot;
+    );
+
+    g.addColorStop(
+        .8,
+        &quot;#f6b66f&quot;
+    );
+
+    g.addColorStop(
+        1,
+        &quot;#c87850&quot;
+    );
+
+    ctx.fillStyle = g;
+
+    ctx.fillRect(
+        0,
+        0,
+        W,
+        H
+    );
+
+
+    /*
+        Brillo del horizonte.
+    */
+
+    const glow =
+        ctx.createLinearGradient(
+            0,
+            H*.4,
+            0,
+            H*.8
+        );
+
+    glow.addColorStop(
+        0,
+        &quot;rgba(255,195,100,0)&quot;
+    );
+
+    glow.addColorStop(
+        .5,
+        &quot;rgba(255,195,100,.28)&quot;
+    );
+
+    glow.addColorStop(
+        1,
+        &quot;rgba(255,100,60,0)&quot;
+    );
+
+    ctx.fillStyle =
+        glow;
+
+    ctx.fillRect(
+        0,
+        H*.35,
+        W,
+        H*.45
+    );
+}
+
+
+/* ============================================================
+   SOL
+============================================================ */
+
+function drawSun(){
+
+    const x =
+        W*.77;
+
+    const y =
+        H*.40;
+
+
+    const halo =
+        ctx.createRadialGradient(
+            x,
+            y,
+            5,
+            x,
+            y,
+            170
+        );
+
+    halo.addColorStop(
+        0,
+        &quot;rgba(255,250,190,.9)&quot;
+    );
+
+    halo.addColorStop(
+        .3,
+        &quot;rgba(255,195,90,.42)&quot;
+    );
+
+    halo.addColorStop(
+        .7,
+        &quot;rgba(255,110,70,.12)&quot;
+    );
+
+    halo.addColorStop(
+        1,
+        &quot;rgba(255,80,50,0)&quot;
+    );
+
+    ctx.fillStyle =
+        halo;
+
+    ctx.fillRect(
+        x-170,
+        y-170,
+        340,
+        340
+    );
+
+
+    ctx.fillStyle =
+        &quot;#ffe89a&quot;;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        x,
+        y,
+        42,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+}
+
+
+/* ============================================================
+   NUBES
+============================================================ */
+
+function drawCloud(
+    x,
+    y,
+    scale
+){
+
+    ctx.save();
+
+    ctx.globalAlpha=.28;
+
+    ctx.fillStyle=&quot;#ffd2bd&quot;;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        x,
+        y,
+        24*scale,
+        0,
+        Math.PI*2
+    );
+
+    ctx.arc(
+        x+32*scale,
+        y-12*scale,
+        32*scale,
+        0,
+        Math.PI*2
+    );
+
+    ctx.arc(
+        x+67*scale,
+        y,
+        24*scale,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+    ctx.fillRect(
+        x-5*scale,
+        y,
+        75*scale,
+        20*scale
+    );
+
+    ctx.restore();
+}
+
+
+function drawClouds(){
+
+    drawCloud(
+        W*.07,
+        H*.18,
+        1
+    );
+
+    drawCloud(
+        W*.39,
+        H*.14,
+        .65
+    );
+
+    drawCloud(
+        W*.62,
+        H*.27,
+        .85
+    );
+}
+
+
+/* ============================================================
+   MONTAÑAS LEJANAS
+============================================================ */
+
+function drawMountains(){
+
+    ctx.fillStyle =
+        &quot;#4b3958&quot;;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        0,
+        H*.70
+    );
+
+    const points = [
+
+        [.03,.50],
+        [.13,.57],
+        [.23,.34],
+        [.31,.52],
+        [.43,.29],
+        [.52,.50],
+        [.63,.36],
+        [.72,.53],
+        [.83,.29],
+        [.93,.48],
+        [1,.37]
+
+    ];
+
+    points.forEach(
+        p =&gt; {
+
+            ctx.lineTo(
+                W*p[0],
+                H*p[1]
+            );
+
+        }
+    );
+
+    ctx.lineTo(W,H);
+    ctx.lineTo(0,H);
+
+    ctx.closePath();
+
+    ctx.fill();
+
+
+    /*
+        Montaña cercana.
+    */
+
+    const g =
+        ctx.createLinearGradient(
+            0,
+            H*.4,
+            0,
+            H
+        );
+
+    g.addColorStop(
+        0,
+        &quot;#354b45&quot;
+    );
+
+    g.addColorStop(
+        1,
+        &quot;#1f302a&quot;
+    );
+
+    ctx.fillStyle=g;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        0,
+        H*.73
+    );
+
+    const near = [
+
+        [.06,.57],
+        [.18,.65],
+        [.29,.44],
+        [.39,.62],
+        [.52,.40],
+        [.63,.62],
+        [.75,.47],
+        [.85,.63],
+        [.95,.44],
+        [1,.59]
+
+    ];
+
+    near.forEach(
+        p =&gt; {
+
+            ctx.lineTo(
+                W*p[0],
+                H*p[1]
+            );
+
+        }
+    );
+
+    ctx.lineTo(W,H);
+    ctx.lineTo(0,H);
+
+    ctx.closePath();
+
+    ctx.fill();
+}
+
+
+/* ============================================================
+   VEGETACIÓN
+============================================================ */
+
+function drawTree(
+    x,
+    y,
+    scale=1
+){
+
+    ctx.save();
+
+    ctx.fillStyle =
+        &quot;#49362b&quot;;
+
+    ctx.fillRect(
+        x-4*scale,
+        y,
+        8*scale,
+        38*scale
+    );
+
+
+    const g =
+        ctx.createLinearGradient(
+            x,
+            y-70*scale,
+            x,
+            y
+        );
+
+    g.addColorStop(
+        0,
+        &quot;#1c3d32&quot;
+    );
+
+    g.addColorStop(
+        1,
+        &quot;#12271f&quot;
+    );
+
+    ctx.fillStyle=g;
+
+    for(
+        let i=0;
+        i&lt;3;
+        i++
+    ){
+
+        ctx.beginPath();
+
+        ctx.arc(
+            x+(i-1)*17*scale,
+            y-22*scale-
+                Math.abs(i-1)*7*scale,
+            24*scale,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fill();
+    }
+
+    ctx.restore();
+}
+
+
+/* ============================================================
+   ROCAS
+============================================================ */
+
+function drawRock(
+    x,
+    y,
+    scale=1
+){
+
+    ctx.save();
+
+    ctx.fillStyle =
+        &quot;#3b3c38&quot;;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        x-20*scale,
+        y
+    );
+
+    ctx.lineTo(
+        x-12*scale,
+        y-15*scale
+    );
+
+    ctx.lineTo(
+        x+5*scale,
+        y-22*scale
+    );
+
+    ctx.lineTo(
+        x+21*scale,
+        y-8*scale
+    );
+
+    ctx.lineTo(
+        x+18*scale,
+        y
+    );
+
+    ctx.closePath();
+
+    ctx.fill();
+
+
+    ctx.fillStyle =
+        &quot;rgba(255,255,255,.12)&quot;;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        x-11*scale,
+        y-15*scale
+    );
+
+    ctx.lineTo(
+        x+5*scale,
+        y-22*scale
+    );
+
+    ctx.lineTo(
+        x+1*scale,
+        y-11*scale
+    );
+
+    ctx.closePath();
+
+    ctx.fill();
+
+    ctx.restore();
+}
+
+
+/* ============================================================
+   BORDE DE MONTAÑA INICIAL
+============================================================ */
+
+function drawMountainStart(){
+
+    /*
+        El inicio ya NO parece comenzar
+        en medio de una carretera.
+
+        Hay una zona de tierra,
+        piedras y caída lateral.
+    */
+
+    const startX =
+        worldToScreenX(0);
+
+    const endX =
+        worldToScreenX(ROAD_START+40);
+
+
+    /*
+        Tierra superior.
+    */
+
+    ctx.fillStyle =
+        &quot;#806344&quot;;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        startX-250,
+        roadCenterY(0)-65
+    );
+
+    for(
+        let x=0;
+        x&lt;=ROAD_START+40;
+        x+=5
+    ){
+
+        ctx.lineTo(
+            worldToScreenX(x),
+            roadY(x)-15
+        );
+    }
+
+    ctx.lineTo(
+        endX,
+        H
+    );
+
+    ctx.lineTo(
+        startX-250,
+        H
+    );
+
+    ctx.closePath();
+
+    ctx.fill();
+
+
+    /*
+        Borde de roca.
+    */
+
+    ctx.strokeStyle =
+        &quot;#b08a5d&quot;;
+
+    ctx.lineWidth=10;
+
+    ctx.beginPath();
+
+    for(
+        let x=0;
+        x&lt;=ROAD_START+40;
+        x+=5
+    ){
+
+        ctx.lineTo(
+            worldToScreenX(x),
+            roadY(x)-11
+        );
+    }
+
+    ctx.stroke();
+
+
+    /*
+        Vegetación inicial.
+    */
+
+    drawTree(
+        startX-90,
+        roadY(0)-55,
+        1
+    );
+
+    drawTree(
+        startX+35,
+        roadY(40)-58,
+        .8
+    );
+
+    drawRock(
+        startX-25,
+        roadY(55)+5,
+        1
+    );
+
+    drawRock(
+        startX+80,
+        roadY(90)+8,
+        .7
+    );
+
+
+    /*
+        Pequeñas marcas de tierra.
+    */
+
+    ctx.fillStyle =
+        &quot;rgba(48,34,26,.45)&quot;;
+
+    for(
+        let i=0;
+        i&lt;18;
+        i++
+    ){
+
+        const x =
+            startX-
+            180+
+            Math.random()*260;
+
+        const y =
+            H*.66+
+            Math.random()*100;
+
+        ctx.beginPath();
+
+        ctx.arc(
+            x,
+            y,
+            2+Math.random()*4,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fill();
+    }
+}
+
+
+/* ============================================================
+   CARRETERA
+============================================================ */
+
+function drawRoad(){
+
+    const start =
+        Math.max(
+            0,
+            distance-300
+        );
+
+    const end =
+        Math.min(
+            1900,
+            distance+470
+        );
+
+
+    /*
+        TERRENO EXTERIOR
+    */
+
+    ctx.beginPath();
+
+    for(
+        let x=start;
+        x&lt;=end;
+        x+=4
+    ){
+
+        const sx =
+            worldToScreenX(x);
+
+        const sy =
+            roadY(x);
+
+        if(x===start)
+            ctx.moveTo(sx,sy);
+        else
+            ctx.lineTo(sx,sy);
+    }
+
+
+    for(
+        let x=end;
+        x&gt;=start;
+        x-=4
+    ){
+
+        const sx =
+            worldToScreenX(x);
+
+        const sy =
+            roadY(x)+H*.46;
+
+        ctx.lineTo(
+            sx,
+            sy
+        );
+    }
+
+    ctx.closePath();
+
+    const terrainGradient =
+        ctx.createLinearGradient(
+            0,
+            H*.55,
+            0,
+            H
+        );
+
+    terrainGradient.addColorStop(
+        0,
+        &quot;#8c6a48&quot;
+    );
+
+    terrainGradient.addColorStop(
+        .5,
+        &quot;#634833&quot;
+    );
+
+    terrainGradient.addColorStop(
+        1,
+        &quot;#2e2520&quot;
+    );
+
+    ctx.fillStyle =
+        terrainGradient;
+
+    ctx.fill();
+
+
+    /*
+        ASFALTO
+    */
+
+    ctx.beginPath();
+
+    for(
+        let x=start;
+        x&lt;=end;
+        x+=4
+    ){
+
+        const sx =
+            worldToScreenX(x);
+
+        const sy =
+            roadY(x);
+
+        if(x===start)
+            ctx.moveTo(sx,sy);
+        else
+            ctx.lineTo(sx,sy);
+    }
+
+    for(
+        let x=end;
+        x&gt;=start;
+        x-=4
+    ){
+
+        const sx =
+            worldToScreenX(x);
+
+        const sy =
+            roadY(x)+H*.41;
+
+        ctx.lineTo(
+            sx,
+            sy
+        );
+    }
+
+    ctx.closePath();
+
+
+    const asphalt =
+        ctx.createLinearGradient(
+            0,
+            H*.5,
+            0,
+            H
+        );
+
+    asphalt.addColorStop(
+        0,
+        &quot;#656a6d&quot;
+    );
+
+    asphalt.addColorStop(
+        .35,
+        &quot;#505659&quot;
+    );
+
+    asphalt.addColorStop(
+        1,
+        &quot;#292e31&quot;
+    );
+
+    ctx.fillStyle =
+        asphalt;
+
+    ctx.fill();
+
+
+    /*
+        BORDES.
+    */
+
+    ctx.strokeStyle =
+        &quot;#d3a26b&quot;;
+
+    ctx.lineWidth=6;
+
+    ctx.beginPath();
+
+    for(
+        let x=start;
+        x&lt;=end;
+        x+=4
+    ){
+
+        const sx =
+            worldToScreenX(x);
+
+        const sy =
+            roadY(x);
+
+        if(x===start)
+            ctx.moveTo(sx,sy);
+        else
+            ctx.lineTo(sx,sy);
+    }
+
+    ctx.stroke();
+
+
+    /*
+        LÍNEA CENTRAL
+    */
+
+    ctx.strokeStyle =
+        &quot;#e9cc64&quot;;
+
+    ctx.lineWidth=4;
+
+    ctx.setLineDash([
+        30,
+        24
+    ]);
+
+    ctx.beginPath();
+
+    for(
+        let x=start;
+        x&lt;=end;
+        x+=4
+    ){
+
+        const sx =
+            worldToScreenX(x);
+
+        const sy =
+            roadCenterY(x);
+
+        if(x===start)
+            ctx.moveTo(sx,sy);
+        else
+            ctx.lineTo(sx,sy);
+    }
+
+    ctx.stroke();
+
+    ctx.setLineDash([]);
+
+
+    /*
+        TEXTURA DE ASFALTO
+    */
+
+    ctx.globalAlpha=.12;
+
+    ctx.strokeStyle=&quot;#101416&quot;;
+
+    ctx.lineWidth=2;
+
+    for(
+        let i=0;
+        i&lt;35;
+        i++
+    ){
+
+        const worldX =
+            start+i*25;
+
+        const sx =
+            worldToScreenX(worldX);
+
+        const sy =
+            roadCenterY(worldX)+
+            50+
+            (i%3)*12;
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            sx-15,
+            sy
+        );
+
+        ctx.lineTo(
+            sx+14,
+            sy+2
+        );
+
+        ctx.stroke();
+    }
+
+    ctx.globalAlpha=1;
+}
+
+
+/* ============================================================
+   ÁRBOLES ALREDEDOR DE LA CARRETERA
+
+   Posición calculada con roadY().
+============================================================ */
+
+const treePositions = [
+
+    [150,-125,.8],
+    [235,130,.9],
+    [320,-135,.7],
+    [405,145,1],
+    [500,-150,.8],
+    [610,140,.9],
+    [735,-130,.75],
+    [850,140,.8],
+    [970,-135,.8],
+    [1080,145,.9],
+    [1210,-150,.8],
+    [1330,145,.75],
+    [1450,-135,.9],
+    [1570,145,.8],
+    [1690,-140,.9]
+
+];
+
+
+function drawTrees(){
+
+    treePositions.forEach(
+        item =&gt; {
+
+            const worldX =
+                item[0];
+
+            const side =
+                item[1];
+
+            const scale =
+                item[2];
+
+            const sx =
+                worldToScreenX(worldX);
+
+            if(
+                sx &lt; -120 ||
+                sx &gt; W+120
+            )
+                return;
+
+
+            /*
+                La base del árbol
+                se calcula desde la carretera.
+            */
+
+            const sy =
+                roadY(worldX) +
+                H*.08;
+
+
+            drawTree(
+                sx+side,
+                sy,
+                scale
+            );
+        }
+    );
+}
+
+
+/* ============================================================
+   RESIDUOS
+============================================================ */
+
+const trashTypes = {
+
+    plastic:{
+        emoji:&quot;🥤&quot;,
+        name:&quot;Botella de plástico&quot;,
+
+        correct:
+            &quot;¡Excelente! ♻️ La botella de plástico va al contenedor amarillo.&quot;,
+
+        wrong:
+            &quot;Cuidado 🥤. La botella es de plástico y debe ir al contenedor amarillo.&quot;
+    },
+
+    paper:{
+        emoji:&quot;📦&quot;,
+        name:&quot;Caja de cartón&quot;,
+
+        correct:
+            &quot;¡Muy bien! 📦 El cartón se deposita en el contenedor azul.&quot;,
+
+        wrong:
+            &quot;Ups 📦. Esta caja es de papel/cartón y va al contenedor azul.&quot;
+    },
+
+    glass:{
+        emoji:&quot;🍾&quot;,
+        name:&quot;Botella de vidrio&quot;,
+
+        correct:
+            &quot;¡Perfecto! 🍾 El vidrio debe ir al contenedor verde.&quot;,
+
+        wrong:
+            &quot;Cuidado 🍾. Esta botella es de vidrio y debe ir al contenedor verde.&quot;
+    }
+
+};
+
+
+/*
+    IMPORTANTE:
+
+    Los residuos están colocados
+    sobre posiciones conocidas de la carretera.
+*/
+
+let trash = [
+
+    {
+        distance:190,
+        type:&quot;plastic&quot;,
+        answered:false
+    },
+
+    {
+        distance:355,
+        type:&quot;paper&quot;,
+        answered:false
+    },
+
+    {
+        distance:520,
+        type:&quot;glass&quot;,
+        answered:false
+    },
+
+    {
+        distance:680,
+        type:&quot;plastic&quot;,
+        answered:false
+    },
+
+    {
+        distance:845,
+        type:&quot;paper&quot;,
+        answered:false
+    },
+
+    {
+        distance:1005,
+        type:&quot;glass&quot;,
+        answered:false
+    },
+
+    {
+        distance:1165,
+        type:&quot;plastic&quot;,
+        answered:false
+    },
+
+    {
+        distance:1320,
+        type:&quot;glass&quot;,
+        answered:false
+    },
+
+    {
+        distance:1485,
+        type:&quot;paper&quot;,
+        answered:false
+    },
+
+    {
+        distance:1645,
+        type:&quot;plastic&quot;,
+        answered:false
+    }
+
+];
+
+
+/* ============================================================
+   DIBUJAR RESIDUOS
+
+   AHORA EL RESIDUO SE PEGA AL CENTRO
+   REAL DE LA CARRETERA.
+============================================================ */
+
+function drawTrash(){
+
+    trash.forEach(
+        item =&gt; {
+
+            if(item.answered)
+                return;
+
+
+            const diff =
+                item.distance -
+                distance;
+
+
+            if(
+                diff &lt; -90 ||
+                diff &gt; 340
+            )
+                return;
+
+
+            const x =
+                worldToScreenX(
+                    item.distance
+                );
+
+
+            /*
+                POSICIÓN REAL DE CARRETERA.
+            */
+
+            const y =
+                roadCenterY(
+                    item.distance
+                );
+
+
+            /*
+                Escala de perspectiva.
+            */
+
+            const scale =
+                Math.max(
+                    .7,
+                    Math.min(
+                        1.15,
+                        1 -
+                        Math.abs(diff)/850
+                    )
+                );
+
+
+            const data =
+                trashTypes[
+                    item.type
+                ];
+
+
+            ctx.save();
+
+
+            /*
+                sombra
+            */
+
+            ctx.fillStyle =
+                &quot;rgba(0,0,0,.28)&quot;;
+
+            ctx.beginPath();
+
+            ctx.ellipse(
+                x,
+                y+16*scale,
+                22*scale,
+                6*scale,
+                0,
+                0,
+                Math.PI*2
+            );
+
+            ctx.fill();
+
+
+            /*
+                círculo blanco
+            */
+
+            ctx.fillStyle =
+                &quot;rgba(255,255,255,.95)&quot;;
+
+            ctx.beginPath();
+
+            ctx.arc(
+                x,
+                y,
+                25*scale,
+                0,
+                Math.PI*2
+            );
+
+            ctx.fill();
+
+
+            ctx.strokeStyle =
+                &quot;rgba(20,30,35,.16)&quot;;
+
+            ctx.lineWidth=2;
+
+            ctx.stroke();
+
+
+            /*
+                emoji
+            */
+
+            ctx.font =
+                `${28*scale}px Arial`;
+
+            ctx.textAlign=&quot;center&quot;;
+            ctx.textBaseline=&quot;middle&quot;;
+
+            ctx.fillText(
+                data.emoji,
+                x,
+                y
+            );
+
+
+            /*
+                símbolo
+            */
+
+            ctx.font =
+                `${11*scale}px Arial`;
+
+            ctx.fillStyle =
+                &quot;#28423a&quot;;
+
+            ctx.fillText(
+                &quot;♻&quot;,
+                x,
+                y-35*scale
+            );
+
+
+            ctx.restore();
+        }
+    );
+}
+
+
+/* ============================================================
+   META
+============================================================ */
+
+const FINISH = 1770;
+
+
+function drawFinish(){
+
+    const x =
+        worldToScreenX(
+            FINISH
+        );
+
+
+    if(
+        x &lt; -150 ||
+        x &gt; W+150
+    )
+        return;
+
+
+    const y =
+        roadY(FINISH);
+
+
+    ctx.save();
+
+
+    /*
+        Poste.
+    */
+
+    ctx.strokeStyle =
+        &quot;#eeeeee&quot;;
+
+    ctx.lineWidth=5;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        x,
+        y-145
+    );
+
+    ctx.lineTo(
+        x,
+        y+80
+    );
+
+    ctx.stroke();
+
+
+    /*
+        Bandera.
+    */
+
+    ctx.fillStyle =
+        &quot;#e94943&quot;;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        x,
+        y-145
+    );
+
+    ctx.lineTo(
+        x+95,
+        y-112
+    );
+
+    ctx.lineTo(
+        x,
+        y-80
+    );
+
+    ctx.closePath();
+
+    ctx.fill();
+
+
+    ctx.fillStyle=&quot;#fff&quot;;
+
+    ctx.font =
+        &quot;900 14px Arial&quot;;
+
+    ctx.textAlign=&quot;center&quot;;
+
+    ctx.fillText(
+        &quot;META&quot;,
+        x+48,
+        y-112
+    );
+
+
+    ctx.restore();
+}
+
+
+/* ============================================================
+   MOTO DE ALTA CALIDAD
+============================================================ */
+
+/*
+    La moto ahora está dibujada como
+    una composición de muchas piezas.
+
+    - neumáticos
+    - llantas
+    - suspensión
+    - chasis
+    - tanque
+    - asiento
+    - motor
+    - escape
+    - faro
+    - piloto
+    - casco
+    - manubrio
+
+    Todo se rota junto según la pendiente.
+*/
+
+function drawWheel(
+    x,
+    y,
+    r
+){
+
+    /*
+        Neumático.
+    */
+
+    const tire =
+        ctx.createRadialGradient(
+            x-3,
+            y-4,
+            2,
+            x,
+            y,
+            r
+        );
+
+    tire.addColorStop(
+        0,
+        &quot;#30383c&quot;
+    );
+
+    tire.addColorStop(
+        .55,
+        &quot;#111518&quot;
+    );
+
+    tire.addColorStop(
+        1,
+        &quot;#050708&quot;
+    );
+
+    ctx.fillStyle=tire;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        x,
+        y,
+        r,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    /*
+        Borde.
+    */
+
+    ctx.strokeStyle =
+        &quot;#0a0d0f&quot;;
+
+    ctx.lineWidth=4;
+
+    ctx.stroke();
+
+
+    /*
+        Llanta.
+    */
+
+    ctx.fillStyle =
+        &quot;#aeb8bb&quot;;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        x,
+        y,
+        r*.55,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    ctx.fillStyle =
+        &quot;#485155&quot;;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        x,
+        y,
+        r*.37,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    /*
+        Radios.
+    */
+
+    ctx.strokeStyle =
+        &quot;rgba(230,240,240,.55)&quot;;
+
+    ctx.lineWidth=1.3;
+
+    for(
+        let i=0;
+        i&lt;10;
+        i++
+    ){
+
+        const a =
+            i*Math.PI*2/10;
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            x,
+            y
+        );
+
+        ctx.lineTo(
+            x+
+            Math.cos(a)*r*.5,
+            y+
+            Math.sin(a)*r*.5
+        );
+
+        ctx.stroke();
+    }
+
+
+    /*
+        Eje.
+    */
+
+    ctx.fillStyle =
+        &quot;#111719&quot;;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        x,
+        y,
+        4,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+}
+
+
+function drawMotorcycle(){
+
+    const x =
+        W*.5;
+
+    /*
+        La moto toca la superficie
+        de la carretera.
+    */
+
+    const ground =
+        roadCenterY(distance);
+
+    const y =
+        ground - 45;
+
+
+    /*
+        Pendiente real.
+    */
+
+    const slope =
+        terrainSlope(distance);
+
+
+    /*
+        Ángulo visual.
+
+        Si sube:
+        la moto mira hacia arriba.
+
+        Si baja:
+        mira hacia abajo.
+    */
+
+    const angle =
+        Math.atan(
+            -slope * 1.05
+        );
+
+
+    ctx.save();
+
+    ctx.translate(
+        x,
+        y
+    );
+
+    ctx.rotate(angle);
+
+
+    /*
+        SOMBRA
+    */
+
+    ctx.save();
+
+    ctx.rotate(-angle);
+
+    const shadow =
+        ctx.createRadialGradient(
+            0,
+            43,
+            4,
+            0,
+            43,
+            62
+        );
+
+    shadow.addColorStop(
+        0,
+        &quot;rgba(0,0,0,.42)&quot;
+    );
+
+    shadow.addColorStop(
+        1,
+        &quot;rgba(0,0,0,0)&quot;
+    );
+
+    ctx.fillStyle=shadow;
+
+    ctx.beginPath();
+
+    ctx.ellipse(
+        0,
+        44,
+        62,
+        15,
+        0,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+    ctx.restore();
+
+
+    /*
+        RUEDAS
+    */
+
+    drawWheel(
+        -38,
+        22,
+        18
+    );
+
+    drawWheel(
+        39,
+        22,
+        18
+    );
+
+
+    /*
+        BASCULANTE TRASERO
+    */
+
+    ctx.strokeStyle =
+        &quot;#8b9598&quot;;
+
+    ctx.lineWidth=5;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        -38,
+        18
+    );
+
+    ctx.lineTo(
+        -7,
+        -2
+    );
+
+    ctx.stroke();
+
+
+    /*
+        CHASIS.
+    */
+
+    ctx.strokeStyle =
+        &quot;#252c30&quot;;
+
+    ctx.lineWidth=7;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        -20,
+        6
+    );
+
+    ctx.lineTo(
+        3,
+        -18
+    );
+
+    ctx.lineTo(
+        30,
+        7
+    );
+
+    ctx.lineTo(
+        -20,
+        6
+    );
+
+    ctx.stroke();
+
+
+    /*
+        SUSPENSIÓN DELANTERA.
+    */
+
+    ctx.strokeStyle =
+        &quot;#c5cdce&quot;;
+
+    ctx.lineWidth=4;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        39,
+        17
+    );
+
+    ctx.lineTo(
+        23,
+        -23
+    );
+
+    ctx.stroke();
+
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        44,
+        18
+    );
+
+    ctx.lineTo(
+        28,
+        -22
+    );
+
+    ctx.stroke();
+
+
+    /*
+        MOTOR.
+    */
+
+    const engine =
+        ctx.createLinearGradient(
+            -12,
+            -5,
+            16,
+            22
+        );
+
+    engine.addColorStop(
+        0,
+        &quot;#6b7477&quot;
+    );
+
+    engine.addColorStop(
+        .5,
+        &quot;#333b3f&quot;
+    );
+
+    engine.addColorStop(
+        1,
+        &quot;#171b1d&quot;
+    );
+
+    ctx.fillStyle=engine;
+
+    ctx.beginPath();
+
+    ctx.roundRect(
+        -16,
+        -4,
+        33,
+        29,
+        7
+    );
+
+    ctx.fill();
+
+
+    /*
+        DETALLE MOTOR.
+    */
+
+    ctx.strokeStyle =
+        &quot;#929b9d&quot;;
+
+    ctx.lineWidth=2;
+
+    for(
+        let i=0;
+        i&lt;4;
+        i++
+    ){
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            -10+i*6,
+            2
+        );
+
+        ctx.lineTo(
+            -10+i*6,
+            19
+        );
+
+        ctx.stroke();
+    }
+
+
+    /*
+        TANQUE PRINCIPAL.
+    */
+
+    const tank =
+        ctx.createLinearGradient(
+            -24,
+            -30,
+            25,
+            2
+        );
+
+    tank.addColorStop(
+        0,
+        &quot;#ff6848&quot;
+    );
+
+    tank.addColorStop(
+        .25,
+        &quot;#f03f34&quot;
+    );
+
+    tank.addColorStop(
+        .7,
+        &quot;#bd242a&quot;
+    );
+
+    tank.addColorStop(
+        1,
+        &quot;#72161c&quot;
+    );
+
+    ctx.fillStyle=tank;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        -22,
+        -14
+    );
+
+    ctx.quadraticCurveTo(
+        -14,
+        -32,
+        5,
+        -31
+    );
+
+    ctx.quadraticCurveTo(
+        22,
+        -29,
+        27,
+        -12
+    );
+
+    ctx.lineTo(
+        14,
+        3
+    );
+
+    ctx.lineTo(
+        -19,
+        1
+    );
+
+    ctx.closePath();
+
+    ctx.fill();
+
+
+    /*
+        BRILLO DEL TANQUE.
+    */
+
+    const shine =
+        ctx.createLinearGradient(
+            -20,
+            -30,
+            8,
+            -8
+        );
+
+    shine.addColorStop(
+        0,
+        &quot;rgba(255,255,255,.55)&quot;
+    );
+
+    shine.addColorStop(
+        1,
+        &quot;rgba(255,255,255,0)&quot;
+    );
+
+    ctx.fillStyle=shine;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        -16,
+        -21
+    );
+
+    ctx.quadraticCurveTo(
+        -5,
+        -29,
+        5,
+        -25
+    );
+
+    ctx.lineTo(
+        -3,
+        -18
+    );
+
+    ctx.closePath();
+
+    ctx.fill();
+
+
+    /*
+        ASIENTO.
+    */
+
+    ctx.fillStyle =
+        &quot;#111719&quot;;
+
+    ctx.beginPath();
+
+    ctx.roundRect(
+        -11,
+        -38,
+        34,
+        10,
+        5
+    );
+
+    ctx.fill();
+
+
+    /*
+        PARTE TRASERA.
+    */
+
+    ctx.fillStyle =
+        &quot;#b32228&quot;;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        -30,
+        -19
+    );
+
+    ctx.lineTo(
+        -12,
+        -32
+    );
+
+    ctx.lineTo(
+        -5,
+        -25
+    );
+
+    ctx.lineTo(
+        -19,
+        -9
+    );
+
+    ctx.closePath();
+
+    ctx.fill();
+
+
+    /*
+        ESCAPE.
+    */
+
+    ctx.strokeStyle =
+        &quot;#9ca6a8&quot;;
+
+    ctx.lineWidth=5;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        -12,
+        15
+    );
+
+    ctx.quadraticCurveTo(
+        3,
+        31,
+        27,
+        28
+    );
+
+    ctx.stroke();
+
+
+    ctx.strokeStyle =
+        &quot;#363d40&quot;;
+
+    ctx.lineWidth=8;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        23,
+        28
+    );
+
+    ctx.lineTo(
+        42,
+        26
+    );
+
+    ctx.stroke();
+
+
+    /*
+        MANUBRIO.
+    */
+
+    ctx.strokeStyle =
+        &quot;#151a1c&quot;;
+
+    ctx.lineWidth=4;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        18,
+        -27
+    );
+
+    ctx.lineTo(
+        29,
+        -40
+    );
+
+    ctx.lineTo(
+        40,
+        -39
+    );
+
+    ctx.stroke();
+
+
+    /*
+        FARO.
+    */
+
+    const headlight =
+        ctx.createRadialGradient(
+            32,
+            -23,
+            1,
+            32,
+            -23,
+            22
+        );
+
+    headlight.addColorStop(
+        0,
+        &quot;rgba(255,255,230,1)&quot;
+    );
+
+    headlight.addColorStop(
+        .25,
+        &quot;rgba(255,241,151,.9)&quot;
+    );
+
+    headlight.addColorStop(
+        .65,
+        &quot;rgba(255,194,65,.25)&quot;
+    );
+
+    headlight.addColorStop(
+        1,
+        &quot;rgba(255,180,40,0)&quot;
+    );
+
+    ctx.fillStyle=headlight;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        32,
+        -23,
+        22,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    ctx.fillStyle =
+        &quot;#fffbd7&quot;;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        32,
+        -23,
+        5,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    /*
+        PILOTO.
+    */
+
+    /*
+        cuerpo
+    */
+
+    ctx.fillStyle =
+        &quot;#242e33&quot;;
+
+    ctx.beginPath();
+
+    ctx.roundRect(
+        -7,
+        -59,
+        18,
+        25,
+        7
+    );
+
+    ctx.fill();
+
+
+    /*
+        brazo
+    */
+
+    ctx.strokeStyle =
+        &quot;#343e43&quot;;
+
+    ctx.lineWidth=6;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        1,
+        -51
+    );
+
+    ctx.lineTo(
+        25,
+        -39
+    );
+
+    ctx.stroke();
+
+
+    /*
+        cabeza
+    */
+
+    ctx.fillStyle =
+        &quot;#d79672&quot;;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        1,
+        -68,
+        10,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    /*
+        casco
+    */
+
+    ctx.fillStyle =
+        &quot;#121719&quot;;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        1,
+        -70,
+        11,
+        Math.PI,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    /*
+        visor.
+    */
+
+    ctx.fillStyle =
+        &quot;#7cbdc8&quot;;
+
+    ctx.beginPath();
+
+    ctx.roundRect(
+        1,
+        -73,
+        9,
+        5,
+        2
+    );
+
+    ctx.fill();
+
+
+    /*
+        pequeña luz trasera.
+    */
+
+    ctx.fillStyle =
+        &quot;#ff3737&quot;;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        -28,
+        -13,
+        3,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    ctx.restore();
+}
+
+
+/* ============================================================
+   HUD
+============================================================ */
+
+function updateHUD(){
+
+    document.getElementById(
+        &quot;score&quot;
+    ).textContent =
+        Math.floor(score);
+
+    document.getElementById(
+        &quot;distanceText&quot;
+    ).textContent =
+        Math.floor(distance);
+
+    document.getElementById(
+        &quot;energyText&quot;
+    ).textContent =
+        Math.max(
+            0,
+            Math.floor(energy)
+        );
+
+
+    const fill =
+        document.getElementById(
+            &quot;energyFill&quot;
+        );
+
+    fill.style.width =
+        Math.max(
+            0,
+            energy
+        ) + &quot;%&quot;;
+
+
+    if(
+        energy &lt; 25
+    ){
+
+        fill.style.background =
+            &quot;linear-gradient(90deg,#ef4444,#ff7043)&quot;;
+
+    }
+    else if(
+        energy &lt; 50
+    ){
+
+        fill.style.background =
+            &quot;linear-gradient(90deg,#f59e0b,#facc15)&quot;;
+
+    }
+    else{
+
+        fill.style.background =
+            &quot;linear-gradient(90deg,#30d579,#a4eb61)&quot;;
+    }
+}
+
+
+/* ============================================================
+   PREGUNTA
+============================================================ */
+
+function openQuestion(item){
+
+    if(
+        questionOpen ||
+        item.answered
+    )
+        return;
+
+
+    currentTrash =
+        item;
+
+    questionOpen=true;
+
+    speed=0;
+
+
+    const data =
+        trashTypes[
+            item.type
+        ];
+
+
+    document.getElementById(
+        &quot;trashEmoji&quot;
+    ).textContent =
+        data.emoji;
+
+    document.getElementById(
+        &quot;trashName&quot;
+    ).textContent =
+        data.name;
+
+
+    document.getElementById(
+        &quot;questionOverlay&quot;
+    ).classList.add(
+        &quot;show&quot;
+    );
+}
+
+
+/* ============================================================
+   RESPONDER
+============================================================ */
+
+function answer(type){
+
+    if(
+        !questionOpen ||
+        !currentTrash
+    )
+        return;
+
+
+    /*
+        UNA SOLA OPORTUNIDAD.
+
+        Se marca antes de procesar
+        para impedir doble respuesta.
+    */
+
+    currentTrash.answered=true;
+
+
+    const correct =
+        type ===
+        currentTrash.type;
+
+
+    const data =
+        trashTypes[
+            currentTrash.type
+        ];
+
+
+    closeQuestion();
+
+
+    if(correct){
+
+        score += 25;
+
+        /*
+            Recuperación.
+        */
+
+        energy =
+            Math.min(
+                100,
+                energy + 18
+            );
+
+
+        showMessage(
+            &quot;✅&quot;,
+            &quot;¡Correcto! ♻️&quot;,
+            data.correct,
+            true
+        );
+
+    }
+    else{
+
+        score =
+            Math.max(
+                0,
+                score - 10
+            );
+
+
+        /*
+            Penalización.
+        */
+
+        energy =
+            Math.max(
+                0,
+                energy - 22
+            );
+
+
+        showMessage(
+            &quot;❌&quot;,
+            &quot;¡No esta vez!&quot;,
+            data.wrong +
+            &quot; Perdiste 22% de energía.&quot;,
+            false
+        );
+
+
+        if(
+            energy &lt;= 0
+        ){
+
+            setTimeout(
+                loseGame,
+                900
+            );
+        }
+    }
+
+
+    updateHUD();
+}
+
+
+/* ============================================================
+   CERRAR PREGUNTA
+============================================================ */
+
+function closeQuestion(){
+
+    questionOpen=false;
+
+    currentTrash=null;
+
+    document
+        .getElementById(
+            &quot;questionOverlay&quot;
+        )
+        .classList.remove(
+            &quot;show&quot;
+        );
+}
+
+
+/* ============================================================
+   MENSAJES
+============================================================ */
+
+let messageTimer;
+
+
+function showMessage(
+    icon,
+    title,
+    text,
+    good
+){
+
+    const box =
+        document.getElementById(
+            &quot;message&quot;
+        );
+
+
+    document.getElementById(
+        &quot;messageIcon&quot;
+    ).textContent =
+        icon;
+
+    document.getElementById(
+        &quot;messageTitle&quot;
+    ).textContent =
+        title;
+
+    document.getElementById(
+        &quot;messageText&quot;
+    ).textContent =
+        text;
+
+
+    box.style.borderColor =
+        good
+        ? &quot;rgba(80,220,120,.5)&quot;
+        : &quot;rgba(255,80,80,.55)&quot;;
+
+
+    box.classList.remove(
+        &quot;show&quot;
+    );
+
+    void box.offsetWidth;
+
+    box.classList.add(
+        &quot;show&quot;
+    );
+
+
+    clearTimeout(
+        messageTimer
+    );
+
+    messageTimer =
+        setTimeout(
+            () =&gt; {
+
+                box.classList.remove(
+                    &quot;show&quot;
+                );
+
+            },
+            2000
+        );
+}
+
+
+/* ============================================================
+   DETECTAR RESIDUO
+============================================================ */
+
+function checkTrash(){
+
+    if(questionOpen)
+        return;
+
+
+    for(
+        const item of trash
+    ){
+
+        if(item.answered)
+            continue;
+
+
+        const difference =
+            item.distance -
+            distance;
+
+
+        /*
+            La pregunta aparece cuando
+            la moto está prácticamente
+            encima del objeto.
+        */
+
+        if(
+            difference &lt;= 15 &amp;&amp;
+            difference &gt;= -12
+        ){
+
+            openQuestion(item);
+
+            return;
+        }
+    }
+}
+
+
+/* ============================================================
+   FÍSICA
+============================================================ */
+
+function update(dt){
+
+    if(
+        !gameRunning ||
+        questionOpen
+    )
+        return;
+
+
+    const slope =
+        terrainSlope(distance);
+
+
+    /*
+        Aceleración.
+    */
+
+    if(
+        keys.right ||
+        keys.left
+    ){
+
+        speed +=
+            100*dt;
+
+        speed =
+            Math.min(
+                speed,
+                155
+            );
+
+    }
+    else{
+
+        speed -=
+            18*dt;
+
+        speed =
+            Math.max(
+                speed,
+                30
+            );
+    }
+
+
+    /*
+        SUBIDA.
+
+        Mientras más inclinada,
+        más se reduce la velocidad.
+    */
+
+    if(
+        slope &gt; 0
+    ){
+
+        speed -=
+            slope *
+            14 *
+            dt;
+    }
+
+
+    /*
+        BAJADA.
+    */
+
+    if(
+        slope &lt; 0
+    ){
+
+        speed +=
+            Math.abs(slope) *
+            8 *
+            dt;
+    }
+
+
+    speed =
+        Math.max(
+            18,
+            Math.min(
+                155,
+                speed
+            )
+        );
+
+
+    /*
+        Movimiento.
+    */
+
+    distance +=
+        speed *
+        dt *
+        .56;
+
+
+    /*
+        CONSUMO DE ENERGÍA.
+
+        Base:
+        conducción constante.
+
+        Extra:
+        pendientes.
+    */
+
+    let consumption =
+        1.45*dt;
+
+
+    if(
+        slope &gt; 0
+    ){
+
+        consumption +=
+            slope *
+            4.2 *
+            dt;
+    }
+
+
+    energy -=
+        consumption;
+
+
+    if(
+        energy &lt;= 0
+    ){
+
+        energy=0;
+
+        updateHUD();
+
+        loseGame();
+
+        return;
+    }
+
+
+    checkTrash();
+
+
+    /*
+        META.
+    */
+
+    if(
+        distance &gt;= FINISH
+    ){
+
+        if(
+            score &gt;= 100
+        ){
+
+            winGame();
+
+        }
+        else{
+
+            loseByPoints();
+
+        }
+    }
+
+
+    updateHUD();
+}
+
+
+/* ============================================================
+   GANAR
+============================================================ */
+
+function winGame(){
+
+    if(!gameRunning)
+        return;
+
+
+    gameRunning=false;
+
+
+    document.getElementById(
+        &quot;endIcon&quot;
+    ).textContent =
+        &quot;🏆&quot;;
+
+
+    document.getElementById(
+        &quot;endTitle&quot;
+    ).textContent =
+        &quot;¡Llegaste a la cima!&quot;;
+
+
+    document.getElementById(
+        &quot;endText&quot;
+    ).textContent =
+        &quot;¡Excelente trabajo! Conseguíste &quot; +
+        Math.floor(score) +
+        &quot; puntos de reciclaje. 🌎♻️&quot;;
+
+
+    document
+        .getElementById(
+            &quot;gameOver&quot;
+        )
+        .classList.add(
+            &quot;show&quot;
+        );
+}
+
+
+/* ============================================================
+   PERDER
+============================================================ */
+
+function loseGame(){
+
+    if(!gameRunning)
+        return;
+
+
+    gameRunning=false;
+
+
+    document.getElementById(
+        &quot;endIcon&quot;
+    ).textContent =
+        &quot;🔋&quot;;
+
+
+    document.getElementById(
+        &quot;endTitle&quot;
+    ).textContent =
+        &quot;¡Sin energía!&quot;;
+
+
+    document.getElementById(
+        &quot;endText&quot;
+    ).textContent =
+        &quot;La moto se quedó sin energía antes de alcanzar la cima. ¡Vuelve a intentarlo!&quot;;
+
+
+    document
+        .getElementById(
+            &quot;gameOver&quot;
+        )
+        .classList.add(
+            &quot;show&quot;
+        );
+}
+
+
+function loseByPoints(){
+
+    if(!gameRunning)
+        return;
+
+
+    gameRunning=false;
+
+
+    document.getElementById(
+        &quot;endIcon&quot;
+    ).textContent =
+        &quot;♻️&quot;;
+
+
+    document.getElementById(
+        &quot;endTitle&quot;
+    ).textContent =
+        &quot;¡Te faltaron puntos!&quot;;
+
+
+    document.getElementById(
+        &quot;endText&quot;
+    ).textContent =
+        &quot;Llegaste a la cima, pero necesitas al menos 100 puntos. Conseguíste &quot; +
+        Math.floor(score) +
+        &quot;.&quot;;
+
+
+    document
+        .getElementById(
+            &quot;gameOver&quot;
+        )
+        .classList.add(
+            &quot;show&quot;
+        );
+}
+
+
+/* ============================================================
+   REINICIAR
+============================================================ */
+
+function restartGame(){
+
+    score=0;
+
+    energy=100;
+
+    distance=0;
+
+    speed=0;
+
+    gameRunning=true;
+
+    questionOpen=false;
+
+    currentTrash=null;
+
+
+    trash.forEach(
+        item =&gt; {
+
+            item.answered=false;
+
+        }
+    );
+
+
+    document
+        .getElementById(
+            &quot;gameOver&quot;
+        )
+        .classList.remove(
+            &quot;show&quot;
+        );
+
+
+    updateHUD();
+}
+
+
+/* ============================================================
+   TECLADO
+============================================================ */
+
+window.addEventListener(
+    &quot;keydown&quot;,
+    e =&gt; {
+
+        const key =
+            e.key.toLowerCase();
+
+
+        if(
+            key===&quot;d&quot; ||
+            e.key===&quot;ArrowRight&quot;
+        ){
+
+            keys.right=true;
+
+            e.preventDefault();
+        }
+
+
+        if(
+            key===&quot;a&quot; ||
+            e.key===&quot;ArrowLeft&quot;
+        ){
+
+            keys.left=true;
+
+            e.preventDefault();
+        }
+    }
+);
+
+
+window.addEventListener(
+    &quot;keyup&quot;,
+    e =&gt; {
+
+        const key =
+            e.key.toLowerCase();
+
+
+        if(
+            key===&quot;d&quot; ||
+            e.key===&quot;ArrowRight&quot;
+        ){
+
+            keys.right=false;
+        }
+
+
+        if(
+            key===&quot;a&quot; ||
+            e.key===&quot;ArrowLeft&quot;
+        ){
+
+            keys.left=false;
+        }
+    }
+);
+
+
+/* ============================================================
+   BOTONES
+============================================================ */
+
+document
+    .querySelectorAll(
+        &quot;.option&quot;
+    )
+    .forEach(
+        button =&gt; {
+
+            button.addEventListener(
+                &quot;click&quot;,
+                () =&gt; {
+
+                    answer(
+                        button.dataset.type
+                    );
+
+                }
+            );
+
+        }
+    );
+
+
+/* ============================================================
+   TOUCH
+============================================================ */
+
+canvas.addEventListener(
+    &quot;touchstart&quot;,
+    e =&gt; {
+
+        const touch =
+            e.touches[0];
+
+
+        if(
+            touch.clientX &gt; W/2
+        ){
+
+            keys.right=true;
+
+        }
+        else{
+
+            keys.left=true;
+
+        }
+    },
+    {
+        passive:true
+    }
+);
+
+
+canvas.addEventListener(
+    &quot;touchend&quot;,
+    () =&gt; {
+
+        keys.right=false;
+        keys.left=false;
+
+    },
+    {
+        passive:true
+    }
+);
+
+
+/* ============================================================
+   DIBUJAR TODO
+============================================================ */
+
+function draw(){
+
+    ctx.clearRect(
+        0,
+        0,
+        W,
+        H
+    );
+
+
+    drawSky();
+
+    drawSun();
+
+    drawClouds();
+
+    drawMountains();
+
+    /*
+        El borde inicial se dibuja
+        antes de la carretera.
+    */
+
+    drawMountainStart();
+
+    drawRoad();
+
+    drawTrees();
+
+    drawFinish();
+
+    /*
+        Objetos después de la carretera
+        para que estén exactamente
+        encima de ella.
+    */
+
+    drawTrash();
+
+    /*
+        Moto al final para que
+        quede por delante de todo.
+    */
+
+    drawMotorcycle();
+}
+
+
+/* ============================================================
+   LOOP
+============================================================ */
+
+function loop(now){
+
+    const dt =
+        Math.min(
+            (now-lastTime)/1000,
+            .033
+        );
+
+    lastTime=now;
+
+
+    update(dt);
+
+    draw();
+
+
+    requestAnimationFrame(
+        loop
+    );
+}
+
+
+/* ============================================================
+   INICIAR
+============================================================ */
+
+updateHUD();
+
+requestAnimationFrame(
+    loop
+);
+
+&lt;/script&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2026 Jhoel Alejandro Mauricio Flores Vargas. Todos los derechos reservados.</p>
+    </footer>
+    <script>
+        function toggleMenu() {
+            const menu = document.querySelector('.menu');
+            menu.classList.toggle('menu-open');
+        }
+    </script>
+</body>
+
+</html>

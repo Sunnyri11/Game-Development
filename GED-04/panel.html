@@ -1,0 +1,3051 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juegos</title>
+    <link rel="stylesheet" href="../estilosProyectos.css">
+</head>
+
+<body>
+
+    <header>
+        <nav>
+            <h1 class="logo">Portafolio</h1>
+            <ul class="menu">
+                <li><a href="../Portafolio.html">Inicio</a></li>
+                <li><a href="../Portafolio.html#proyectos">Proyectos</a></li>
+            </ul>
+            <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="banner-proyecto">
+            <h1>Guardianes del Agua</h1>
+        </div>
+        <div class="contenedor-proyecto">
+            <div class="video-proyecto">
+                <img src="../Images/Guardianes_del_Agua.png">
+                </img>
+
+            </div>
+
+            <!-- DESCRIPCIÓN DEL PROYECTO -->
+            <div class="descripcion-proyecto">
+                <h2>Descripción</h2>
+                <p>
+                    La jugadora recorre diferentes zonas de la ciudad, encuentra problemas relacionados con el agua y
+                    debe decidir cómo solucionarlos utilizando recursos limitados. Las decisiones modifican el estado de
+                    cada zona.
+                </p>
+            </div>
+        </div>
+
+        <!-- DESARROLLO DEL PROYECTO -->
+        <div class="desarrollo-proyecto">
+            <h2>Desarrollo</h2>
+            <ul>
+                <li><strong>Plataforma:</strong> HTML, CSS y JavaScript</li>
+                <li><strong>Lenguaje:</strong>JavaScript</li>
+                <li><strong>Gráficos:</strong> CSS</li>
+                <li><strong>Objetivo:</strong> Deberas completar todos los minijuegos de la zona para salvarla y asi
+                    desbloquear la siguiente. Se necesita de tu ayuda para salvar el mundo</li>
+            </ul>
+            <br>
+            <a id="botonjuego" target="_blank" href="Guardianes del Agua.html">EMPIEZA A JUGAR!!!!!!!</a>
+        </div>
+
+
+
+        <!-- CÓDIGO DEL PROYECTO -->
+        <section class="codigo-proyecto">
+            <h2>Código del Proyecto</h2>
+            <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;es&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+
+&lt;title&gt;Life-Jump 🍎&lt;/title&gt;
+
+&lt;style&gt;
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+html,
+body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+    background:#72d8ff;
+}
+
+#game{
+    position:fixed;
+    inset:0;
+
+    width:100vw;
+    height:100vh;
+
+    display:block;
+}
+
+
+/* =====================================================
+   HUD
+===================================================== */
+
+#hud{
+    position:fixed;
+
+    top:16px;
+    left:16px;
+    right:16px;
+
+    z-index:20;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+
+    pointer-events:none;
+}
+
+.hudLeft{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.panel{
+    padding:11px 16px;
+
+    min-width:130px;
+
+    border-radius:17px;
+
+    color:white;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(31,61,71,.94),
+            rgba(21,44,52,.86)
+        );
+
+    border:1px solid
+        rgba(255,255,255,.18);
+
+    box-shadow:
+        0 10px 30px
+        rgba(0,0,0,.18),
+
+        inset 0 1px 0
+        rgba(255,255,255,.12);
+
+    backdrop-filter:blur(12px);
+}
+
+.label{
+    color:#c9e6e9;
+
+    font-size:10px;
+
+    font-weight:900;
+
+    letter-spacing:1.4px;
+
+    text-transform:uppercase;
+}
+
+.value{
+    margin-top:3px;
+
+    font-size:22px;
+
+    font-weight:950;
+}
+
+#energyPanel{
+    width:230px;
+}
+
+.energyBar{
+    height:12px;
+
+    margin-top:7px;
+
+    overflow:hidden;
+
+    border-radius:100px;
+
+    background:#10252c;
+
+    border:1px solid
+        rgba(255,255,255,.1);
+}
+
+#energyFill{
+    width:100%;
+    height:100%;
+
+    border-radius:100px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #48e087,
+            #b8f15c
+        );
+
+    transition:
+        width .2s,
+        background .2s;
+}
+
+#controls{
+    position:fixed;
+
+    left:50%;
+    bottom:15px;
+
+    z-index:20;
+
+    transform:
+        translateX(-50%);
+
+    padding:9px 17px;
+
+    border-radius:100px;
+
+    color:white;
+
+    background:
+        rgba(21,46,53,.72);
+
+    border:1px solid
+        rgba(255,255,255,.15);
+
+    backdrop-filter:blur(10px);
+
+    font-size:13px;
+
+    font-weight:800;
+
+    pointer-events:none;
+}
+
+
+/* =====================================================
+   MENSAJE
+===================================================== */
+
+#message{
+    position:fixed;
+
+    z-index:60;
+
+    left:50%;
+    top:48%;
+
+    width:min(
+        440px,
+        calc(100vw - 30px)
+    );
+
+    padding:20px 25px;
+
+    transform:
+        translate(-50%,-50%)
+        scale(.85);
+
+    opacity:0;
+
+    text-align:center;
+
+    color:white;
+
+    border-radius:23px;
+
+    background:
+        rgba(18,40,47,.97);
+
+    border:2px solid
+        rgba(255,255,255,.12);
+
+    box-shadow:
+        0 25px 70px
+        rgba(0,0,0,.35);
+
+    pointer-events:none;
+}
+
+#message.show{
+    animation:
+        messageAnimation
+        2.1s ease forwards;
+}
+
+@keyframes messageAnimation{
+
+    0%{
+        opacity:0;
+
+        transform:
+            translate(-50%,-50%)
+            scale(.8);
+    }
+
+    12%{
+        opacity:1;
+
+        transform:
+            translate(-50%,-50%)
+            scale(1);
+    }
+
+    78%{
+        opacity:1;
+
+        transform:
+            translate(-50%,-50%)
+            scale(1);
+    }
+
+    100%{
+        opacity:0;
+
+        transform:
+            translate(-50%,-50%)
+            scale(.94);
+    }
+}
+
+.messageIcon{
+    font-size:44px;
+}
+
+.messageTitle{
+    margin-top:5px;
+
+    font-size:24px;
+
+    font-weight:950;
+}
+
+.messageText{
+    margin-top:5px;
+
+    color:#c7d9dc;
+
+    line-height:1.4;
+
+    font-size:14px;
+}
+
+
+/* =====================================================
+   PANTALLA FINAL
+===================================================== */
+
+#endScreen{
+    position:fixed;
+
+    inset:0;
+
+    z-index:100;
+
+    display:none;
+
+    justify-content:center;
+    align-items:center;
+
+    background:
+        rgba(7,25,31,.68);
+
+    backdrop-filter:blur(8px);
+}
+
+#endScreen.show{
+    display:flex;
+}
+
+.endCard{
+    width:min(
+        500px,
+        calc(100vw - 30px)
+    );
+
+    padding:35px;
+
+    text-align:center;
+
+    color:white;
+
+    border-radius:30px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #25464e,
+            #122b33
+        );
+
+    border:1px solid
+        rgba(255,255,255,.16);
+
+    box-shadow:
+        0 30px 90px
+        rgba(0,0,0,.5);
+}
+
+.endIcon{
+    font-size:70px;
+}
+
+.endCard h1{
+    margin-top:8px;
+
+    font-size:34px;
+}
+
+.endCard p{
+    margin-top:10px;
+
+    color:#c4d9dc;
+
+    line-height:1.5;
+}
+
+.restart{
+    margin-top:25px;
+
+    padding:14px 30px;
+
+    border:0;
+
+    border-radius:15px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #8cf05c,
+            #48d88b
+        );
+
+    color:#15342a;
+
+    font-size:16px;
+
+    font-weight:950;
+
+    cursor:pointer;
+
+    box-shadow:
+        0 8px 25px
+        rgba(55,210,110,.25);
+
+    transition:
+        transform .15s,
+        filter .15s;
+}
+
+.restart:hover{
+    transform:translateY(-3px);
+
+    filter:brightness(1.07);
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media(max-width:650px){
+
+    #hud{
+        top:8px;
+        left:8px;
+        right:8px;
+    }
+
+    .panel{
+        padding:8px 11px;
+
+        min-width:100px;
+    }
+
+    .value{
+        font-size:17px;
+    }
+
+    #energyPanel{
+        width:165px;
+    }
+
+    #controls{
+        bottom:8px;
+
+        font-size:10px;
+    }
+}
+
+&lt;/style&gt;
+&lt;/head&gt;
+
+
+&lt;body&gt;
+
+
+&lt;canvas id=&quot;game&quot;&gt;&lt;/canvas&gt;
+
+
+&lt;!-- =====================================================
+     HUD
+===================================================== --&gt;
+
+&lt;div id=&quot;hud&quot;&gt;
+
+    &lt;div class=&quot;hudLeft&quot;&gt;
+
+        &lt;div class=&quot;panel&quot;&gt;
+
+            &lt;div class=&quot;label&quot;&gt;
+                ⏱️ Tiempo
+            &lt;/div&gt;
+
+            &lt;div class=&quot;value&quot;&gt;
+                &lt;span id=&quot;timer&quot;&gt;
+                    60
+                &lt;/span&gt;s
+            &lt;/div&gt;
+
+        &lt;/div&gt;
+
+
+        &lt;div class=&quot;panel&quot;&gt;
+
+            &lt;div class=&quot;label&quot;&gt;
+                🍎 Salud
+            &lt;/div&gt;
+
+            &lt;div class=&quot;value&quot;&gt;
+                &lt;span id=&quot;healthyCount&quot;&gt;
+                    0
+                &lt;/span&gt;
+            &lt;/div&gt;
+
+        &lt;/div&gt;
+
+    &lt;/div&gt;
+
+
+    &lt;div
+        class=&quot;panel&quot;
+        id=&quot;energyPanel&quot;
+    &gt;
+
+        &lt;div class=&quot;label&quot;&gt;
+            ⚡ Energía
+        &lt;/div&gt;
+
+        &lt;div class=&quot;value&quot;&gt;
+            &lt;span id=&quot;energyText&quot;&gt;
+                70
+            &lt;/span&gt;%
+        &lt;/div&gt;
+
+        &lt;div class=&quot;energyBar&quot;&gt;
+
+            &lt;div
+                id=&quot;energyFill&quot;
+            &gt;&lt;/div&gt;
+
+        &lt;/div&gt;
+
+    &lt;/div&gt;
+
+&lt;/div&gt;
+
+
+&lt;div id=&quot;controls&quot;&gt;
+    A / D o ← / → para moverte · ESPACIO para saltar
+&lt;/div&gt;
+
+
+&lt;!-- =====================================================
+     MENSAJE
+===================================================== --&gt;
+
+&lt;div id=&quot;message&quot;&gt;
+
+    &lt;div
+        class=&quot;messageIcon&quot;
+        id=&quot;messageIcon&quot;
+    &gt;
+        🍎
+    &lt;/div&gt;
+
+    &lt;div
+        class=&quot;messageTitle&quot;
+        id=&quot;messageTitle&quot;
+    &gt;
+        ¡Muy bien!
+    &lt;/div&gt;
+
+    &lt;div
+        class=&quot;messageText&quot;
+        id=&quot;messageText&quot;
+    &gt;
+        ¡Elegiste una opción saludable!
+    &lt;/div&gt;
+
+&lt;/div&gt;
+
+
+&lt;!-- =====================================================
+     FINAL
+===================================================== --&gt;
+
+&lt;div id=&quot;endScreen&quot;&gt;
+
+    &lt;div class=&quot;endCard&quot;&gt;
+
+        &lt;div
+            class=&quot;endIcon&quot;
+            id=&quot;endIcon&quot;
+        &gt;
+            🏆
+        &lt;/div&gt;
+
+        &lt;h1 id=&quot;endTitle&quot;&gt;
+            ¡Lo lograste!
+        &lt;/h1&gt;
+
+        &lt;p id=&quot;endText&quot;&gt;
+            Lograste mantenerte en las
+            plataformas durante todo el tiempo.
+        &lt;/p&gt;
+
+        &lt;button
+            class=&quot;restart&quot;
+            onclick=&quot;restartGame()&quot;
+        &gt;
+            🔄 Jugar nuevamente
+        &lt;/button&gt;
+
+    &lt;/div&gt;
+
+&lt;/div&gt;
+
+
+&lt;script&gt;
+
+/* =========================================================
+   CANVAS
+========================================================= */
+
+const canvas =
+    document.getElementById(
+        &quot;game&quot;
+    );
+
+const ctx =
+    canvas.getContext(
+        &quot;2d&quot;
+    );
+
+
+let W =
+    window.innerWidth;
+
+let H =
+    window.innerHeight;
+
+let DPR =
+    Math.min(
+        window.devicePixelRatio || 1,
+        2
+    );
+
+
+function resize(){
+
+    W =
+        window.innerWidth;
+
+    H =
+        window.innerHeight;
+
+    DPR =
+        Math.min(
+            window.devicePixelRatio || 1,
+            2
+        );
+
+
+    canvas.width =
+        W * DPR;
+
+    canvas.height =
+        H * DPR;
+
+    canvas.style.width =
+        W + &quot;px&quot;;
+
+    canvas.style.height =
+        H + &quot;px&quot;;
+
+
+    ctx.setTransform(
+        DPR,
+        0,
+        0,
+        DPR,
+        0,
+        0
+    );
+}
+
+
+window.addEventListener(
+    &quot;resize&quot;,
+    resize
+);
+
+resize();
+
+
+/* =========================================================
+   ESTADO
+========================================================= */
+
+let gameRunning = true;
+
+let timer = 60;
+
+let energy = 70;
+
+let healthyCount = 0;
+
+let cameraX = 0;
+
+let lastTime =
+    performance.now();
+
+
+const player = {
+
+    x:180,
+
+    y:300,
+
+    width:42,
+
+    height:58,
+
+    vx:0,
+
+    vy:0,
+
+    speed:360,
+
+    jumpPower:710,
+
+    onGround:false,
+
+    coyote:0,
+
+    jumpPressed:false
+
+};
+
+
+const keys = {
+
+    left:false,
+
+    right:false,
+
+    jump:false
+
+};
+
+
+/* =========================================================
+   MUNDO
+========================================================= */
+
+const worldWidth = 7600;
+
+
+/* =========================================================
+   PLATAFORMAS
+
+   Se generan manualmente para que
+   el recorrido sea jugable.
+========================================================= */
+
+const platforms = [
+
+    {
+        x:0,
+        y:560,
+        w:500,
+        h:30
+    },
+
+    {
+        x:600,
+        y:490,
+        w:270,
+        h:30
+    },
+
+    {
+        x:950,
+        y:420,
+        w:260,
+        h:30
+    },
+
+    {
+        x:1280,
+        y:500,
+        w:330,
+        h:30
+    },
+
+    {
+        x:1700,
+        y:390,
+        w:240,
+        h:30
+    },
+
+    {
+        x:2030,
+        y:320,
+        w:270,
+        h:30
+    },
+
+    {
+        x:2390,
+        y:450,
+        w:320,
+        h:30
+    },
+
+    {
+        x:2820,
+        y:350,
+        w:230,
+        h:30
+    },
+
+    {
+        x:3150,
+        y:280,
+        w:280,
+        h:30
+    },
+
+    {
+        x:3530,
+        y:420,
+        w:300,
+        h:30
+    },
+
+    {
+        x:3930,
+        y:340,
+        w:250,
+        h:30
+    },
+
+    {
+        x:4270,
+        y:250,
+        w:300,
+        h:30
+    },
+
+    {
+        x:4670,
+        y:390,
+        w:300,
+        h:30
+    },
+
+    {
+        x:5080,
+        y:300,
+        w:250,
+        h:30
+    },
+
+    {
+        x:5440,
+        y:210,
+        w:300,
+        h:30
+    },
+
+    {
+        x:5840,
+        y:350,
+        w:290,
+        h:30
+    },
+
+    {
+        x:6230,
+        y:250,
+        w:300,
+        h:30
+    },
+
+    {
+        x:6640,
+        y:180,
+        w:330,
+        h:30
+    },
+
+    {
+        x:7090,
+        y:300,
+        w:390,
+        h:30
+    }
+
+];
+
+
+/* =========================================================
+   COMIDA
+========================================================= */
+
+const foods = [
+
+    {
+        x:320,
+        platform:0,
+        type:&quot;healthy&quot;,
+        emoji:&quot;🍎&quot;,
+        name:&quot;Manzana&quot;
+    },
+
+    {
+        x:730,
+        platform:1,
+        type:&quot;healthy&quot;,
+        emoji:&quot;🍌&quot;,
+        name:&quot;Plátano&quot;
+    },
+
+    {
+        x:1030,
+        platform:2,
+        type:&quot;junk&quot;,
+        emoji:&quot;🍔&quot;,
+        name:&quot;Hamburguesa&quot;
+    },
+
+    {
+        x:1430,
+        platform:3,
+        type:&quot;healthy&quot;,
+        emoji:&quot;🥕&quot;,
+        name:&quot;Zanahoria&quot;
+    },
+
+    {
+        x:1800,
+        platform:4,
+        type:&quot;junk&quot;,
+        emoji:&quot;🍟&quot;,
+        name:&quot;Papas fritas&quot;
+    },
+
+    {
+        x:2130,
+        platform:5,
+        type:&quot;healthy&quot;,
+        emoji:&quot;🍓&quot;,
+        name:&quot;Fresas&quot;
+    },
+
+    {
+        x:2500,
+        platform:6,
+        type:&quot;junk&quot;,
+        emoji:&quot;🍩&quot;,
+        name:&quot;Dona&quot;
+    },
+
+    {
+        x:2880,
+        platform:7,
+        type:&quot;healthy&quot;,
+        emoji:&quot;🥦&quot;,
+        name:&quot;Brócoli&quot;
+    },
+
+    {
+        x:3260,
+        platform:8,
+        type:&quot;healthy&quot;,
+        emoji:&quot;🍊&quot;,
+        name:&quot;Naranja&quot;
+    },
+
+    {
+        x:3650,
+        platform:9,
+        type:&quot;junk&quot;,
+        emoji:&quot;🍕&quot;,
+        name:&quot;Pizza&quot;
+    },
+
+    {
+        x:4020,
+        platform:10,
+        type:&quot;healthy&quot;,
+        emoji:&quot;🥝&quot;,
+        name:&quot;Kiwi&quot;
+    },
+
+    {
+        x:4380,
+        platform:11,
+        type:&quot;junk&quot;,
+        emoji:&quot;🍫&quot;,
+        name:&quot;Chocolate&quot;
+    },
+
+    {
+        x:4800,
+        platform:12,
+        type:&quot;healthy&quot;,
+        emoji:&quot;🍉&quot;,
+        name:&quot;Sandía&quot;
+    },
+
+    {
+        x:5160,
+        platform:13,
+        type:&quot;junk&quot;,
+        emoji:&quot;🌭&quot;,
+        name:&quot;Hot dog&quot;
+    },
+
+    {
+        x:5550,
+        platform:14,
+        type:&quot;healthy&quot;,
+        emoji:&quot;🍐&quot;,
+        name:&quot;Pera&quot;
+    },
+
+    {
+        x:5940,
+        platform:15,
+        type:&quot;junk&quot;,
+        emoji:&quot;🍬&quot;,
+        name:&quot;Caramelo&quot;
+    },
+
+    {
+        x:6350,
+        platform:16,
+        type:&quot;healthy&quot;,
+        emoji:&quot;🍇&quot;,
+        name:&quot;Uvas&quot;
+    },
+
+    {
+        x:6780,
+        platform:17,
+        type:&quot;healthy&quot;,
+        emoji:&quot;🥑&quot;,
+        name:&quot;Aguacate&quot;
+    },
+
+    {
+        x:7220,
+        platform:18,
+        type:&quot;healthy&quot;,
+        emoji:&quot;🍍&quot;,
+        name:&quot;Piña&quot;
+    }
+
+];
+
+
+foods.forEach(
+    food =&gt; {
+
+        food.collected=false;
+
+    }
+);
+
+
+/* =========================================================
+   PARTÍCULAS
+========================================================= */
+
+let particles = [];
+
+
+function createParticles(
+    x,
+    y,
+    color
+){
+
+    for(
+        let i=0;
+        i&lt;16;
+        i++
+    ){
+
+        particles.push({
+
+            x:x,
+
+            y:y,
+
+            vx:
+                (Math.random()-.5)
+                *180,
+
+            vy:
+                -Math.random()
+                *220,
+
+            life:1,
+
+            size:
+                3+
+                Math.random()*5,
+
+            color:color
+
+        });
+
+    }
+}
+
+
+function updateParticles(dt){
+
+    particles.forEach(
+        p =&gt; {
+
+            p.x +=
+                p.vx*dt;
+
+            p.y +=
+                p.vy*dt;
+
+            p.vy +=
+                420*dt;
+
+            p.life -=
+                dt*1.7;
+
+        }
+    );
+
+
+    particles =
+        particles.filter(
+            p =&gt;
+                p.life &gt; 0
+        );
+}
+
+
+function drawParticles(){
+
+    particles.forEach(
+        p =&gt; {
+
+            ctx.globalAlpha =
+                Math.max(
+                    0,
+                    p.life
+                );
+
+            ctx.fillStyle =
+                p.color;
+
+            ctx.beginPath();
+
+            ctx.arc(
+                p.x-cameraX,
+                p.y,
+                p.size,
+                0,
+                Math.PI*2
+            );
+
+            ctx.fill();
+
+        }
+    );
+
+    ctx.globalAlpha=1;
+}
+
+
+/* =========================================================
+   CIELO
+========================================================= */
+
+function drawSky(){
+
+    const gradient =
+        ctx.createLinearGradient(
+            0,
+            0,
+            0,
+            H
+        );
+
+    gradient.addColorStop(
+        0,
+        &quot;#63cfff&quot;
+    );
+
+    gradient.addColorStop(
+        .45,
+        &quot;#9ce8ff&quot;
+    );
+
+    gradient.addColorStop(
+        1,
+        &quot;#e7f9c4&quot;
+    );
+
+
+    ctx.fillStyle =
+        gradient;
+
+    ctx.fillRect(
+        0,
+        0,
+        W,
+        H
+    );
+}
+
+
+/* =========================================================
+   SOL
+========================================================= */
+
+function drawSun(){
+
+    const x =
+        W*.78;
+
+    const y =
+        H*.18;
+
+
+    const glow =
+        ctx.createRadialGradient(
+            x,
+            y,
+            10,
+            x,
+            y,
+            130
+        );
+
+    glow.addColorStop(
+        0,
+        &quot;rgba(255,250,170,.8)&quot;
+    );
+
+    glow.addColorStop(
+        .45,
+        &quot;rgba(255,230,100,.25)&quot;
+    );
+
+    glow.addColorStop(
+        1,
+        &quot;rgba(255,220,100,0)&quot;
+    );
+
+
+    ctx.fillStyle =
+        glow;
+
+    ctx.fillRect(
+        x-130,
+        y-130,
+        260,
+        260
+    );
+
+
+    ctx.fillStyle =
+        &quot;#fff1a8&quot;;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        x,
+        y,
+        40,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+}
+
+
+/* =========================================================
+   NUBES
+========================================================= */
+
+function cloud(
+    x,
+    y,
+    s
+){
+
+    ctx.save();
+
+    ctx.fillStyle =
+        &quot;rgba(255,255,255,.72)&quot;;
+
+
+    ctx.beginPath();
+
+    ctx.arc(
+        x,
+        y,
+        27*s,
+        0,
+        Math.PI*2
+    );
+
+    ctx.arc(
+        x+32*s,
+        y-13*s,
+        34*s,
+        0,
+        Math.PI*2
+    );
+
+    ctx.arc(
+        x+68*s,
+        y,
+        25*s,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+    ctx.fillRect(
+        x-5*s,
+        y,
+        78*s,
+        24*s
+    );
+
+    ctx.restore();
+}
+
+
+function drawClouds(){
+
+    cloud(
+        100-cameraX*.08,
+        120,
+        1
+    );
+
+    cloud(
+        430-cameraX*.05,
+        190,
+        .65
+    );
+
+    cloud(
+        850-cameraX*.08,
+        95,
+        .8
+    );
+
+    cloud(
+        1350-cameraX*.05,
+        155,
+        .7
+    );
+
+    cloud(
+        1850-cameraX*.04,
+        100,
+        1
+    );
+}
+
+
+/* =========================================================
+   MONTAÑAS
+========================================================= */
+
+function drawMountains(){
+
+    /*
+        Montañas lejanas.
+    */
+
+    ctx.fillStyle =
+        &quot;#80b9ad&quot;;
+
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        0,
+        H*.65
+    );
+
+
+    const points = [
+
+        [0,.57],
+        [.08,.43],
+        [.18,.55],
+        [.27,.37],
+        [.38,.56],
+        [.50,.40],
+        [.61,.55],
+        [.72,.35],
+        [.84,.55],
+        [.93,.40],
+        [1,.52]
+
+    ];
+
+
+    points.forEach(
+        p =&gt; {
+
+            ctx.lineTo(
+                W*p[0],
+                H*p[1]
+            );
+
+        }
+    );
+
+
+    ctx.lineTo(
+        W,
+        H
+    );
+
+    ctx.lineTo(
+        0,
+        H
+    );
+
+    ctx.closePath();
+
+    ctx.fill();
+
+
+    /*
+        Montaña cercana.
+    */
+
+    ctx.fillStyle =
+        &quot;#4c9674&quot;;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        0,
+        H*.76
+    );
+
+
+    const closePoints = [
+
+        [0,.64],
+        [.12,.51],
+        [.23,.68],
+        [.34,.48],
+        [.46,.67],
+        [.58,.51],
+        [.71,.69],
+        [.84,.48],
+        [.94,.66],
+        [1,.53]
+
+    ];
+
+
+    closePoints.forEach(
+        p =&gt; {
+
+            ctx.lineTo(
+                W*p[0],
+                H*p[1]
+            );
+
+        }
+    );
+
+
+    ctx.lineTo(
+        W,
+        H
+    );
+
+    ctx.lineTo(
+        0,
+        H
+    );
+
+    ctx.closePath();
+
+    ctx.fill();
+}
+
+
+/* =========================================================
+   PLATAFORMAS
+========================================================= */
+
+function drawPlatform(
+    p
+){
+
+    const x =
+        p.x -
+        cameraX;
+
+    const y =
+        p.y;
+
+
+    if(
+        x+p.w &lt; -50 ||
+        x &gt; W+50
+    )
+        return;
+
+
+    /*
+        Sombra.
+    */
+
+    ctx.fillStyle =
+        &quot;rgba(20,70,60,.18)&quot;;
+
+    ctx.fillRect(
+        x+8,
+        y+10,
+        p.w,
+        p.h
+    );
+
+
+    /*
+        Parte inferior.
+    */
+
+    const body =
+        ctx.createLinearGradient(
+            0,
+            y,
+            0,
+            y+p.h
+        );
+
+    body.addColorStop(
+        0,
+        &quot;#50ba73&quot;
+    );
+
+    body.addColorStop(
+        1,
+        &quot;#218151&quot;
+    );
+
+    ctx.fillStyle =
+        body;
+
+
+    ctx.beginPath();
+
+    ctx.roundRect(
+        x,
+        y,
+        p.w,
+        p.h,
+        9
+    );
+
+    ctx.fill();
+
+
+    /*
+        Superficie.
+    */
+
+    ctx.fillStyle =
+        &quot;#a6e86a&quot;;
+
+    ctx.beginPath();
+
+    ctx.roundRect(
+        x,
+        y-6,
+        p.w,
+        12,
+        6
+    );
+
+    ctx.fill();
+
+
+    /*
+        Detalles.
+    */
+
+    ctx.fillStyle =
+        &quot;rgba(255,255,255,.22)&quot;;
+
+    for(
+        let i=20;
+        i&lt;p.w;
+        i+=45
+    ){
+
+        ctx.beginPath();
+
+        ctx.arc(
+            x+i,
+            y+17,
+            3,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fill();
+    }
+}
+
+
+/* =========================================================
+   COMIDA
+========================================================= */
+
+function drawFood(
+    food
+){
+
+    if(food.collected)
+        return;
+
+
+    const p =
+        platforms[
+            food.platform
+        ];
+
+
+    const x =
+        food.x -
+        cameraX;
+
+
+    const y =
+        p.y-47;
+
+
+    if(
+        x &lt; -80 ||
+        x &gt; W+80
+    )
+        return;
+
+
+    /*
+        Aura.
+    */
+
+    const color =
+        food.type ===
+        &quot;healthy&quot;
+        ? &quot;rgba(93,235,130,.24)&quot;
+        : &quot;rgba(255,115,80,.22)&quot;;
+
+
+    const glow =
+        ctx.createRadialGradient(
+            x,
+            y,
+            3,
+            x,
+            y,
+            34
+        );
+
+    glow.addColorStop(
+        0,
+        color
+    );
+
+    glow.addColorStop(
+        1,
+        &quot;rgba(255,255,255,0)&quot;
+    );
+
+    ctx.fillStyle =
+        glow;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        x,
+        y,
+        34,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    /*
+        Círculo.
+    */
+
+    ctx.fillStyle =
+        food.type ===
+        &quot;healthy&quot;
+        ? &quot;#dfffe6&quot;
+        : &quot;#fff0df&quot;;
+
+
+    ctx.beginPath();
+
+    ctx.arc(
+        x,
+        y,
+        25,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    ctx.strokeStyle =
+        food.type ===
+        &quot;healthy&quot;
+        ? &quot;#5bd47c&quot;
+        : &quot;#ff8c56&quot;;
+
+    ctx.lineWidth=3;
+
+    ctx.stroke();
+
+
+    /*
+        Emoji.
+    */
+
+    ctx.font =
+        &quot;30px Arial&quot;;
+
+    ctx.textAlign =
+        &quot;center&quot;;
+
+    ctx.textBaseline =
+        &quot;middle&quot;;
+
+    ctx.fillText(
+        food.emoji,
+        x,
+        y
+    );
+
+
+    /*
+        Flecha / indicador.
+    */
+
+    ctx.font =
+        &quot;bold 11px Arial&quot;;
+
+    ctx.fillStyle =
+        food.type ===
+        &quot;healthy&quot;
+        ? &quot;#159447&quot;
+        : &quot;#d95327&quot;;
+
+
+    ctx.fillText(
+        food.type ===
+        &quot;healthy&quot;
+        ? &quot;+ ENERGÍA&quot;
+        : &quot;- ENERGÍA&quot;,
+        x,
+        y-39
+    );
+}
+
+
+/* =========================================================
+   JUGADOR
+========================================================= */
+
+function drawPlayer(){
+
+    const x =
+        player.x -
+        cameraX;
+
+    const y =
+        player.y;
+
+
+    ctx.save();
+
+    ctx.translate(
+        x,
+        y
+    );
+
+
+    /*
+        Sombra.
+    */
+
+    ctx.fillStyle =
+        &quot;rgba(0,0,0,.18)&quot;;
+
+    ctx.beginPath();
+
+    ctx.ellipse(
+        0,
+        player.height/2+5,
+        26,
+        7,
+        0,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    /*
+        Piernas.
+    */
+
+    ctx.strokeStyle =
+        &quot;#274c78&quot;;
+
+    ctx.lineWidth=8;
+
+    ctx.lineCap=&quot;round&quot;;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        -7,
+        14
+    );
+
+    ctx.lineTo(
+        -13,
+        34
+    );
+
+    ctx.lineTo(
+        -20,
+        39
+    );
+
+    ctx.stroke();
+
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        7,
+        14
+    );
+
+    ctx.lineTo(
+        13,
+        34
+    );
+
+    ctx.lineTo(
+        22,
+        38
+    );
+
+    ctx.stroke();
+
+
+    /*
+        Zapatos.
+    */
+
+    ctx.fillStyle =
+        &quot;#f3a33d&quot;;
+
+    ctx.beginPath();
+
+    ctx.ellipse(
+        -22,
+        40,
+        12,
+        6,
+        -.1,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+    ctx.beginPath();
+
+    ctx.ellipse(
+        22,
+        40,
+        12,
+        6,
+        .1,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    /*
+        Cuerpo.
+    */
+
+    const shirt =
+        ctx.createLinearGradient(
+            -20,
+            -5,
+            20,
+            25
+        );
+
+    shirt.addColorStop(
+        0,
+        &quot;#ff6c73&quot;
+    );
+
+    shirt.addColorStop(
+        1,
+        &quot;#e94060&quot;
+    );
+
+    ctx.fillStyle =
+        shirt;
+
+    ctx.beginPath();
+
+    ctx.roundRect(
+        -20,
+        -5,
+        40,
+        31,
+        11
+    );
+
+    ctx.fill();
+
+
+    /*
+        Corazón.
+    */
+
+    ctx.fillStyle =
+        &quot;#fff&quot;;
+
+    ctx.font =
+        &quot;14px Arial&quot;;
+
+    ctx.textAlign =
+        &quot;center&quot;;
+
+    ctx.fillText(
+        &quot;♥&quot;,
+        0,
+        14
+    );
+
+
+    /*
+        Brazos.
+    */
+
+    ctx.strokeStyle =
+        &quot;#f2b18d&quot;;
+
+    ctx.lineWidth=7;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        -17,
+        1
+    );
+
+    ctx.lineTo(
+        -27,
+        18
+    );
+
+    ctx.stroke();
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        17,
+        1
+    );
+
+    ctx.lineTo(
+        27,
+        18
+    );
+
+    ctx.stroke();
+
+
+    /*
+        Cuello.
+    */
+
+    ctx.fillStyle =
+        &quot;#e8a57f&quot;;
+
+    ctx.fillRect(
+        -6,
+        -12,
+        12,
+        9
+    );
+
+
+    /*
+        Cabeza.
+    */
+
+    ctx.fillStyle =
+        &quot;#f1b18c&quot;;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        0,
+        -27,
+        19,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    /*
+        Pelo.
+    */
+
+    ctx.fillStyle =
+        &quot;#6b3d2b&quot;;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        0,
+        -34,
+        20,
+        Math.PI,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    /*
+        Ojos.
+    */
+
+    ctx.fillStyle =
+        &quot;#263238&quot;;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        -7,
+        -27,
+        2.5,
+        0,
+        Math.PI*2
+    );
+
+    ctx.arc(
+        7,
+        -27,
+        2.5,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    /*
+        Sonrisa.
+    */
+
+    ctx.strokeStyle =
+        &quot;#a84c52&quot;;
+
+    ctx.lineWidth=2;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        0,
+        -24,
+        7,
+        0,
+        Math.PI
+    );
+
+    ctx.stroke();
+
+
+    ctx.restore();
+}
+
+
+/* =========================================================
+   CÁMARA
+========================================================= */
+
+function updateCamera(){
+
+    const target =
+        player.x -
+        W*.32;
+
+
+    cameraX +=
+        (
+            target -
+            cameraX
+        ) * .08;
+
+
+    cameraX =
+        Math.max(
+            0,
+            Math.min(
+                cameraX,
+                worldWidth-W
+            )
+        );
+}
+
+
+/* =========================================================
+   COLISIÓN CON PLATAFORMAS
+========================================================= */
+
+function checkPlatformCollision(
+    oldY
+){
+
+    player.onGround=false;
+
+
+    for(
+        const p of platforms
+    ){
+
+        const playerBottom =
+            player.y +
+            player.height/2;
+
+
+        const oldBottom =
+            oldY +
+            player.height/2;
+
+
+        const horizontal =
+            player.x +
+            player.width/2 &gt;
+            p.x &amp;&amp;
+
+            player.x -
+            player.width/2 &lt;
+            p.x+p.w;
+
+
+        const crossing =
+            oldBottom &lt;= p.y &amp;&amp;
+            playerBottom &gt;= p.y;
+
+
+        if(
+            horizontal &amp;&amp;
+            crossing &amp;&amp;
+            player.vy &gt;= 0
+        ){
+
+            player.y =
+                p.y -
+                player.height/2;
+
+            player.vy=0;
+
+            player.onGround=true;
+
+            player.coyote=.12;
+
+            return;
+        }
+    }
+}
+
+
+/* =========================================================
+   RECOGER COMIDA
+========================================================= */
+
+function checkFood(){
+
+    for(
+        const food of foods
+    ){
+
+        if(food.collected)
+            continue;
+
+
+        const p =
+            platforms[
+                food.platform
+            ];
+
+
+        const fx =
+            food.x;
+
+        const fy =
+            p.y-47;
+
+
+        const dx =
+            player.x -
+            fx;
+
+        const dy =
+            player.y -
+            fy;
+
+
+        const distance =
+            Math.sqrt(
+                dx*dx+
+                dy*dy
+            );
+
+
+        if(
+            distance &lt; 55
+        ){
+
+            food.collected=true;
+
+
+            if(
+                food.type ===
+                &quot;healthy&quot;
+            ){
+
+                /*
+                    Comida saludable:
+                    aumenta energía.
+                */
+
+                energy =
+                    Math.min(
+                        100,
+                        energy+25
+                    );
+
+
+                /*
+                    Mejora el salto.
+                */
+
+                player.jumpPower =
+                    Math.min(
+                        900,
+                        player.jumpPower+35
+                    );
+
+
+                healthyCount++;
+
+
+                createParticles(
+                    fx,
+                    fy,
+                    &quot;#65e887&quot;
+                );
+
+
+                showMessage(
+                    &quot;🍎&quot;,
+                    &quot;¡Excelente elección!&quot;,
+                    food.name +
+                    &quot; te da energía y hace tus saltos más fuertes. 💪&quot;,
+                    true
+                );
+
+            }
+            else{
+
+                /*
+                    Comida chatarra:
+                    reduce energía.
+                */
+
+                energy =
+                    Math.max(
+                        5,
+                        energy-20
+                    );
+
+
+                /*
+                    Reduce salto.
+                */
+
+                player.jumpPower =
+                    Math.max(
+                        500,
+                        player.jumpPower-45
+                    );
+
+
+                createParticles(
+                    fx,
+                    fy,
+                    &quot;#ff795e&quot;
+                );
+
+
+                showMessage(
+                    &quot;🍔&quot;,
+                    &quot;¡Cuidado!&quot;,
+                    food.name +
+                    &quot; reduce tu energía y hace tus saltos más pequeños.&quot;,
+                    false
+                );
+            }
+
+
+            updateHUD();
+        }
+    }
+}
+
+
+/* =========================================================
+   INPUT
+========================================================= */
+
+window.addEventListener(
+    &quot;keydown&quot;,
+    e =&gt; {
+
+        const key =
+            e.key.toLowerCase();
+
+
+        if(
+            key === &quot;a&quot; ||
+            e.key === &quot;ArrowLeft&quot;
+        ){
+
+            keys.left=true;
+
+            e.preventDefault();
+        }
+
+
+        if(
+            key === &quot;d&quot; ||
+            e.key === &quot;ArrowRight&quot;
+        ){
+
+            keys.right=true;
+
+            e.preventDefault();
+        }
+
+
+        if(
+            e.code === &quot;Space&quot; ||
+            key === &quot;w&quot; ||
+            e.key === &quot;ArrowUp&quot;
+        ){
+
+            if(
+                !keys.jump &amp;&amp;
+                gameRunning
+            ){
+
+                jump();
+
+            }
+
+            keys.jump=true;
+
+            e.preventDefault();
+        }
+
+    }
+);
+
+
+window.addEventListener(
+    &quot;keyup&quot;,
+    e =&gt; {
+
+        const key =
+            e.key.toLowerCase();
+
+
+        if(
+            key === &quot;a&quot; ||
+            e.key === &quot;ArrowLeft&quot;
+        ){
+
+            keys.left=false;
+        }
+
+
+        if(
+            key === &quot;d&quot; ||
+            e.key === &quot;ArrowRight&quot;
+        ){
+
+            keys.right=false;
+        }
+
+
+        if(
+            e.code === &quot;Space&quot; ||
+            key === &quot;w&quot; ||
+            e.key === &quot;ArrowUp&quot;
+        ){
+
+            keys.jump=false;
+        }
+
+    }
+);
+
+
+/* =========================================================
+   SALTO
+========================================================= */
+
+function jump(){
+
+    if(
+        player.onGround ||
+        player.coyote &gt; 0
+    ){
+
+        player.vy =
+            -player.jumpPower;
+
+        player.onGround=false;
+
+        createParticles(
+            player.x,
+            player.y+25,
+            &quot;#ffffff&quot;
+        );
+    }
+}
+
+
+/* =========================================================
+   ACTUALIZAR JUEGO
+========================================================= */
+
+function update(
+    dt
+){
+
+    if(
+        !gameRunning
+    )
+        return;
+
+
+    /*
+        Temporizador.
+    */
+
+    timer -= dt;
+
+
+    if(
+        timer &lt;= 0
+    ){
+
+        timer=0;
+
+        winGame();
+
+        return;
+    }
+
+
+    /*
+        Movimiento horizontal.
+    */
+
+    if(keys.left){
+
+        player.vx =
+            -player.speed;
+
+    }
+    else if(keys.right){
+
+        player.vx =
+            player.speed;
+
+    }
+    else{
+
+        player.vx *=
+            Math.pow(
+                .0005,
+                dt
+            );
+    }
+
+
+    player.x +=
+        player.vx *
+        dt;
+
+
+    /*
+        Límites.
+    */
+
+    player.x =
+        Math.max(
+            20,
+            Math.min(
+                worldWidth-20,
+                player.x
+            )
+        );
+
+
+    /*
+        Gravedad.
+    */
+
+    const oldY =
+        player.y;
+
+
+    player.vy +=
+        1900 *
+        dt;
+
+
+    player.y +=
+        player.vy *
+        dt;
+
+
+    /*
+        Coyote time.
+    */
+
+    if(
+        !player.onGround
+    ){
+
+        player.coyote -=
+            dt;
+    }
+
+
+    checkPlatformCollision(
+        oldY
+    );
+
+
+    checkFood();
+
+
+    updateCamera();
+
+
+    updateParticles(
+        dt
+    );
+
+
+    /*
+        Si cae demasiado,
+        pierde.
+    */
+
+    if(
+        player.y &gt;
+        H+180
+    ){
+
+        loseGame();
+
+        return;
+    }
+
+
+    updateHUD();
+}
+
+
+/* =========================================================
+   HUD
+========================================================= */
+
+function updateHUD(){
+
+    document.getElementById(
+        &quot;timer&quot;
+    ).textContent =
+        Math.ceil(timer);
+
+
+    document.getElementById(
+        &quot;energyText&quot;
+    ).textContent =
+        Math.floor(energy);
+
+
+    document.getElementById(
+        &quot;healthyCount&quot;
+    ).textContent =
+        healthyCount;
+
+
+    const fill =
+        document.getElementById(
+            &quot;energyFill&quot;
+        );
+
+
+    fill.style.width =
+        energy+&quot;%&quot;;
+
+
+    if(
+        energy &lt;= 25
+    ){
+
+        fill.style.background =
+            &quot;linear-gradient(90deg,#ff4d5e,#ff814f)&quot;;
+
+    }
+    else if(
+        energy &lt;= 50
+    ){
+
+        fill.style.background =
+            &quot;linear-gradient(90deg,#ffb12b,#ffe04c)&quot;;
+
+    }
+    else{
+
+        fill.style.background =
+            &quot;linear-gradient(90deg,#48e087,#b8f15c)&quot;;
+    }
+}
+
+
+/* =========================================================
+   MENSAJE
+========================================================= */
+
+let messageTimer;
+
+
+function showMessage(
+    icon,
+    title,
+    text,
+    good
+){
+
+    const box =
+        document.getElementById(
+            &quot;message&quot;
+        );
+
+
+    document.getElementById(
+        &quot;messageIcon&quot;
+    ).textContent =
+        icon;
+
+
+    document.getElementById(
+        &quot;messageTitle&quot;
+    ).textContent =
+        title;
+
+
+    document.getElementById(
+        &quot;messageText&quot;
+    ).textContent =
+        text;
+
+
+    box.style.borderColor =
+        good
+        ? &quot;rgba(76,230,130,.55)&quot;
+        : &quot;rgba(255,100,80,.55)&quot;;
+
+
+    box.classList.remove(
+        &quot;show&quot;
+    );
+
+
+    void box.offsetWidth;
+
+
+    box.classList.add(
+        &quot;show&quot;
+    );
+
+
+    clearTimeout(
+        messageTimer
+    );
+
+
+    messageTimer =
+        setTimeout(
+            () =&gt; {
+
+                box.classList.remove(
+                    &quot;show&quot;
+                );
+
+            },
+            2100
+        );
+}
+
+
+/* =========================================================
+   GANAR
+========================================================= */
+
+function winGame(){
+
+    if(
+        !gameRunning
+    )
+        return;
+
+
+    gameRunning=false;
+
+
+    document.getElementById(
+        &quot;endIcon&quot;
+    ).textContent =
+        &quot;🏆&quot;;
+
+
+    document.getElementById(
+        &quot;endTitle&quot;
+    ).textContent =
+        &quot;¡Lo lograste!&quot;;
+
+
+    document.getElementById(
+        &quot;endText&quot;
+    ).textContent =
+        &quot;¡Excelente! Te mantuviste sobre &quot; +
+        &quot;las plataformas durante todo el tiempo. &quot; +
+        &quot;Elegiste &quot; +
+        healthyCount +
+        &quot; alimentos saludables. 🍎💪&quot;;
+
+
+    document.getElementById(
+        &quot;endScreen&quot;
+    ).classList.add(
+        &quot;show&quot;
+    );
+}
+
+
+/* =========================================================
+   PERDER
+========================================================= */
+
+function loseGame(){
+
+    if(
+        !gameRunning
+    )
+        return;
+
+
+    gameRunning=false;
+
+
+    document.getElementById(
+        &quot;endIcon&quot;
+    ).textContent =
+        &quot;😵&quot;;
+
+
+    document.getElementById(
+        &quot;endTitle&quot;
+    ).textContent =
+        &quot;¡Te caíste!&quot;;
+
+
+    document.getElementById(
+        &quot;endText&quot;
+    ).textContent =
+        &quot;No pasa nada. Intenta calcular mejor tus saltos y busca alimentos que te den energía. 🍎&quot;;
+
+
+    document.getElementById(
+        &quot;endScreen&quot;
+    ).classList.add(
+        &quot;show&quot;
+    );
+}
+
+
+/* =========================================================
+   REINICIAR
+========================================================= */
+
+function restartGame(){
+
+    gameRunning=true;
+
+    timer=60;
+
+    energy=70;
+
+    healthyCount=0;
+
+    cameraX=0;
+
+
+    player.x=180;
+
+    player.y=450;
+
+    player.vx=0;
+
+    player.vy=0;
+
+    player.jumpPower=710;
+
+    player.onGround=false;
+
+    player.coyote=0;
+
+
+    foods.forEach(
+        food =&gt; {
+
+            food.collected=false;
+
+        }
+    );
+
+
+    particles=[];
+
+
+    document.getElementById(
+        &quot;endScreen&quot;
+    ).classList.remove(
+        &quot;show&quot;
+    );
+
+
+    updateHUD();
+}
+
+
+/* =========================================================
+   DIBUJAR
+========================================================= */
+
+function draw(){
+
+    ctx.clearRect(
+        0,
+        0,
+        W,
+        H
+    );
+
+
+    drawSky();
+
+    drawSun();
+
+    drawClouds();
+
+    drawMountains();
+
+
+    /*
+        Plataformas.
+    */
+
+    platforms.forEach(
+        p =&gt; {
+
+            drawPlatform(p);
+
+        }
+    );
+
+
+    /*
+        Comida.
+    */
+
+    foods.forEach(
+        food =&gt; {
+
+            drawFood(food);
+
+        }
+    );
+
+
+    drawParticles();
+
+    drawPlayer();
+}
+
+
+/* =========================================================
+   LOOP
+========================================================= */
+
+function loop(
+    now
+){
+
+    const dt =
+        Math.min(
+            (now-lastTime)/1000,
+            .033
+        );
+
+
+    lastTime=now;
+
+
+    update(dt);
+
+    draw();
+
+
+    requestAnimationFrame(
+        loop
+    );
+}
+
+
+/* =========================================================
+   INICIAR
+========================================================= */
+
+updateHUD();
+
+requestAnimationFrame(
+    loop
+);
+
+&lt;/script&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2026 Jhoel Alejandro Mauricio Flores Vargas. Todos los derechos reservados.</p>
+    </footer>
+    <script>
+        function toggleMenu() {
+            const menu = document.querySelector('.menu');
+            menu.classList.toggle('menu-open');
+        }
+    </script>
+</body>
+
+</html>
